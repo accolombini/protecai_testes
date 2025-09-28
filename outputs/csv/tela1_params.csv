@@ -1,0 +1,339 @@
+Code,Description,Value
+00.01,Language,English
+00.02,Password,****
+00.04,Description,52-MP-20
+00.05,Plant Reference,204-MF-02_rev.0
+00.06,Model Number,P241311B2M0600J
+00.08,Serial Number,690927U
+00.09,Frequency,60 Hz
+00.0A,Comms Level,2
+00.0B,Relay Address,1
+00.0C,Plant Status,0000000000000010
+00.0D,Control Status,0000000000000000
+00.0E,Active Group,1
+00.10,CB Trip/Close,No Operation
+00.11,Software Ref. 1,P241 60C
+00.20,Opto I/P Status,00000001
+00.21,Relay O/P Status,0000000
+00.22,Alarm Status 1,10000000000000000000001000000100
+00.50,Alarm Status 1,10000000000000000000001000000100
+00.51,Alarm Status 2,00000000000000000000000000000000
+00.52,Alarm Status 3,00000000000000000000000000000000
+00.D0,Access Level,2
+00.D1,Password Control,2
+00.D2,Password Level 1,****
+00.D3,Password Level 2,****
+07.01,CB Control by,Disabled
+08.01,Date/Time,2019-08-15 11:57:01.636
+08.06,Battery Status,Healthy
+08.07,Battery Alarm,Enabled
+08.20,LocalTime Enable,Fixed
+08.21,LocalTime Offset,0 min
+08.22,DST Enable,Enabled
+08.23,DST Offset,60.00 min
+08.24,DST Start,Last
+08.25,DST Start Day,Sunday
+08.26,DST Start Month,March
+08.27,DST Start Mins,60.00 min
+08.28,DST End,Last
+08.29,DST End Day,Sunday
+08.2A,DST End Month,October
+08.2B,DST End Mins,60.00 min
+09.01,Restore Defaults,No Operation
+09.02,Setting Group,Select via Menu
+09.03,Active Settings,Group 1
+09.04,Save Changes,No Operation
+09.05,Copy From,Group 1
+09.06,Copy To,No Operation
+09.07,Setting Group 1,Enabled
+09.08,Setting Group 2,Disabled
+09.0B,Thermal Overload,Enabled
+09.0C,Short Circuit,Enabled
+09.0D,Sensitive E/F,Enabled
+09.0E,Neg Seq O/C,Enabled
+09.0F,3Ph Volt.Check,Disabled
+09.10,Derived E/F,Disabled
+09.11,Neg Seq O/V,Disabled
+09.14,Stall Detection,Enabled
+09.16,Residual O/V NVD,Disabled
+09.17,Limit nb Starts,Enabled
+09.18,Loss of Load,Disabled
+09.19,Out of Step,Disabled
+09.1A,Reverse power,Disabled
+09.1B,Antibackspin,Disabled
+09.1C,Field Failure,Disabled
+09.1D,Volt Protection,Enabled
+09.1E,Under Frequency,Disabled
+09.1F,RTD Inputs,Enabled
+09.20,CB Fail,Enabled
+09.21,Supervision,Disabled
+09.24,System Config,Invisible
+09.25,Input Labels,Visible
+09.26,Output Labels,Visible
+09.27,RTD Labels,Visible
+09.28,CT & VT Ratios,Visible
+09.29,Record Control,Invisible
+09.2A,Disturb Recorder,Visible
+09.2B,Measure't Setup,Visible
+09.2C,Comms Settings,Visible
+09.2D,Commission Tests,Visible
+09.2E,Setting Values,Primary
+09.2F,Control Inputs,Visible
+09.35,Ctrl I/P Config,Invisible
+09.36,Ctrl I/P Labels,Invisible
+09.39,Direct Access,Enabled
+09.FB,RP1 Read Only,Disabled
+0A.01,Main VT Primary,13.80 kV
+0A.02,Main VT Sec'y,120.0 V
+0A.07,Phase CT Primary,150.0 A
+0A.08,Phase CT Sec'y,5.000 A
+0A.0B,SEF CT Primary,50.00 A
+0A.0C,SEF CT Secondary,5.000 A
+0A.11,VT Connect. Mode,2 VT + Residual
+0A.12,NVD VT Primary,110.0 V
+0A.13,NVD VT Secondary,110.0 V
+0C.01,Duration,10.00 s
+0C.02,TriggerPosition,30.00 %
+0C.03,TriggerMode,Extended
+0C.04,AnalogChannel1,IN
+0C.05,AnalogChannel2,IN
+0C.06,AnalogChannel3,IN
+0C.07,AnalogChannel4,IA
+0C.08,AnalogChannel5,IB
+0C.09,AnalogChannel6,IC
+0C.0A,AnalogChannel7,IN
+0C.0B,AnalogChannel8,IN
+0C.0C,DigitalInput1,Strt in Progress
+0C.0D,Input1Trigger,Trigger L/H
+0C.0E,DigitalInput2,Trip V<2
+0C.0F,Input2Trigger,Trigger L/H
+0C.10,DigitalInput3,Relay Label 03
+0C.11,Input3Trigger,Trigger L/H
+0C.12,DigitalInput4,Relay Label 04
+0C.13,Input4Trigger,No trigger
+0C.14,DigitalInput5,Relay Label 05
+0C.15,Input5Trigger,No trigger
+0C.16,DigitalInput6,Relay Label 06
+0C.17,Input6Trigger,No trigger
+0C.18,DigitalInput7,Relay Label 07
+0C.19,Input7Trigger,No trigger
+0C.1A,DigitalInput8,Unused
+0C.1C,DigitalInput9,Unused
+0C.1E,DigitalInput10,Unused
+0C.20,DigitalInput11,Unused
+0C.22,DigitalInput12,Unused
+0C.24,DigitalInput13,Unused
+0C.26,DigitalInput14,Unused
+0C.28,DigitalInput15,Unused
+0C.2A,DigitalInput16,Unused
+0C.2C,DigitalInput17,Unused
+0C.2E,DigitalInput18,Unused
+0C.30,DigitalInput19,Unused
+0C.32,DigitalInput20,Unused
+0C.34,DigitalInput21,Unused
+0C.36,DigitalInput22,Unused
+0C.38,DigitalInput23,Unused
+0C.3A,DigitalInput24,Unused
+0C.3C,DigitalInput25,Unused
+0C.3E,DigitalInput26,Unused
+0C.40,DigitalInput27,Unused
+0C.42,DigitalInput28,Unused
+0C.44,DigitalInput29,Unused
+0C.46,DigitalInput30,Unused
+0C.48,DigitalInput31,Unused
+0C.4A,DigitalInput32,Unused
+0D.01,Default Display,3Ph + N Current
+0D.02,Local Values,Primary
+0D.03,Remote Values,Primary
+0D.04,Measurement Ref,VA
+0D.06,Demand Interval,30.00 min
+0D.07,Alarm Fix Dem.,Invisible
+0D.0A,Alarm Energies,Invisible
+0D.0F,Motor Hour Run>1,Disabled
+0D.11,Motor Hour Run>2,Disabled
+0F.01,Opto I/P Status,00000001
+0F.02,Relay O/P Status,0000000
+0F.03,Test Port Status,00000000
+0F.04,LED Status,00000000
+0F.05,Monitor Bit 1,Relay Label 01
+0F.06,Monitor Bit 2,Relay Label 02
+0F.07,Monitor Bit 3,Relay Label 03
+0F.08,Monitor Bit 4,Relay Label 04
+0F.09,Monitor Bit 5,Relay Label 05
+0F.0A,Monitor Bit 6,Relay Label 06
+0F.0B,Monitor Bit 7,Relay Label 07
+0F.0C,Monitor Bit 8,Opto Label 01
+0F.0D,Test Mode,Disable
+0F.0E,Test Pattern,0000000
+0F.0F,Contact Test,No operation
+0F.10,Test LEDs,No operation
+0F.30,DDB 543 - 512,00000000000000000000000000000000
+0F.31,DDB 575 - 544,00000000000000000000000000000000
+0F.32,DDB 607 - 576,00000000000000000000000000000000
+0F.33,DDB 639 - 608,00000000000000000000000000000000
+0F.34,DDB 671 - 640,00000000000000000000000000000000
+0F.35,DDB 703 - 672,00000000000000000000000000000000
+0F.36,DDB 735 - 704,00000000000000000000000000000000
+0F.37,DDB 767 - 736,00000000000000000000000000000000
+0F.38,DDB 799 - 768,00000000000000000000000000000000
+0F.39,DDB 831 - 800,00000000000000000000000000000000
+0F.3A,DDB 863 - 832,00000000000000000000000000000000
+0F.3B,DDB 895 - 864,00000000000000000000000000000000
+0F.3C,DDB 927 - 896,00100000000000000000000000000000
+0F.3D,DDB 959 - 928,00000000000000000000000000000000
+0F.3E,DDB 991 - 960,00000000000000000000000000000000
+0F.3F,DDB 1023 - 992,00000000000000000000000000000000
+0F.40,DDB 1055 - 1024,00000000000000000000000000000000
+0F.41,DDB 1087 - 1056,00000000000000000000000000000000
+0F.42,DDB 1119 - 1088,00000000000000000000000000000000
+0F.43,DDB 1151 - 1120,00000000000000000000000000000000
+0F.44,DDB 1183 - 1152,00000000000000000000000000000000
+0F.45,DDB 1215 - 1184,00000000000000000000000000000000
+0F.46,DDB 1247 - 1216,00000000000000000000000000000000
+0F.47,DDB 1279 - 1248,00000000000000000000000000000000
+0F.48,DDB 1311 - 1280,00000000000000000000000000000000
+0F.49,DDB 1343 - 1312,00000000000000000000000000000000
+0F.4A,DDB 1375 - 1344,00000000000000000000000000000000
+0F.4B,DDB 1407 - 1376,00000000000000000000000000000000
+0F.4C,DDB 1439 - 1408,00000000000000000000000000000000
+0F.4D,DDB 1471 - 1440,00000000000000000000000000000000
+0F.4E,DDB 1503 - 1472,00000000000000000000000000000000
+0F.4F,DDB 1535 - 1504,00000000000000000000000000000000
+0F.50,DDB 1567 - 1536,00000000000000000000000000000000
+0F.51,DDB 1599 - 1568,00000000000000000000000000000000
+0F.52,DDB 1631 - 1600,00000000000000000000000000000000
+0F.53,DDB 1663 - 1632,00000000000000000000000000000000
+0F.54,DDB 1695 - 1664,00000000000000000000000000000000
+0F.55,DDB 1727 - 1696,00000000000000000000000000000000
+0F.56,DDB 1759 - 1728,00000000000000000000000000000000
+0F.57,DDB 1791 - 1760,00000000000000000000000000000000
+0F.58,DDB 1823 - 1792,00000000000000000000000000000000
+0F.59,DDB 1855 - 1824,00000000000000000000000000000000
+0F.5A,DDB 1887 - 1856,00000000000000000000000000000000
+0F.5B,DDB 1919 - 1888,00000000000000000000000000000000
+0F.5C,DDB 1951 - 1920,00000000000000000000000000000000
+0F.5D,DDB 1983 - 1952,00000000000000000000000000000000
+0F.5E,DDB 2015 - 1984,00000000000000000000000000000000
+0F.5F,DDB 2047 - 2016,00000000000000000000000000000000
+10.01,Broken I^,2.000
+10.02,I^ Maintenance,Disabled
+10.06,No CB Ops Maint,Disabled
+10.0A,CB Time Maint,Disabled
+11.01,Global Nominal V,110/125V
+11.50,Opto Filter Cntl,11111111
+11.80,Characteristic,Standard 60%-80%
+30.01,Ith Current Set,88.50 A
+30.02,K Coefficient,3
+30.03,Thermal Const T1,18.00 min
+30.04,Thermal Const T2,18.00 min
+30.05,Cooling Const Tr,198.0 min
+30.06,Thermal Trip,Enabled
+30.07,Thermal Alarm,Enabled
+30.08,Alarm Threshold,93.00 %
+30.09,Thermal Lockout,Enabled
+30.0A,Lockout Thresh.,85.00 %
+30.0B,Inh.Trip dur St.,Disabled
+30.0C,Thermal Overload,Thermal Model
+31.01,I>1 Function,DT
+31.02,I>1 Current Set,690.0 A
+31.03,I>1 Time Delay,40.00 ms
+31.11,I>2 Function,Disabled
+31.21,I>3 Function,Disabled
+31.31,I>4 Function,Disabled
+32.01,ISEF>1 Function,DT
+32.02,ISEF>1 Direction,Non Directional
+32.03,ISEF>1 Current,15.00 A
+32.04,ISEF>1 T. Delay,40.00 ms
+32.09,ISEF>2 Function,Disabled
+32.10,GROUP 1 WATTMETRIC SEF,
+32.11,P0> Function,Disabled
+33.01,I2>1 Status,DT
+33.02,I2>1 Current Set,18.75 A
+33.03,I2>1 Time Delay,3.000 s
+33.04,I2>2 Status,Disabled
+39.01,Prolonged Start,Enabled
+39.02,Start Criteria,52a
+39.03,Starting Current,225.0 A
+39.04,Prol. Start Time,5.000 s
+39.05,Stall Rotor-strt,Disabled
+39.06,Stall Detection,Enabled
+39.07,Stall Setting,225.0 A
+39.08,Stall Time,3.000 s
+39.09,Reacceleration,Enabled
+39.0A,Reac. Low V Set,11.50 kV
+39.0B,LV Ride Thru,Disabled
+3C.01,Hot Start Status,Enabled
+3C.02,Hot Start Nb.,1
+3C.03,Cold Start Stat.,Enabled
+3C.04,Cold Start Nb.,3
+3C.05,Supervising Time,60.00 min
+3C.06,T.Betw.St.Status,Disabled
+3C.08,Inhib.Start Time,30.00 min
+42.01,GROUP 1 UNDER VOLTAGE,
+42.02,V< Measur't Mode,Phase-Phase
+42.03,V< Operate Mode,Three Phase
+42.04,V<1 Function,DT
+42.05,V<1 Voltage Set,3450 V
+42.06,V<1 Time Delay,500.0 ms
+42.09,V<2 Status,DT
+42.0A,V<2 Voltage Set,12.42 kV
+42.0B,V<2 Time Delay,250.0 ms
+42.0C,Inhib.During St.,Disabled
+42.0D,GROUP 1 OVERVOLTAGE,
+42.0E,V> Measur't Mode,Phase-Phase
+42.0F,V> Operate Mode,Any Phase
+42.10,V>1 Status,Disabled
+42.14,V>2 Status,Disabled
+44.01,Select RTD,0000111111
+44.03,RTD 1 Alarm Set,130.0 Cel
+44.04,RTD 1 Alarm Dly,5.000 s
+44.05,RTD 1 Trip Set,155.0 Cel
+44.06,RTD 1 Trip Dly,3.000 s
+44.08,RTD 2 Alarm Set,130.0 Cel
+44.09,RTD 2 Alarm Dly,5.000 s
+44.0A,RTD 2 Trip Set,155.0 Cel
+44.0B,RTD 2 Trip Dly,3.000 s
+44.0D,RTD 3 Alarm Set,130.0 Cel
+44.0E,RTD 3 Alarm Dly,5.000 s
+44.0F,RTD 3 Trip Set,155.0 Cel
+44.10,RTD 3 Trip Dly,3.000 s
+44.12,RTD 4 Alarm Set,130.0 Cel
+44.13,RTD 4 Alarm Dly,5.000 s
+44.14,RTD 4 Trip Set,155.0 Cel
+44.15,RTD 4 Trip Dly,3.000 s
+44.17,RTD 5 Alarm Set,130.0 Cel
+44.18,RTD 5 Alarm Dly,5.000 s
+44.19,RTD 5 Trip Set,155.0 Cel
+44.1A,RTD 5 Trip Dly,3.000 s
+44.1C,RTD 6 Alarm Set,130.0 Cel
+44.1D,RTD 6 Alarm Dly,5.000 s
+44.1E,RTD 6 Trip Set,155.0 Cel
+44.1F,RTD 6 Trip Dly,3.000 s
+44.34,Ext.Temp.Influen,Disabled
+44.50,RTD Type,PT100
+44.51,RTD Unit,Celcius
+45.01,GROUP 1 CB FAIL,
+45.02,CB Fail 1 Status,Disabled
+45.08,GROUP 1 UNDER CURRENT,
+45.09,I< Current Set,9.000 A
+4A.01,Opto Input 1,52 Fechado
+4A.02,Opto Input 2,52 Aberto
+4A.03,Opto Input 3,OPTO 3
+4A.04,Opto Input 4,OPTO 4
+4A.05,Opto Input 5,OPTO 5
+4A.06,Opto Input 6,OPTO 6
+4A.07,Opto Input 7,OPTO 7
+4A.08,Opto Input 8,OPTO 8
+4B.01,Relay 1,50 BF
+4B.02,Relay 2,Desliga sub tens
+4B.03,Relay 3,Trip rele 86
+4B.04,Relay 4,Sel Log 00-MF-24
+4B.05,Relay 5,Sel Log MF-1C
+4B.06,Relay 6,RELAY 6
+4B.07,Relay 7,Bloq fech 52-02
+4C.01,RTD 1,RTD 1 - FASE R
+4C.02,RTD 2,RTD 2 - FASE S
+4C.03,RTD 3,RTD 3 - FASE T
+4C.04,RTD 4,RTD 4 - FASE R
+4C.05,RTD 5,RTD 5 - FASE S
+4C.06,RTD 6,RTD 6 - FASE T
