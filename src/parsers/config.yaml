@@ -1,0 +1,21 @@
+# Atributos que SEMPRE são atômicos (copiar como estão)
+# Nota: Pode-se ir ajustando esses nomes para casarem com as colunas reais da sua base.
+
+atomic_attributes:
+  - tag
+  - serial number
+  - manufacturer
+  - plant reference
+  - voltage rating
+  - current rating
+
+# Regras de detecção por atributo (regex)
+multivalued_rules:
+  description: '^\s*\d{1,2}[-_/][A-Za-z]{1,10}[-_/]\w+'
+  model number: '^[A-Za-z]\w{4,}$'
+
+# Opcional: atributos que podem ser multivalorados OU atômicos
+# (quando não bater no regex acima, tratamos como atômico)
+maybe_multivalued:
+  - model number
+  - description
