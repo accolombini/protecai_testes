@@ -14,7 +14,7 @@ Requisitos:
 
 Executar:
     python src/app.py --inputs tela1.pdf tela3.pdf
-    python -m src.app --inputs input_pdfs/*.pdf => É preciso ter o __init__.py em src/
+    python -m src.app --inputs input_pdfs/*.pdfworkon => É preciso ter o __init__.py em src/
 
 
 Uso (exemplos):
