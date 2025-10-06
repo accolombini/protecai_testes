@@ -79,11 +79,12 @@ psql -h localhost -p 5432 -U protecai -d protecai_db
 
 **Via Adminer (interface web):**
 1. Acesse: http://localhost:8080
-2. **Sistema**: PostgreSQL
-3. **Servidor**: postgres-protecai
-4. **Usuário**: protecai
-5. **Senha**: protecai_password
-6. **Base de dados**: protecai_db
+2. **⚠️ IMPORTANTE**: Mude "Sistema" de "MySQL" para "PostgreSQL"
+3. **Sistema**: PostgreSQL (NÃO deixe MySQL!)
+4. **Servidor**: postgres-protecai
+5. **Usuário**: protecai
+6. **Senha**: protecai123
+7. **Base de dados**: protecai_db
 
 ### 3. Parar o ambiente Docker
 
