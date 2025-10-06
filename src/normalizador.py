@@ -23,18 +23,20 @@ import sys
 import argparse
 from pathlib import Path
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 # Imports dos módulos de normalização
 try:
     from .utils.generate_normalized_excel import NormalizedExcelGenerator
     from .utils.generate_docx_documentation import DocxDocumentationGenerator
+    from .utils.generate_separated_outputs import SeparatedOutputsGenerator
     from .utils.code_parser import CodeParser
 except ImportError:
     # Para execução direta
     sys.path.append(str(Path(__file__).parent))
     from utils.generate_normalized_excel import NormalizedExcelGenerator
     from utils.generate_docx_documentation import DocxDocumentationGenerator
+    from utils.generate_separated_outputs import SeparatedOutputsGenerator
     from utils.code_parser import CodeParser
 
 
@@ -70,6 +72,7 @@ class ProtecaiNormalizer:
         self.parser = CodeParser()
         self.excel_generator = NormalizedExcelGenerator()
         self.docx_generator = DocxDocumentationGenerator()
+        self.separated_generator = SeparatedOutputsGenerator()
         
         print(f"[INFO] Normalizador inicializado:")
         print(f"       Entrada: {self.input_dir}")
@@ -87,24 +90,30 @@ class ProtecaiNormalizer:
         results = {
             'excel_path': None,
             'docx_path': None,
+            'separated_outputs': [],
             'stats': {},
             'timestamp': self.timestamp,
             'success': False
         }
         
         try:
-            # Etapa 1: Processar dados e gerar Excel normalizado
-            print("\n[ETAPA 1] Processando dados e gerando Excel normalizado...")
+            # Etapa 1: Gerar saídas separadas por arquivo (Excel + CSV)
+            print("\n[ETAPA 1] Gerando saídas separadas por arquivo (Excel + CSV)...")
+            self._generate_separated_outputs()
+            results['separated_outputs'] = self._get_separated_outputs_info()
+            
+            # Etapa 2: Processar dados e gerar Excel consolidado (legado)
+            print("\n[ETAPA 2] Processando dados e gerando Excel consolidado...")
             excel_path = self._generate_normalized_excel()
             results['excel_path'] = excel_path
             
-            # Etapa 2: Gerar documentação DOCX
-            print("\n[ETAPA 2] Gerando documentação DOCX...")
+            # Etapa 3: Gerar documentação DOCX
+            print("\n[ETAPA 3] Gerando documentação DOCX...")
             docx_path = self._generate_docx_documentation()
             results['docx_path'] = docx_path
             
-            # Etapa 3: Coletar estatísticas
-            results['stats'] = self.excel_generator.stats.copy()
+            # Etapa 4: Coletar estatísticas
+            results['stats'] = self.separated_generator.global_stats.copy()
             results['success'] = True
             
             print("\n[SUCESSO] Pipeline concluído com sucesso!")
@@ -118,6 +127,24 @@ class ProtecaiNormalizer:
             traceback.print_exc()
             results['error'] = str(e)
             return results
+    
+    def _generate_separated_outputs(self) -> None:
+        """Gera saídas separadas por arquivo."""
+        self.separated_generator.process_all_files(self.input_dir)
+    
+    def _get_separated_outputs_info(self) -> List[Dict[str, Any]]:
+        """Retorna informações sobre as saídas separadas geradas."""
+        return [
+            {
+                'file_identifier': info['file_identifier'],
+                'manufacturer': info['manufacturer'],
+                'excel_path': f"outputs/norm_excel/{info['file_identifier']}_params_normalized.xlsx",
+                'csv_path': f"outputs/norm_csv/{info['file_identifier']}_params_normalized.csv",
+                'total_rows': info['total_rows'],
+                'multivalued_count': info['multivalued_count']
+            }
+            for info in self.separated_generator.processed_files
+        ]
     
     def _generate_normalized_excel(self) -> Path:
         """Gera o Excel normalizado."""
@@ -188,8 +215,19 @@ class ProtecaiNormalizer:
         
         print()
         print("ARQUIVOS GERADOS:")
+        
+        # Saídas separadas por arquivo
+        if results.get('separated_outputs'):
+            print("  SAÍDAS SEPARADAS POR ARQUIVO:")
+            for output_info in results['separated_outputs']:
+                print(f"    • {output_info['file_identifier']} ({output_info['manufacturer']}):")
+                print(f"      Excel: {output_info['excel_path']}")
+                print(f"      CSV: {output_info['csv_path']}")
+                print(f"      Registros: {output_info['total_rows']} (multivalorados: {output_info['multivalued_count']})")
+        
+        # Arquivos consolidados (legado)
         if results.get('excel_path'):
-            print(f"  • Excel normalizado: {results['excel_path'].name}")
+            print(f"  • Excel consolidado: {results['excel_path'].name}")
         if results.get('docx_path'):
             print(f"  • Documentação DOCX: {results['docx_path'].name}")
         
@@ -197,6 +235,8 @@ class ProtecaiNormalizer:
         print("ARQUIVOS 'LATEST' (para uso fácil):")
         print(f"  • {self.output_dir / 'codigos_normalizados_latest.xlsx'}")
         print(f"  • {self.output_dir / 'documentacao_codigos_latest.docx'}")
+        print("  • outputs/norm_excel/summary_normalization.xlsx")
+        print("  • outputs/norm_csv/summary_normalization.csv")
         
         print("="*60)
     

@@ -8,18 +8,8 @@ Este script:
 3. Gera documento DOCX com tabelas explicativas
 4. Organiza por tipo de código e nível de confiança
 
-Estrutura do documento:
-- Sumário executivo
-- Tabela de códigos ANSI encontrados
-- Tabela de tipos de proteção
-- Tabela de model numbers
-- Tabela de valores não interpretados (para revisão)
-- Estatísticas do processamento
-
-    ||> documentacao_codigos_latest.docx
-
 Autor: Sistema ProtecAI
-Data: 2025-10-03
+Data: 2025-10-05
 """
 
 from __future__ import annotations
@@ -28,7 +18,6 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 import pandas as pd
 from datetime import datetime
-from collections import defaultdict
 
 # Imports para DOCX
 from docx import Document
@@ -40,12 +29,9 @@ from docx.oxml.ns import qn
 # Importar o gerador de Excel (para reutilizar dados)
 try:
     from .generate_normalized_excel import NormalizedExcelGenerator
-    from .code_parser import TokenType
 except ImportError:
-    # Para execução direta
     sys.path.append(str(Path(__file__).parent))
     from generate_normalized_excel import NormalizedExcelGenerator
-    from code_parser import TokenType
 
 
 # Configurações de diretórios

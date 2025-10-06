@@ -216,6 +216,7 @@ docker/
 
 # Documentation drafts and revisions
 outputs/doc/MODELAGEM_DADOS_REVISADA.txt
+outputs/doc/MODELAGEM_DADOS.docx
 
 # SQL documentation files (keep only final versions)
 docs/
