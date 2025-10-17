@@ -30,7 +30,7 @@ protecai_testes/
 │  └─ postgres/        # Configuração Docker PostgreSQL + Adminer
 │     ├─ docker-compose.yaml
 │     ├─ initdb/       # Scripts de inicialização do banco
-│     └─ data/         # Dados persistentes PostgreSQL (gitignored)
+│     └─ data/         # Dados persistentes PostgreSQL (ignorado pelo git)
 ├─ docs/               # Documentação SQL e modelagem
 ├─ src/
 │  ├─ app.py           # CLI principal: extração de PDFs
@@ -49,6 +49,24 @@ protecai_testes/
 
 ## 🐳 Docker + PostgreSQL (Recomendado)
 
+### 0. Configuração inicial (apenas primeira vez)
+
+Certifique-se de que o arquivo `.env` existe em `docker/postgres/`:
+
+```bash
+# Verificar se o arquivo .env existe
+ls docker/postgres/.env
+
+# Se não existir, criar com as configurações padrão:
+cat > docker/postgres/.env << 'EOF'
+POSTGRES_USER=protecai
+POSTGRES_PASSWORD=protecai
+POSTGRES_DB=protecai_db
+POSTGRES_PORT=5432
+TZ=America/Sao_Paulo
+EOF
+```
+
 ### 1. Subir o ambiente Docker
 
 ```bash
@@ -56,15 +74,20 @@ protecai_testes/
 cd docker/postgres
 
 # Subir PostgreSQL + Adminer
-docker-compose up -d
+docker compose up -d
 
 # Verificar se os containers estão rodando
-docker-compose ps
+docker compose ps
 ```
 
 **Serviços disponíveis:**
 - **PostgreSQL 16**: `localhost:5432`
 - **Adminer** (interface web): http://localhost:8080
+
+**Credenciais padrão:**
+- **Usuário**: protecai
+- **Senha**: protecai
+- **Database**: protecai_db
 
 ### 2. Acessar o banco PostgreSQL
 
@@ -74,6 +97,7 @@ docker-compose ps
 docker exec -it postgres-protecai psql -U protecai -d protecai_db
 
 # Ou diretamente do host (se tiver psql instalado)
+# Será solicitada a senha: protecai
 psql -h localhost -p 5432 -U protecai -d protecai_db
 ```
 
@@ -83,21 +107,26 @@ psql -h localhost -p 5432 -U protecai -d protecai_db
 3. **Sistema**: PostgreSQL (NÃO deixe MySQL!)
 4. **Servidor**: postgres-protecai
 5. **Usuário**: protecai
-6. **Senha**: protecai123
+6. **Senha**: protecai
 7. **Base de dados**: protecai_db
 
-### 3. Parar o ambiente Docker
+### 3. Gerenciar o ambiente Docker
 
 ```bash
-# Parar containers (mantém dados)
-docker-compose stop
+# 🟢 PARAR containers (mantém dados) - RECOMENDADO para pausa temporária
+docker compose stop
 
-# Parar e remover containers (mantém dados persistentes)
-docker-compose down
+# 🟡 Reiniciar containers parados
+docker compose start
 
-# Parar e remover TUDO (incluindo dados - ⚠️ CUIDADO!)
-docker-compose down -v
+# 🟠 PARAR e REMOVER containers (mantém dados persistentes, mas remove containers)
+docker compose down
+
+# 🔴 PARAR e REMOVER TUDO incluindo dados - ⚠️ MUITO CUIDADO!
+docker compose down -v
 ```
+
+**💡 Dica**: Para pausar o trabalho, use sempre `docker compose stop`!
 
 ---
 
@@ -105,13 +134,17 @@ docker-compose down -v
 
 ### 1. Criar ambiente virtual
 ```bash
-# Com virtualenvwrapper (macOS)
-mkvirtualenv -p python3.13 protecai_testes
+# Com virtualenvwrapper (macOS/Linux)
+mkvirtualenv -p python3 protecai_testes
 workon protecai_testes
 
 # Ou com venv padrão
 python3 -m venv venv
-source venv/bin/activate  # macOS/Linux
+
+# Ativar ambiente virtual:
+source venv/bin/activate     # macOS/Linux
+# ou
+venv\Scripts\activate        # Windows
 ```
 
 ### 2. Instalar dependências
@@ -277,17 +310,20 @@ lsof -i :5432  # PostgreSQL
 lsof -i :8080  # Adminer
 
 # Recriar containers
-docker-compose down
-docker-compose up -d --force-recreate
+docker compose down
+docker compose up -d --force-recreate
+
+# Ou reiniciar serviços
+docker compose restart
 ```
 
 ### Erro de conexão PostgreSQL
 ```bash
 # Verificar se o container está rodando
-docker-compose ps
+docker compose ps
 
 # Ver logs do PostgreSQL
-docker-compose logs postgres-protecai
+docker compose logs postgres-protecai
 
 # Testar conexão
 docker exec -it postgres-protecai psql -U protecai -d protecai_db -c "SELECT version();"
