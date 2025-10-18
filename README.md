@@ -111,7 +111,7 @@ psql -h localhost -p 5432 -U protecai -d protecai_db
 7. **Base de dados**: protecai_db
 
 ### 3. Gerenciar o ambiente Docker
-
+#### Atenção lembrar de entrar no repositório onde se encontra o docker-compose.yaml
 ```bash
 # 🟢 PARAR containers (mantém dados) - RECOMENDADO para pausa temporária
 docker compose stop
