@@ -1,0 +1,44 @@
+{
+  "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/inputs/pdf/tela1.pdf": {
+    "file_name": "tela1.pdf",
+    "file_hash": "f3eaa37463ace257b5b864c80da30afd063507dccbc41dfc9d8b7ac5c8da80fc",
+    "processed_at": "2025-10-17T14:28:35.760495",
+    "metadata": {
+      "size_bytes": 202715,
+      "modified_time": "2025-09-27T15:00:18.335188",
+      "extension": ".pdf",
+      "absolute_path": "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/inputs/pdf/tela1.pdf"
+    },
+    "processing_result": {
+      "status": "success",
+      "rows_extracted": 338,
+      "detected_format": "micom"
+    },
+    "output_files": [
+      "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/outputs/excel/tela1_params.xlsx",
+      "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/outputs/csv/tela1_params.csv"
+    ],
+    "registry_version": "1.0"
+  },
+  "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/inputs/pdf/tela3.pdf": {
+    "file_name": "tela3.pdf",
+    "file_hash": "78992df4927d366fe264138ae2a66e36d82ed304109b981cf20e37029b2ae9af",
+    "processed_at": "2025-10-17T14:49:39.126041",
+    "metadata": {
+      "size_bytes": 265990,
+      "modified_time": "2025-09-27T15:00:21.542206",
+      "extension": ".pdf",
+      "absolute_path": "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/inputs/pdf/tela3.pdf"
+    },
+    "processing_result": {
+      "status": "success",
+      "rows_extracted": 151,
+      "detected_format": "easergy"
+    },
+    "output_files": [
+      "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/outputs/excel/tela3_params.xlsx",
+      "/Users/accol/Library/Mobile Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes/outputs/csv/tela3_params.csv"
+    ],
+    "registry_version": "1.0"
+  }
+}

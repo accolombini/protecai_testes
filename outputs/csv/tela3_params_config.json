@@ -1,0 +1,901 @@
+{
+  "identification": {
+    "model": "P220-2",
+    "manufacturer": "Schneider Electric (Easergy)",
+    "serial_number": null,
+    "software_version": "6.A",
+    "tag_reference": "MF09",
+    "plant_reference": null,
+    "bay_position": null,
+    "frequency": "60Hz",
+    "description": null
+  },
+  "electrical": {
+    "phase_ct_primary": "100",
+    "phase_ct_secondary": "5",
+    "neutral_ct_primary": "50",
+    "neutral_ct_secondary": "5",
+    "vt_primary": null,
+    "vt_secondary": null,
+    "nvd_vt_primary": null,
+    "nvd_vt_secondary": null,
+    "vt_connection_mode": null,
+    "nominal_voltage": null,
+    "equipment_load": null
+  },
+  "protection_functions": [
+    {
+      "function_name": "Motor",
+      "code": "0106",
+      "enabled": false,
+      "current_setting": null,
+      "time_setting": "52A",
+      "characteristic": null,
+      "direction": null,
+      "additional_settings": {
+        "START DETECTION": "52A",
+        "teta FORBID START ?": "YES",
+        "teta FORBID START": "80%",
+        "EXCES LONG START FUNCT ?": "NO",
+        "Istart DETECTION": "2.0Ith",
+        "tIstart": "4s",
+        "BLOCKED ROTOR FUNCT ?": "NO",
+        "tIstall": "No",
+        "STALLED ROTOR ?": "YES",
+        "Istall DETECTION": "2.0Ith",
+        "LOCK ROTOR AT START ?": "NO",
+        "START NB LIMITAT FUNCT ?": "YES",
+        "HOT START NB": "2",
+        "COLD START NB": "3",
+        "TIME BETW START FUNCT ?": "NO",
+        "teta FORBID. START": "nan",
+        "EXCEX LG START": "No",
+        "LOCKED ROTOR": "No",
+        "START NB LIMIT": "nan",
+        "Tbetw 2 start": "No",
+        "SUCCESS START": "No",
+        "EXCES LG START": "No",
+        "T betw 2 start": "No"
+      }
+    },
+    {
+      "function_name": "Thermal",
+      "code": "0200",
+      "enabled": false,
+      "current_setting": null,
+      "time_setting": null,
+      "characteristic": null,
+      "direction": null,
+      "additional_settings": {
+        "THERMAL OVERLOAD FUNCT ?": "NO"
+      }
+    },
+    {
+      "function_name": "Overcurrent",
+      "code": "0210",
+      "enabled": false,
+      "current_setting": null,
+      "time_setting": null,
+      "characteristic": null,
+      "direction": null,
+      "additional_settings": {
+        "I>> FUNCTION ?": "NO",
+        "I>>": "nan",
+        "tI>>": "No"
+      }
+    },
+    {
+      "function_name": "Earth Fault",
+      "code": "0220",
+      "enabled": false,
+      "current_setting": null,
+      "time_setting": null,
+      "characteristic": null,
+      "direction": null,
+      "additional_settings": {
+        "I0> FUNCTION ?": "NO",
+        "I0>> FUNCTION ?": "NO",
+        "I0>>": "nan",
+        "tI0>>": "No",
+        "I0>": "No",
+        "tI0>": "No"
+      }
+    },
+    {
+      "function_name": "Negative Sequence",
+      "code": "0230",
+      "enabled": false,
+      "current_setting": null,
+      "time_setting": null,
+      "characteristic": null,
+      "direction": null,
+      "additional_settings": {
+        "I2> FUNCTION ?": "NO",
+        "I2>": "0.125In",
+        "tI2>": "No",
+        "I2>> FUNCTION": "NO",
+        "tI2>>": "No"
+      }
+    }
+  ],
+  "io_configuration": {
+    "opto_inputs": {},
+    "relay_outputs": {},
+    "rtd_inputs": {},
+    "analog_outputs": {
+      "ANALOG OUTPUT": "4-20 mA"
+    }
+  },
+  "additional_parameters": {
+    "Change Group Input": "EDGE",
+    "SETTING GROUP": "1",
+    "DEFAULT DISPLAY": "IB RMS",
+    "teta ALARM ?": "YES",
+    "teta ALARM": "No",
+    "CLOSE ORDER": "No",
+    "TRIP ORDER": "No",
+    "Active group": "No",
+    "TRIP RLY SETTINGS": null,
+    "TRIP RLY SETTINGS 2": "No",
+    "LATCH TRIP ORDER": "No",
+    "TRIP T": "1.00s",
+    "CLOSE T": "1.00s"
+  },
+  "raw_data": [
+    {
+      "Code": "0000",
+      "Description": "TYPE",
+      "Value": "P220-2"
+    },
+    {
+      "Code": "010A",
+      "Description": "REFERENCE",
+      "Value": "MF09"
+    },
+    {
+      "Code": "0005",
+      "Description": "SOFTWARE VERSION",
+      "Value": "6.A"
+    },
+    {
+      "Code": "0104",
+      "Description": "FREQUENCY",
+      "Value": "60Hz"
+    },
+    {
+      "Code": "0118",
+      "Description": "Change Group Input",
+      "Value": "EDGE"
+    },
+    {
+      "Code": "0109",
+      "Description": "SETTING GROUP",
+      "Value": "1"
+    },
+    {
+      "Code": "0105",
+      "Description": "DEFAULT DISPLAY",
+      "Value": "IB RMS"
+    },
+    {
+      "Code": "0106",
+      "Description": "START DETECTION",
+      "Value": "52A"
+    },
+    {
+      "Code": "0107",
+      "Description": "ANALOG OUTPUT",
+      "Value": "4-20 mA"
+    },
+    {
+      "Code": "0108",
+      "Description": "DATA TYPE ANALOG",
+      "Value": "IB RMS"
+    },
+    {
+      "Code": "0120",
+      "Description": "PRIM PH",
+      "Value": "100"
+    },
+    {
+      "Code": "0121",
+      "Description": "SEC PH",
+      "Value": "5"
+    },
+    {
+      "Code": "0122",
+      "Description": "PRIM E",
+      "Value": "50"
+    },
+    {
+      "Code": "0123",
+      "Description": "SEC E",
+      "Value": "5"
+    },
+    {
+      "Code": "0150",
+      "Description": "LED 5",
+      "Value": "No"
+    },
+    {
+      "Code": "0152",
+      "Description": "LED 6",
+      "Value": ""
+    },
+    {
+      "Code": "0154",
+      "Description": "LED 7",
+      "Value": "No"
+    },
+    {
+      "Code": "0156",
+      "Description": "LED 8",
+      "Value": ""
+    },
+    {
+      "Code": "0114",
+      "Description": "Pulse up",
+      "Value": ""
+    },
+    {
+      "Code": "0200",
+      "Description": "THERMAL OVERLOAD FUNCT ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0201",
+      "Description": "teta INHIBIT ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0202",
+      "Description": "Iteta>",
+      "Value": "0.64In"
+    },
+    {
+      "Code": "0203",
+      "Description": "Ke",
+      "Value": "3"
+    },
+    {
+      "Code": "0204",
+      "Description": "Te1",
+      "Value": "29mn"
+    },
+    {
+      "Code": "0205",
+      "Description": "Te2",
+      "Value": "29mn"
+    },
+    {
+      "Code": "0206",
+      "Description": "Tr",
+      "Value": "234mn"
+    },
+    {
+      "Code": "0208",
+      "Description": "teta ALARM ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0209",
+      "Description": "teta ALARM",
+      "Value": "90%"
+    },
+    {
+      "Code": "020A",
+      "Description": "teta FORBID START ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "020B",
+      "Description": "teta FORBID START",
+      "Value": "80%"
+    },
+    {
+      "Code": "0210",
+      "Description": "I>> FUNCTION ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0211",
+      "Description": "I>>",
+      "Value": "5.5In"
+    },
+    {
+      "Code": "0212",
+      "Description": "tI>>",
+      "Value": "0.00s"
+    },
+    {
+      "Code": "0220",
+      "Description": "I0> FUNCTION ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0223",
+      "Description": "I0>> FUNCTION ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0224",
+      "Description": "I0>>",
+      "Value": "0.300Ien"
+    },
+    {
+      "Code": "0225",
+      "Description": "tI0>>",
+      "Value": "0.05s"
+    },
+    {
+      "Code": "0230",
+      "Description": "I2> FUNCTION ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0231",
+      "Description": "I2>",
+      "Value": "0.125In"
+    },
+    {
+      "Code": "0232",
+      "Description": "tI2>",
+      "Value": "3.00s"
+    },
+    {
+      "Code": "0233",
+      "Description": "I2>> FUNCTION",
+      "Value": "NO"
+    },
+    {
+      "Code": "0240",
+      "Description": "EXCES LONG START FUNCT ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0241",
+      "Description": "Istart DETECTION",
+      "Value": "2.0Ith"
+    },
+    {
+      "Code": "0242",
+      "Description": "tIstart",
+      "Value": "4s"
+    },
+    {
+      "Code": "0244",
+      "Description": "BLOCKED ROTOR FUNCT ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0245",
+      "Description": "tIstall",
+      "Value": "2.0s"
+    },
+    {
+      "Code": "0246",
+      "Description": "STALLED ROTOR ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "0247",
+      "Description": "Istall DETECTION",
+      "Value": "2.0Ith"
+    },
+    {
+      "Code": "0248",
+      "Description": "LOCK ROTOR AT START ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0250",
+      "Description": "I< FUNCTION ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0300",
+      "Description": "THERMAL OVERLOAD FUNCT ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0310",
+      "Description": "I>> FUNCTION ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0320",
+      "Description": "I0> FUNCTION ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0323",
+      "Description": "I0>> FUNCTION ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0330",
+      "Description": "I2> FUNCTION ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0333",
+      "Description": "I2>> FUNCTION",
+      "Value": "NO"
+    },
+    {
+      "Code": "0340",
+      "Description": "EXCES LONG START FUNCT ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0344",
+      "Description": "BLOCKED ROTOR FUNCT ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0350",
+      "Description": "I< FUNCTION ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "01D3",
+      "Description": "START NB LIMITAT FUNCT ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "01D4",
+      "Description": "Treference",
+      "Value": "60mn"
+    },
+    {
+      "Code": "01D5",
+      "Description": "HOT START NB",
+      "Value": "2"
+    },
+    {
+      "Code": "01D6",
+      "Description": "COLD START NB",
+      "Value": "3"
+    },
+    {
+      "Code": "01D7",
+      "Description": "Tinterdiction",
+      "Value": "30mn"
+    },
+    {
+      "Code": "01D8",
+      "Description": "TIME BETW START FUNCT ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "01DA",
+      "Description": "REACCEL AUTHORIZ FUNCT ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "0160",
+      "Description": "INPUT 3",
+      "Value": "No"
+    },
+    {
+      "Code": "0161",
+      "Description": "INPUT 4",
+      "Value": "No"
+    },
+    {
+      "Code": "0162",
+      "Description": "INPUT 5",
+      "Value": "No"
+    },
+    {
+      "Code": "01E5",
+      "Description": "EXT 1",
+      "Value": "0.00s"
+    },
+    {
+      "Code": "01E6",
+      "Description": "EXT 2",
+      "Value": "0.00s"
+    },
+    {
+      "Code": "01EA",
+      "Description": "EXT 3",
+      "Value": "0.00s"
+    },
+    {
+      "Code": "01EB",
+      "Description": "EXT 4",
+      "Value": "0.00s"
+    },
+    {
+      "Code": "01A0",
+      "Description": "THERM OV.",
+      "Value": "No"
+    },
+    {
+      "Code": "01A1",
+      "Description": "teta ALARM",
+      "Value": "No"
+    },
+    {
+      "Code": "01A2",
+      "Description": "teta FORBID. START",
+      "Value": "No"
+    },
+    {
+      "Code": "01A7",
+      "Description": "I>>",
+      "Value": "No"
+    },
+    {
+      "Code": "01A8",
+      "Description": "tI>>",
+      "Value": "No"
+    },
+    {
+      "Code": "01A3",
+      "Description": "I0>",
+      "Value": "No"
+    },
+    {
+      "Code": "01A4",
+      "Description": "tI0>",
+      "Value": "No"
+    },
+    {
+      "Code": "01A5",
+      "Description": "I0>>",
+      "Value": "No"
+    },
+    {
+      "Code": "01A6",
+      "Description": "tI0>>",
+      "Value": "No"
+    },
+    {
+      "Code": "01A9",
+      "Description": "tI2>",
+      "Value": "No"
+    },
+    {
+      "Code": "01AA",
+      "Description": "tI2>>",
+      "Value": "No"
+    },
+    {
+      "Code": "01AB",
+      "Description": "EXCEX LG START",
+      "Value": "No"
+    },
+    {
+      "Code": "01AC",
+      "Description": "tIstall",
+      "Value": "No"
+    },
+    {
+      "Code": "01AD",
+      "Description": "LOCKED ROTOR",
+      "Value": "No"
+    },
+    {
+      "Code": "01AE",
+      "Description": "tI<",
+      "Value": "No"
+    },
+    {
+      "Code": "01AF",
+      "Description": "START NB LIMIT",
+      "Value": "No"
+    },
+    {
+      "Code": "01B0",
+      "Description": "Tbetw 2 start",
+      "Value": "No"
+    },
+    {
+      "Code": "01BF",
+      "Description": "EXT 1",
+      "Value": "No"
+    },
+    {
+      "Code": "01C0",
+      "Description": "EXT 2",
+      "Value": "No"
+    },
+    {
+      "Code": "01C2",
+      "Description": "EXT 3",
+      "Value": "No"
+    },
+    {
+      "Code": "01C3",
+      "Description": "EXT 4",
+      "Value": "No"
+    },
+    {
+      "Code": "01C1",
+      "Description": "SUCCESS START",
+      "Value": "No"
+    },
+    {
+      "Code": "01F0",
+      "Description": "EQU. A Toperat",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "01F1",
+      "Description": "EQU. A Treset",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "01F2",
+      "Description": "EQU. B Toperat",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "01F3",
+      "Description": "EQU. B Treset",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "01F4",
+      "Description": "EQU. C Toperat",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "01F5",
+      "Description": "EQU. C Treset",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "01F6",
+      "Description": "EQU. D Toperat",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "01F7",
+      "Description": "EQU. D Treset",
+      "Value": "0.0s"
+    },
+    {
+      "Code": "0170",
+      "Description": "THERM OV.",
+      "Value": "No"
+    },
+    {
+      "Code": "0171",
+      "Description": "teta ALARM",
+      "Value": "No"
+    },
+    {
+      "Code": "0172",
+      "Description": "teta FORBID. START",
+      "Value": ""
+    },
+    {
+      "Code": "0177",
+      "Description": "I>>",
+      "Value": ""
+    },
+    {
+      "Code": "0178",
+      "Description": "tI>>",
+      "Value": "No"
+    },
+    {
+      "Code": "0173",
+      "Description": "I0>",
+      "Value": "No"
+    },
+    {
+      "Code": "0174",
+      "Description": "tI0>",
+      "Value": "No"
+    },
+    {
+      "Code": "0175",
+      "Description": "I0>>",
+      "Value": ""
+    },
+    {
+      "Code": "0176",
+      "Description": "tI0>>",
+      "Value": "No"
+    },
+    {
+      "Code": "0179",
+      "Description": "tI2>",
+      "Value": "No"
+    },
+    {
+      "Code": "017A",
+      "Description": "tI2>>",
+      "Value": "No"
+    },
+    {
+      "Code": "017B",
+      "Description": "EXCES LG START",
+      "Value": "No"
+    },
+    {
+      "Code": "017C",
+      "Description": "tIstall",
+      "Value": "No"
+    },
+    {
+      "Code": "017D",
+      "Description": "LOCKED ROTOR",
+      "Value": "No"
+    },
+    {
+      "Code": "017E",
+      "Description": "tI<",
+      "Value": "No"
+    },
+    {
+      "Code": "017F",
+      "Description": "START NB LIMIT",
+      "Value": ""
+    },
+    {
+      "Code": "0180",
+      "Description": "T betw 2 start",
+      "Value": "No"
+    },
+    {
+      "Code": "018F",
+      "Description": "EXT 1",
+      "Value": "No"
+    },
+    {
+      "Code": "0190",
+      "Description": "EXT 2",
+      "Value": "No"
+    },
+    {
+      "Code": "019D",
+      "Description": "EXT 3",
+      "Value": "No"
+    },
+    {
+      "Code": "019E",
+      "Description": "EXT 4",
+      "Value": "No"
+    },
+    {
+      "Code": "0191",
+      "Description": "CLOSE ORDER",
+      "Value": "No"
+    },
+    {
+      "Code": "0192",
+      "Description": "TRIP ORDER",
+      "Value": "No"
+    },
+    {
+      "Code": "0193",
+      "Description": "ORDER 1",
+      "Value": "No"
+    },
+    {
+      "Code": "0194",
+      "Description": "ORDER 2",
+      "Value": "No"
+    },
+    {
+      "Code": "0195",
+      "Description": "SUCCESS START",
+      "Value": "No"
+    },
+    {
+      "Code": "0196",
+      "Description": "t EQU.A",
+      "Value": "No"
+    },
+    {
+      "Code": "0197",
+      "Description": "t EQU.B",
+      "Value": "No"
+    },
+    {
+      "Code": "0198",
+      "Description": "t EQU.C",
+      "Value": "No"
+    },
+    {
+      "Code": "0199",
+      "Description": "t EQU.D",
+      "Value": "No"
+    },
+    {
+      "Code": "019A",
+      "Description": "SW OPER TIME",
+      "Value": "No"
+    },
+    {
+      "Code": "019B",
+      "Description": "SW OPER NB",
+      "Value": "No"
+    },
+    {
+      "Code": "019C",
+      "Description": "SAn",
+      "Value": "No"
+    },
+    {
+      "Code": "016F",
+      "Description": "Active group",
+      "Value": "No"
+    },
+    {
+      "Code": "01D0",
+      "Description": "TRIP RLY SETTINGS",
+      "Value": ""
+    },
+    {
+      "Code": "01D1",
+      "Description": "TRIP RLY SETTINGS 2",
+      "Value": "No"
+    },
+    {
+      "Code": "01D2",
+      "Description": "LATCH TRIP ORDER",
+      "Value": "No"
+    },
+    {
+      "Code": "01DC",
+      "Description": "SW OPERATING TIME ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "01DE",
+      "Description": "SW OPERATION NB ?",
+      "Value": "YES"
+    },
+    {
+      "Code": "01DF",
+      "Description": "SW OPERATION NB",
+      "Value": "20"
+    },
+    {
+      "Code": "01E0",
+      "Description": "SAn ?",
+      "Value": "NO"
+    },
+    {
+      "Code": "01E3",
+      "Description": "TRIP T",
+      "Value": "1.00s"
+    },
+    {
+      "Code": "01E4",
+      "Description": "CLOSE T",
+      "Value": "1.00s"
+    },
+    {
+      "Code": "0115",
+      "Description": "Latch",
+      "Value": "No"
+    },
+    {
+      "Code": "010C",
+      "Description": "FAULT NUMBER",
+      "Value": "5"
+    },
+    {
+      "Code": "01E7",
+      "Description": "PRE-TIME",
+      "Value": "2.5s"
+    },
+    {
+      "Code": "01E8",
+      "Description": "POST-TIME",
+      "Value": "0.5s"
+    },
+    {
+      "Code": "01E9",
+      "Description": "DISTURB REC TRIG",
+      "Value": "ON TRIP"
+    }
+  ]
+}

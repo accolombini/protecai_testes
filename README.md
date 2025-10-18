@@ -156,38 +156,84 @@ pip install -r requirements.txt
 
 ## 🚀 Fluxo de trabalho completo
 
-### 1. Extração de PDFs → CSV/Excel
+### NOVA ARQUITETURA UNIFICADA (2025-10-18)
 
-```bash
-# Extrair dados dos PDFs para formato tabular
-python src/app.py --inputs input_pdfs/tela1.pdf input_pdfs/tela3.pdf --xlsx outputs/excel/dados.xlsx
+🔥 **IMPORTANTE**: O sistema agora usa arquitetura unificada onde **TODOS** os formatos são convertidos para CSV padronizado antes do processamento.
 
-# Ou para CSV
-python src/app.py --inputs input_pdfs/tela1.pdf input_pdfs/tela3.pdf --csv outputs/csv/dados.csv
+```
+inputs/{pdf,txt,xlsx,csv} → [CONVERSOR UNIVERSAL] → outputs/csv/ → [PIPELINE ÚNICO]
 ```
 
-### 2. Normalização com códigos ANSI
+### 1. Conversão Universal → CSV Padronizado
 
 ```bash
-# Processa arquivos CSV/Excel e aplica normalização ANSI
+# Converter TODOS os formatos para CSV padronizado
+python src/universal_format_converter.py
+
+# Resultado: Todos os arquivos em formato (Code, Description, Value) em outputs/csv/
+```
+
+### 2. Pipeline Completo Unificado
+
+```bash
+# Pipeline completo: conversão + normalização + importação
+python src/pipeline_completo.py
+
+# Apenas conversão (para testar)
+python src/pipeline_completo.py --only-extract
+
+# Pular normalização
+python src/pipeline_completo.py --skip-normalization
+```
+
+### 3. Normalização ANSI (Automática no Pipeline)
+
+```bash
+# Já incluída no pipeline completo, mas pode ser executada separadamente:
 python src/normalizador.py
 
 # Gera arquivos em outputs/norm_csv/ e outputs/norm_excel/
 ```
 
-### 3. Importação para PostgreSQL
+### 4. Importação para PostgreSQL (Automática no Pipeline)
 
 **Importante**: Certifique-se que o Docker está rodando primeiro!
 
 ```bash
-# Importar dados normalizados para PostgreSQL
+# Já incluída no pipeline completo, mas pode ser executada separadamente:
 python src/importar_dados_normalizado.py
 
 # Verifica log de importação
 cat outputs/logs/relatorio_importacao.json
 ```
 
-### 4. Validar importação
+### ✨ Vantagens da Arquitetura Unificada
+
+🎯 **Consistência**: Todos os formatos seguem o mesmo pipeline após conversão
+🔧 **Manutenção**: Apenas um fluxo de processamento para manter
+📊 **Comparabilidade**: Dados padronizados facilitam análise comparativa
+🚀 **Performance**: Menos duplicação de código e lógica
+🛡️ **Confiabilidade**: Reduz pontos de falha no sistema
+
+### 📁 Estrutura de Diretórios Atualizada
+
+```
+inputs/
+├── pdf/          # PDFs dos relés (MiCOM, Easergy, etc.)
+├── txt/          # Arquivos texto estruturados
+├── xlsx/         # Planilhas Excel/LibreOffice
+├── csv/          # CSVs de outras fontes
+└── registry/     # Controle de arquivos processados
+
+outputs/
+├── csv/          # 🎯 CSV padronizado (Code, Description, Value)
+├── atrib_limpos/ # Dados limpos para normalização
+├── norm_csv/     # Dados normalizados (CSV)
+├── norm_excel/   # Dados normalizados (Excel)
+└── logs/         # Relatórios de processamento
+```
+
+### 5. Validar importação
 
 ```bash
 # Executar validações pós-importação
