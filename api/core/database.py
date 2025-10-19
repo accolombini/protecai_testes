@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 # Configurar engine do SQLAlchemy
 engine = create_engine(
     settings.DATABASE_URL,
-    poolclass=StaticPool,
     connect_args={
-        "check_same_thread": False,
         "options": "-c search_path=relay_configs,public"
     },
     echo=True if settings.LOG_LEVEL == "DEBUG" else False

@@ -7,7 +7,7 @@ Schemas para validação e serialização de dados.
 
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any, Union
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
 # ================================
@@ -84,10 +84,14 @@ class EquipmentBase(BaseModel):
     """Equipamento base"""
     tag_reference: Optional[str] = Field(None, description="Tag de referência")
     serial_number: Optional[str] = Field(None, description="Número de série")
-    firmware_version: Optional[str] = Field(None, description="Versão do firmware")
-    installation_date: Optional[datetime] = Field(None, description="Data de instalação")
-    location: Optional[str] = Field(None, description="Localização")
-    status: EquipmentStatus = Field(EquipmentStatus.active, description="Status do equipamento")
+    plant_reference: Optional[str] = Field(None, description="Referência da planta")
+    bay_position: Optional[str] = Field(None, description="Posição do bay")
+    software_version: Optional[str] = Field(None, description="Versão do software")
+    frequency: Optional[float] = Field(None, description="Frequência nominal")
+    description: Optional[str] = Field(None, description="Descrição")
+    installation_date: Optional[date] = Field(None, description="Data de instalação")
+    commissioning_date: Optional[date] = Field(None, description="Data de comissionamento")
+    status: Optional[str] = Field(None, description="Status do equipamento")
     model_id: int = Field(..., description="ID do modelo")
     
     model_config = {"protected_namespaces": ()}
@@ -100,10 +104,14 @@ class EquipmentUpdate(BaseModel):
     """Atualização de equipamento"""
     tag_reference: Optional[str] = None
     serial_number: Optional[str] = None
-    firmware_version: Optional[str] = None
-    installation_date: Optional[datetime] = None
-    location: Optional[str] = None
-    status: Optional[EquipmentStatus] = None
+    plant_reference: Optional[str] = None
+    bay_position: Optional[str] = None
+    software_version: Optional[str] = None
+    frequency: Optional[float] = None
+    description: Optional[str] = None
+    installation_date: Optional[date] = None
+    commissioning_date: Optional[date] = None
+    status: Optional[str] = None
 
 class EquipmentResponse(EquipmentBase):
     """Response do equipamento"""

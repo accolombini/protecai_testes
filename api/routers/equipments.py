@@ -5,7 +5,8 @@ Router de Equipamentos - CRUD Completo
 Endpoints para gerenciamento de equipamentos de proteção.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import logging
@@ -28,7 +29,7 @@ logger = logging.getLogger(__name__)
 async def list_equipments(
     page: int = Query(1, ge=1, description="Número da página"),
     size: int = Query(10, ge=1, le=100, description="Itens por página"),
-    status: Optional[str] = Query(None, description="Filtrar por status"),
+    status_filter: Optional[str] = Query(None, alias="status", description="Filtrar por status"),
     manufacturer: Optional[str] = Query(None, description="Filtrar por fabricante"),
     db: Session = Depends(get_db)
 ):
@@ -43,16 +44,17 @@ async def list_equipments(
     - **manufacturer**: Filtrar por nome do fabricante
     """
     try:
+        # Buscar equipamentos usando service com DB real
         service = EquipmentService(db)
-        equipments, total = await service.get_equipments(
+        equipments_data, total = await service.get_equipments(
             page=page, 
             size=size, 
-            status_filter=status,
+            status_filter=status_filter,
             manufacturer_filter=manufacturer
         )
         
         return EquipmentListResponse(
-            data=equipments,
+            data=equipments_data,
             total=total,
             page=page,
             size=size,
@@ -78,7 +80,7 @@ async def get_equipment(
     - **equipment_id**: ID único do equipamento
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         equipment = await service.get_equipment_by_id(equipment_id)
         
         if not equipment:
@@ -110,7 +112,7 @@ async def create_equipment(
     - **equipment**: Dados do equipamento a ser criado
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         new_equipment = await service.create_equipment(equipment)
         
         logger.info(f"Equipment created with ID: {new_equipment.id}")
@@ -142,7 +144,7 @@ async def update_equipment(
     - **equipment_update**: Dados a serem atualizados
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         updated_equipment = await service.update_equipment(equipment_id, equipment_update)
         
         if not updated_equipment:
@@ -175,7 +177,7 @@ async def delete_equipment(
     - **equipment_id**: ID do equipamento a ser excluído
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         success = await service.delete_equipment(equipment_id)
         
         if not success:
@@ -210,7 +212,7 @@ async def get_equipment_electrical_config(
     - **equipment_id**: ID do equipamento
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         electrical_config = await service.get_electrical_configuration(equipment_id)
         
         if not electrical_config:
@@ -242,7 +244,7 @@ async def get_equipment_protection_functions(
     - **equipment_id**: ID do equipamento
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         protection_functions = await service.get_protection_functions(equipment_id)
         
         return protection_functions
@@ -266,7 +268,7 @@ async def get_equipment_io_configuration(
     - **equipment_id**: ID do equipamento
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         io_config = await service.get_io_configuration(equipment_id)
         
         return io_config
@@ -290,7 +292,7 @@ async def get_equipment_summary(
     - **equipment_id**: ID do equipamento
     """
     try:
-        service = EquipmentService(db)
+        service = EquipmentService()
         summary = await service.get_equipment_summary(equipment_id)
         
         if not summary:

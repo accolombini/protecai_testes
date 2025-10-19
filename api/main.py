@@ -166,9 +166,10 @@ async def health_check():
     """Health check da API"""
     try:
         # Verificar conexão com banco
+        from api.core.database import engine
         from sqlalchemy import text
-        db = next(get_db())
-        db.execute(text("SELECT 1"))
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
         db_status = "✅ Connected"
     except Exception as e:
         db_status = f"❌ Error: {str(e)}"
