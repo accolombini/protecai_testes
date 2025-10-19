@@ -1,3 +1,7 @@
+# ProtecAI - Dependências Unificadas
+# ===================================
+
+# Sistema Existente (Pipeline de Processamento)
 et_xmlfile==2.0.0
 lxml==6.0.2
 numpy==2.3.3
@@ -12,3 +16,37 @@ six==1.17.0
 typing_extensions==4.15.0
 tzdata==2025.2
 xlsxwriter==3.2.9
+
+# API REST Framework (TODO #7)
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Banco de dados
+sqlalchemy==2.0.23
+alembic==1.12.1
+
+# Validação e serialização
+pydantic==2.5.1
+pydantic-settings==2.1.0
+
+# Segurança
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Logging e monitoramento
+structlog==23.2.0
+
+# Testes
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+
+# Documentação
+mkdocs==1.5.3
+mkdocs-material==9.4.8
+
+# Desenvolvimento
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
