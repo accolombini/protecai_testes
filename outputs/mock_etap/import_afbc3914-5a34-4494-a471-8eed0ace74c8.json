@@ -1,0 +1,27 @@
+{
+  "name": "Test Native Study",
+  "description": "Test study for etapPy\u2122 API preparation",
+  "equipment_configs": [
+    {
+      "tag": "REL_NATIVE_001",
+      "manufacturer": "Schneider Electric",
+      "model": "MiCOM P143",
+      "configuration": {
+        "50.01": "Enabled",
+        "50.02": "1200A",
+        "51.01": "Enabled",
+        "51.02": "1.5s"
+      }
+    },
+    {
+      "tag": "REL_NATIVE_002",
+      "manufacturer": "ABB",
+      "model": "REF615",
+      "configuration": {
+        "overcurrent": "Active",
+        "pickup": "800A",
+        "time_delay": "0.3s"
+      }
+    }
+  ]
+}

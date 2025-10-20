@@ -24,7 +24,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Imports dos módulos do projeto
-from api.routers import equipments, compare, imports, etap, ml, validation
+from api.routers import equipments, compare, imports, etap, etap_native, ml, validation
 from api.core.config import settings
 from api.core.database import engine, get_db
 
@@ -112,6 +112,13 @@ app.include_router(
 )
 
 app.include_router(
+    etap_native.router,
+    prefix="/api/v1",
+    tags=["ETAP Native"],
+    responses={503: {"description": "ETAP Native service unavailable"}},
+)
+
+app.include_router(
     ml.router,
     prefix="/api/v1/ml",
     tags=["ML Optimization"],
@@ -155,7 +162,8 @@ async def root():
             "equipments": "✅ CRUD completo",
             "compare": "✅ Comparação inteligente",
             "import": "✅ Controle de dados",
-            "etap": "🚧 Interface preparatória",
+            "etap": "✅ Interface enterprise",
+            "etap_native": "🚀 etapPy™ API Preparation",
             "ml": "🚧 Interface preparatória",
             "validation": "✅ Validação de seletividade"
         }
@@ -180,7 +188,8 @@ async def health_check():
         "services": {
             "api": "✅ Running",
             "database": db_status,
-            "etap": "🚧 Preparatory",
+            "etap": "✅ Enterprise Ready",
+            "etap_native": "� etapPy™ Prepared",
             "ml": "🚧 Preparatory"
         },
         "uptime": "Active since startup"
