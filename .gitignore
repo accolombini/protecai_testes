@@ -201,6 +201,16 @@ docker/postgres/logs/
 
 # Office temporary files
 ~$*
+*.tmp
+~$*.docx
+~$*.xlsx
+~$*.pptx
+*.lnk
+
+# Backup files
+*_backup.*
+*_old.*
+*_temp.*
 
 # Project specific outputs that should not be tracked
 outputs/logs/
