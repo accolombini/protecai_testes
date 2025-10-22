@@ -846,31 +846,65 @@ def process_txt_file(txt_path: Path) -> pd.DataFrame:
     """
     Processa arquivo TXT estruturado.
     
-    Espera formato de linhas tipo:
-    Code: Description: Value
-    ou
-    Code | Description | Value
+    Suporta formatos:
+    - Code: Description: Value
+    - Code | Description | Value  
+    - SepaM .S40: key=value (formato INI)
     """
     rows = []
     
     try:
-        with open(txt_path, 'r', encoding='utf-8') as f:
-            content = f.read()
+        # Tentar diferentes encodings comuns para arquivos SepaM
+        encodings = ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']
+        content = None
+        used_encoding = None
         
-        # Tentar diferentes padrões de separação
+        for encoding in encodings:
+            try:
+                with open(txt_path, 'r', encoding=encoding) as f:
+                    content = f.read()
+                    used_encoding = encoding
+                    break
+            except UnicodeDecodeError:
+                continue
+        
+        if content is None:
+            raise ValueError(f"Não foi possível decodificar o arquivo com nenhum encoding testado: {encodings}")
+        
+        # Log do encoding usado (apenas para .S40)
+        if txt_path.suffix.upper() == '.S40':
+            print(f"[ENCODING] {txt_path.name}: {used_encoding}")
+        
+        # Detectar se é arquivo SepaM (.S40) pelo conteúdo
+        is_sepam = (txt_path.suffix.lower() == '.s40' or 
+                   '[Sepam_' in content or 
+                   '=' in content and '[' in content)
+        
+        current_section = "general"
+        
         for line in content.splitlines():
             line = line.strip()
             if not line or line.startswith('#'):  # Ignorar comentários
                 continue
             
-            # Padrão 1: Code: Description: Value
-            if line.count(':') >= 2:
+            # SepaM .S40 format: key=value e seções [nome]
+            if is_sepam:
+                if line.startswith('[') and line.endswith(']'):
+                    current_section = line[1:-1]  # Remove [ ]
+                    continue
+                elif '=' in line:
+                    key, value = line.split('=', 1)
+                    code = f"{current_section}.{key.strip()}"
+                    rows.append({"Code": code, "Description": key.strip(), "Value": value.strip()})
+            
+            # Padrão tradicional 1: Code: Description: Value
+            elif line.count(':') >= 2:
                 parts = line.split(':', 2)
                 if len(parts) == 3:
                     code, desc, val = [p.strip() for p in parts]
                     rows.append({"Code": code, "Description": desc, "Value": val})
             
-            # Padrão 2: Code | Description | Value
+            # Padrão tradicional 2: Code | Description | Value
             elif '|' in line:
                 parts = line.split('|')
                 if len(parts) >= 3:
@@ -984,9 +1018,10 @@ def process_file_by_extension(file_path: Path) -> Tuple[pd.DataFrame, str]:
         result = detect_and_parse(text)
         return result.df, result.detected
     
-    elif extension == '.txt':
+    elif extension in ['.txt', '.s40', '.S40']:
         df = process_txt_file(file_path)
-        return df, "structured_text"
+        format_type = "sepam_s40" if extension.lower() == '.s40' else "structured_text"
+        return df, format_type
     
     elif extension in ['.xlsx', '.xls']:
         df = process_xlsx_file(file_path)
@@ -1020,7 +1055,7 @@ def scan_and_process_all_formats(registry: FileRegistryManager) -> Dict[str, Lis
     # Definir diretórios e extensões
     format_dirs = {
         'pdf': (INPUT_PDF_DIR, ['.pdf']),
-        'txt': (INPUT_TXT_DIR, ['.txt']),
+        'txt': (INPUT_TXT_DIR, ['.txt', '.S40']),
         'xlsx': (INPUT_XLSX_DIR, ['.xlsx', '.xls']),
         'csv': (INPUT_CSV_DIR, ['.csv'])
     }

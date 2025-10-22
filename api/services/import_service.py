@@ -803,14 +803,6 @@ class ImportService:
             }
     
     async def get_import_details(self, import_id: str) -> Optional[Dict]:
-            }
-            
-        except Exception as e:
-            logger.error(f"ERRO CRÍTICO no histórico real: {e}")
-            # Fallback para histórico mínimo baseado em CSV
-            return await self._get_fallback_import_history(page, size)
-    
-    async def get_import_details(self, import_id: str) -> Optional[Dict]:
         """Retorna detalhes de uma importação específica"""
         try:
             # Por enquanto, simular detalhes

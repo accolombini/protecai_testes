@@ -138,12 +138,31 @@ class UniversalFormatConverter:
             detected_format = "micom"
         elif "easergy studio" in lowered or "easergy p2" in lowered:
             detected_format = "easergy" 
+        elif "[sepam_" in lowered or "=" in text and "[" in text:
+            detected_format = "sepam_s40"
         elif "generic" in source_format or "txt" in source_format:
             detected_format = "structured_text"
+        
+        # Variável para track de seção SepaM
+        current_section = "general"
         
         for raw_line in text.splitlines():
             line = raw_line.strip()
             if not line or line.startswith('#') or line.startswith('//'):
+                continue
+            
+            # SepaM .S40 format: [seção] e key=value
+            if line.startswith('[') and line.endswith(']'):
+                current_section = line[1:-1]  # Remove [ ]
+                continue
+            elif '=' in line and detected_format == "sepam_s40":
+                key, value = line.split('=', 1)
+                code = f"{current_section}.{key.strip()}"
+                rows.append({
+                    "Code": code,
+                    "Description": key.strip(),
+                    "Value": value.strip()
+                })
                 continue
             
             # Tentar patterns MiCOM primeiro
@@ -236,7 +255,7 @@ class UniversalFormatConverter:
         try:
             # Tentar diferentes encodings
             text = None
-            for encoding in ['utf-8', 'latin-1', 'cp1252']:
+            for encoding in ['utf-8', 'latin-1', 'cp1252', 'iso-8859-1']:
                 try:
                     with open(txt_path, 'r', encoding=encoding) as f:
                         text = f.read()
@@ -406,7 +425,7 @@ class UniversalFormatConverter:
         # Buscar arquivos em cada formato
         formatos = {
             'pdf': list(INPUT_PDF_DIR.glob("*.pdf")),
-            'txt': list(INPUT_TXT_DIR.glob("*.txt")),
+            'txt': list(INPUT_TXT_DIR.glob("*.txt")) + list(INPUT_TXT_DIR.glob("*.S40")),
             'xlsx': list(INPUT_XLSX_DIR.glob("*.xlsx")) + list(INPUT_XLSX_DIR.glob("*.xls")),
             'csv': list(INPUT_CSV_DIR.glob("*.csv"))
         }

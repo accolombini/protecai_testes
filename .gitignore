@@ -216,10 +216,37 @@ docker/postgres/logs/
 outputs/logs/
 outputs/norm_csv/
 outputs/norm_excel/
+outputs/csv/
+outputs/atrib_limpos/
+outputs/excel/
+
+# Input files - should not be tracked in production
+inputs/pdf/
+inputs/txt/
+inputs/xlsx/
+inputs/csv/
+inputs/glossario/
+
+# Temporary folder for incoming data processing
+temp/
 
 # Generated documentation with timestamps
 outputs/doc/*_2025*.xlsx
 outputs/doc/*_2025*.docx
+
+# Arquivos de contexto - MANTER SEMPRE (são fundamentais para continuidade)
+# AUDITORIA_MOCK_FAKE.md - MANTER
+# CONTEXTO_PROTECAI.md - MANTER
+
+# Registry backups
+inputs/registry/*_backup_*.json
+
+# Frontend development files (untracked components)
+frontend/protecai-frontend/src/components/APIIntegrationDashboard.tsx
+frontend/protecai-frontend/src/components/FileUploadProcessor.tsx
+frontend/protecai-frontend/src/components/RealFileUpload.tsx
+frontend/protecai-frontend/src/components/SimpleAPITest.tsx
+frontend/protecai-frontend/src/components/SimpleUpload.tsx
 
 # Docker infrastructure (development only)
 docker/

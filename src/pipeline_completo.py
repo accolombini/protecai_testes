@@ -131,7 +131,11 @@ class ProtecaiPipelineOrchestrator:
         
         for formato, dir_path in formatos.items():
             if dir_path.exists():
-                arquivos = list(dir_path.glob(f"*.{formato}"))
+                if formato == 'txt':
+                    # Incluir arquivos .txt e .S40
+                    arquivos = list(dir_path.glob("*.txt")) + list(dir_path.glob("*.S40"))
+                else:
+                    arquivos = list(dir_path.glob(f"*.{formato}"))
                 contadores[formato] = len(arquivos)
                 
                 if arquivos and self.verbose:
