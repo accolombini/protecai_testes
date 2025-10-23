@@ -5,7 +5,7 @@ interface TestComponentProps {}
 
 const TestComponent: React.FC<TestComponentProps> = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-protec-50 to-protec-100 p-8">
+    <div className="min-h-screen bg-linear-to-br from-protec-50 to-protec-100 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-4xl font-bold text-protec-800 mb-6">
