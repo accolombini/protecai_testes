@@ -292,3 +292,144 @@ class EquipmentService:
         except Exception as e:
             logger.error(f"Error generating equipment summary for {equipment_id}: {e}")
             raise
+    
+    async def create_equipment(self, equipment_data) -> Dict:
+        """
+        Cria novo equipamento no banco de dados
+        
+        Args:
+            equipment_data: Dados do equipamento a ser criado
+            
+        Returns:
+            Dict: Dados do equipamento criado
+        """
+        try:
+            # Verificar se o model_id existe
+            model_exists = self.db.query(RelayModel)\
+                                .filter(RelayModel.id == equipment_data.model_id)\
+                                .first()
+            
+            if not model_exists:
+                raise ValueError(f"Model with ID {equipment_data.model_id} not found")
+            
+            # Criar novo equipamento
+            new_equipment = RelayEquipment(
+                tag_reference=equipment_data.tag_reference,
+                serial_number=equipment_data.serial_number,
+                plant_reference=equipment_data.plant_reference,
+                bay_position=getattr(equipment_data, 'bay_position', None),
+                software_version=getattr(equipment_data, 'software_version', None),
+                frequency=getattr(equipment_data, 'frequency', None),
+                description=equipment_data.description,
+                installation_date=getattr(equipment_data, 'installation_date', None),
+                commissioning_date=getattr(equipment_data, 'commissioning_date', None),
+                status=equipment_data.status,
+                model_id=equipment_data.model_id,
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow()
+            )
+            
+            self.db.add(new_equipment)
+            self.db.commit()
+            self.db.refresh(new_equipment)
+            
+            logger.info(f"Created new equipment with ID: {new_equipment.id}")
+            
+            # Retornar dados completos do equipamento criado
+            return await self.get_equipment_by_id(new_equipment.id)
+            
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error creating equipment: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Unexpected error creating equipment: {e}")
+            raise
+    
+    async def update_equipment(self, equipment_id: int, equipment_data) -> Optional[Dict]:
+        """
+        Atualiza equipamento existente
+        
+        Args:
+            equipment_id: ID do equipamento
+            equipment_data: Dados a serem atualizados
+            
+        Returns:
+            Optional[Dict]: Dados do equipamento atualizado ou None
+        """
+        try:
+            equipment = self.db.query(RelayEquipment)\
+                              .filter(RelayEquipment.id == equipment_id)\
+                              .first()
+            
+            if not equipment:
+                return None
+            
+            # Atualizar campos fornecidos
+            update_data = equipment_data.dict(exclude_unset=True)
+            
+            if 'model_id' in update_data:
+                model_exists = self.db.query(RelayModel)\
+                                    .filter(RelayModel.id == update_data['model_id'])\
+                                    .first()
+                if not model_exists:
+                    raise ValueError(f"Model with ID {update_data['model_id']} not found")
+            
+            for field, value in update_data.items():
+                setattr(equipment, field, value)
+            
+            equipment.updated_at = datetime.utcnow()
+            
+            self.db.commit()
+            self.db.refresh(equipment)
+            
+            logger.info(f"Updated equipment with ID: {equipment_id}")
+            
+            # Retornar dados completos do equipamento atualizado
+            return await self.get_equipment_by_id(equipment_id)
+            
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error updating equipment {equipment_id}: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Unexpected error updating equipment {equipment_id}: {e}")
+            raise
+    
+    async def delete_equipment(self, equipment_id: int) -> bool:
+        """
+        Exclui equipamento (soft delete - marca como descomissionado)
+        
+        Args:
+            equipment_id: ID do equipamento
+            
+        Returns:
+            bool: True se excluído com sucesso, False se não encontrado
+        """
+        try:
+            equipment = self.db.query(RelayEquipment)\
+                              .filter(RelayEquipment.id == equipment_id)\
+                              .first()
+            
+            if not equipment:
+                return False
+            
+            # Soft delete - marcar como descomissionado
+            equipment.status = 'decommissioned'
+            equipment.updated_at = datetime.utcnow()
+            
+            self.db.commit()
+            
+            logger.info(f"Soft deleted equipment with ID: {equipment_id}")
+            return True
+            
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error deleting equipment {equipment_id}: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Unexpected error deleting equipment {equipment_id}: {e}")
+            raise

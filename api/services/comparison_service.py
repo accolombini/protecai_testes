@@ -1,11 +1,13 @@
 import logging
 from typing import Dict, List
 from datetime import datetime
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
 class ComparisonService:
-    def __init__(self):
+    def __init__(self, db: Session):
+        self.db = db
         self.comparison_count = 0
     
     async def compare_equipments(self, comparison_data: Dict) -> Dict:

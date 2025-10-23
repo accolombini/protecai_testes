@@ -372,7 +372,8 @@ class UniversalRelayProcessor:
     Processador universal para qualquer tipo de relé
     """
     
-    def __init__(self):
+    def __init__(self, db=None):
+        self.db = db
         self.detector = UniversalRelayDetector()
         
     def process_relay_data(self, csv_data: List[Dict[str, str]]) -> Dict[str, Any]:

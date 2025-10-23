@@ -55,7 +55,8 @@ class CSVBridge:
     - Preparar dados para futura API Python
     """
     
-    def __init__(self):
+    def __init__(self, db=None):
+        self.db = db
         self.field_mappings = self._initialize_field_mappings()
         self.device_configs = {}
         

@@ -912,7 +912,8 @@ class EtapAdapterManager:
     Permite troca dinâmica entre diferentes tipos de conexão
     """
     
-    def __init__(self):
+    def __init__(self, db=None):
+        self.db = db
         self.current_adapter: Optional[EtapAdapterBase] = None
         self.config_history: List[EtapConnectionConfig] = []
         self.logger = logger

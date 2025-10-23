@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 class ValidationService:
     """Service para validação de configurações"""
     
-    def __init__(self):
+    def __init__(self, db=None):
+        self.db = db
         self.validation_rules = {
             "selectivity": {
                 "time_grading": 0.3,  # mínimo 300ms entre níveis

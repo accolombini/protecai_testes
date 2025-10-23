@@ -64,7 +64,7 @@ async def get_validation_rules():
     """
     try:
         service = ValidationService(None)  # Não precisa de DB para regras estáticas
-        rules = await service.get_validation_rules()
+        rules = await service.get_validation_templates()
         
         return {
             "success": True,
