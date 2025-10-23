@@ -1,14 +1,15 @@
 """
-Router de Equipamentos - CRUD Completo
-======================================
+Router de Equipamentos - CRUD Completo com Sistema Unificado
+============================================================
 
-Endpoints para gerenciamento de equipamentos de proteção.
+Endpoints para gerenciamento de equipamentos de proteção com
+integração transparente entre schemas protec_ai e relay_configs.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi import status
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import logging
 
 from api.core.database import get_db
@@ -20,12 +21,12 @@ from api.schemas import (
     BaseResponse,
     PaginationParams
 )
-from api.services.equipment_service import EquipmentService
+from api.services.unified_equipment_service import UnifiedEquipmentService
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-@router.get("/", response_model=EquipmentListResponse)
+@router.get("/", response_model=Dict[str, Any])
 async def list_equipments(
     page: int = Query(1, ge=1, description="Número da página"),
     size: int = Query(10, ge=1, le=100, description="Itens por página"),
@@ -34,9 +35,9 @@ async def list_equipments(
     db: Session = Depends(get_db)
 ):
     """
-    📋 **Listar Equipamentos**
+    📋 **Listar Equipamentos Unificados**
     
-    Retorna lista paginada de equipamentos com filtros opcionais.
+    Retorna lista paginada de equipamentos de ambos os schemas (protec_ai + relay_configs).
     
     - **page**: Número da página (padrão: 1)
     - **size**: Itens por página (padrão: 10, máximo: 100)
@@ -44,46 +45,48 @@ async def list_equipments(
     - **manufacturer**: Filtrar por nome do fabricante
     """
     try:
-        # Buscar equipamentos usando service com DB real
-        service = EquipmentService(db)
-        equipments_data, total = await service.get_equipments(
-            page=page, 
-            size=size, 
-            status_filter=status_filter,
-            manufacturer_filter=manufacturer
-        )
+        # Usar o service unificado validado
+        service = UnifiedEquipmentService(db)
         
-        return EquipmentListResponse(
-            data=equipments_data,
-            total=total,
+        equipments_data, total = await service.get_unified_equipment_data(
             page=page,
             size=size,
-            message=f"Found {total} equipments"
+            manufacturer_filter=manufacturer or ""
         )
+        
+        return {
+            "data": equipments_data,
+            "total": total,
+            "page": page,
+            "size": size,
+            "message": f"Found {len(equipments_data)} unified equipments",
+            "protec_ai_count": len([eq for eq in equipments_data if eq.get("source_schema") == "protec_ai"]),
+            "relay_configs_count": len([eq for eq in equipments_data if eq.get("source_schema") == "relay_configs"])
+        }
     except Exception as e:
-        logger.error(f"Error listing equipments: {e}")
+        logger.error(f"Error listing unified equipments: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error retrieving equipments"
         )
 
-@router.get("/{equipment_id}", response_model=EquipmentResponse)
+@router.get("/{equipment_id}", response_model=Dict[str, Any])
 async def get_equipment(
-    equipment_id: int,
+    equipment_id: str,
     db: Session = Depends(get_db)
 ):
     """
-    🔍 **Obter Equipamento por ID**
+    🔍 **Obter Equipamento por ID Unificado**
     
-    Retorna detalhes completos de um equipamento específico.
+    Retorna detalhes completos de um equipamento de qualquer schema.
     
-    - **equipment_id**: ID único do equipamento
+    - **equipment_id**: ID único do equipamento (formato: schema_id)
     """
     try:
-        service = EquipmentService()
-        equipment = await service.get_equipment_by_id(equipment_id)
+        service = UnifiedEquipmentService(db)
+        equipment = await service.get_unified_equipment_details(equipment_id)
         
-        if not equipment:
+        if not equipment or not equipment.get("equipment"):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Equipment with ID {equipment_id} not found"
@@ -99,7 +102,40 @@ async def get_equipment(
             detail="Error retrieving equipment"
         )
 
-@router.post("/", response_model=EquipmentResponse, status_code=status.HTTP_201_CREATED)
+@router.get("/statistics/unified")
+async def get_unified_statistics(db: Session = Depends(get_db)):
+    """Obter estatísticas unificadas do sistema de equipamentos"""
+    try:
+        logger.info("Retrieving unified equipment statistics")
+        service = UnifiedEquipmentService(db)
+        stats = await service.get_unified_statistics()
+        return stats
+    except Exception as e:
+        logger.error(f"Error getting unified statistics: {e}")
+        raise HTTPException(status_code=500, detail="Error retrieving statistics")
+
+@router.get("/manufacturers/unified", response_model=Dict[str, Any])
+async def get_unified_manufacturers(
+    query: str = Query("", description="Filtro de busca por nome"),
+    db: Session = Depends(get_db)
+):
+    """
+    🏭 **Fabricantes Unificados**
+    
+    Retorna lista consolidada de fabricantes de ambos os schemas.
+    """
+    try:
+        service = UnifiedEquipmentService(db)
+        manufacturers = await service.search_unified_manufacturers(query)
+        return manufacturers
+    except Exception as e:
+        logger.error(f"Error getting unified manufacturers: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error retrieving manufacturers"
+        )
+
+@router.post("/", response_model=BaseResponse, status_code=status.HTTP_201_CREATED)
 async def create_equipment(
     equipment: EquipmentCreate,
     db: Session = Depends(get_db)
@@ -107,206 +143,100 @@ async def create_equipment(
     """
     ➕ **Criar Novo Equipamento**
     
-    Cria um novo equipamento no sistema.
-    
-    - **equipment**: Dados do equipamento a ser criado
+    AVISO: Funcionalidade em desenvolvimento para sistema unificado.
     """
-    try:
-        service = EquipmentService()
-        new_equipment = await service.create_equipment(equipment)
-        
-        logger.info(f"Equipment created with ID: {new_equipment.id}")
-        return new_equipment
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
-    except Exception as e:
-        logger.error(f"Error creating equipment: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error creating equipment"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Create functionality being implemented for unified system"
+    )
 
-@router.put("/{equipment_id}", response_model=EquipmentResponse)
+@router.put("/{equipment_id}", response_model=BaseResponse)
 async def update_equipment(
-    equipment_id: int,
+    equipment_id: str,
     equipment_update: EquipmentUpdate,
     db: Session = Depends(get_db)
 ):
     """
     📝 **Atualizar Equipamento**
     
-    Atualiza dados de um equipamento existente.
-    
-    - **equipment_id**: ID do equipamento a ser atualizado
-    - **equipment_update**: Dados a serem atualizados
+    AVISO: Funcionalidade em desenvolvimento para sistema unificado.
     """
-    try:
-        service = EquipmentService()
-        updated_equipment = await service.update_equipment(equipment_id, equipment_update)
-        
-        if not updated_equipment:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Equipment with ID {equipment_id} not found"
-            )
-        
-        logger.info(f"Equipment {equipment_id} updated successfully")
-        return updated_equipment
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error updating equipment {equipment_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error updating equipment"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Update functionality being implemented for unified system"
+    )
 
 @router.delete("/{equipment_id}", response_model=BaseResponse)
 async def delete_equipment(
-    equipment_id: int,
+    equipment_id: str,
     db: Session = Depends(get_db)
 ):
     """
     🗑️ **Excluir Equipamento**
     
-    Remove um equipamento do sistema (soft delete - marca como descomissionado).
-    
-    - **equipment_id**: ID do equipamento a ser excluído
+    AVISO: Funcionalidade em desenvolvimento para sistema unificado.
     """
-    try:
-        service = EquipmentService()
-        success = await service.delete_equipment(equipment_id)
-        
-        if not success:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Equipment with ID {equipment_id} not found"
-            )
-        
-        logger.info(f"Equipment {equipment_id} deleted successfully")
-        return BaseResponse(
-            message=f"Equipment {equipment_id} deleted successfully"
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error deleting equipment {equipment_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error deleting equipment"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Delete functionality being implemented for unified system"
+    )
 
 @router.get("/{equipment_id}/electrical", response_model=dict)
 async def get_equipment_electrical_config(
-    equipment_id: int,
+    equipment_id: str,
     db: Session = Depends(get_db)
 ):
     """
     ⚡ **Obter Configuração Elétrica**
     
-    Retorna configuração elétrica completa de um equipamento.
-    
-    - **equipment_id**: ID do equipamento
+    AVISO: Funcionalidade em desenvolvimento para sistema unificado.
     """
-    try:
-        service = EquipmentService()
-        electrical_config = await service.get_electrical_configuration(equipment_id)
-        
-        if not electrical_config:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Electrical configuration not found for equipment {equipment_id}"
-            )
-        
-        return electrical_config
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting electrical config for equipment {equipment_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving electrical configuration"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Electrical configuration functionality being implemented for unified system"
+    )
 
 @router.get("/{equipment_id}/protection-functions", response_model=List[dict])
 async def get_equipment_protection_functions(
-    equipment_id: int,
+    equipment_id: str,
     db: Session = Depends(get_db)
 ):
     """
     🛡️ **Obter Funções de Proteção**
     
-    Retorna todas as funções de proteção de um equipamento.
-    
-    - **equipment_id**: ID do equipamento
+    AVISO: Funcionalidade em desenvolvimento para sistema unificado.
     """
-    try:
-        service = EquipmentService()
-        protection_functions = await service.get_protection_functions(equipment_id)
-        
-        return protection_functions
-    except Exception as e:
-        logger.error(f"Error getting protection functions for equipment {equipment_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving protection functions"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Protection functions functionality being implemented for unified system"
+    )
 
 @router.get("/{equipment_id}/io-configuration", response_model=List[dict])
 async def get_equipment_io_configuration(
-    equipment_id: int,
+    equipment_id: str,
     db: Session = Depends(get_db)
 ):
     """
     🔌 **Obter Configuração I/O**
     
-    Retorna configuração de I/O completa de um equipamento.
-    
-    - **equipment_id**: ID do equipamento
+    AVISO: Funcionalidade em desenvolvimento para sistema unificado.
     """
-    try:
-        service = EquipmentService()
-        io_config = await service.get_io_configuration(equipment_id)
-        
-        return io_config
-    except Exception as e:
-        logger.error(f"Error getting I/O configuration for equipment {equipment_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving I/O configuration"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="I/O configuration functionality being implemented for unified system"
+    )
 
 @router.get("/{equipment_id}/summary", response_model=dict)
 async def get_equipment_summary(
-    equipment_id: int,
+    equipment_id: str,
     db: Session = Depends(get_db)
 ):
     """
     📊 **Obter Resumo Completo**
     
-    Retorna resumo completo do equipamento com todas as configurações.
-    
-    - **equipment_id**: ID do equipamento
+    AVISO: Funcionalidade em desenvolvimento para sistema unificado.
     """
-    try:
-        service = EquipmentService()
-        summary = await service.get_equipment_summary(equipment_id)
-        
-        if not summary:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Equipment with ID {equipment_id} not found"
-            )
-        
-        return summary
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting equipment summary {equipment_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving equipment summary"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Summary functionality being implemented for unified system"
+    )
