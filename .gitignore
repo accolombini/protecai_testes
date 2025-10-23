@@ -214,6 +214,7 @@ docker/postgres/logs/
 
 # Project specific outputs that should not be tracked
 outputs/logs/
+outputs/logs_backup_*/
 outputs/norm_csv/
 outputs/norm_excel/
 outputs/csv/
