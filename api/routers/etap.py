@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 # Schemas para ETAP API
 # ================================
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
 from typing import Union
 
@@ -39,13 +39,32 @@ class StudyCreateRequest(BaseModel):
     """Request para criação de estudo"""
     name: str = Field(..., description="Nome do estudo")
     description: Optional[str] = Field(None, description="Descrição detalhada")
-    study_type: StudyType = Field(..., description="Tipo do estudo")
+    study_type: Union[StudyType, str] = Field(..., description="Tipo do estudo")
     plant_reference: Optional[str] = Field(None, description="Referência da planta (formato Petrobras)")
     protection_standard: ProtectionStandard = Field(ProtectionStandard.PETROBRAS, description="Padrão de proteção")
     frequency: float = Field(60.0, description="Frequência nominal (Hz)")
     base_voltage: Optional[float] = Field(None, description="Tensão base (kV)")
     base_power: Optional[float] = Field(None, description="Potência base (MVA)")
     study_config: Optional[Dict] = Field({}, description="Configurações específicas do estudo")
+    
+    @validator('study_type', pre=True)
+    def validate_study_type(cls, v):
+        """Convert string to StudyType enum"""
+        if isinstance(v, str):
+            try:
+                return StudyType(v.upper())
+            except ValueError:
+                # Try to match common variations
+                mapping = {
+                    'coordination': StudyType.COORDINATION,
+                    'selectivity': StudyType.SELECTIVITY, 
+                    'arc_flash': StudyType.ARC_FLASH,
+                    'short_circuit': StudyType.SHORT_CIRCUIT
+                }
+                if v.lower() in mapping:
+                    return mapping[v.lower()]
+                raise ValueError(f"Invalid study type: {v}")
+        return v
 
 class StudyResponse(BaseModel):
     """Response de estudo"""
@@ -81,7 +100,7 @@ class StudyDetailResponse(BaseModel):
 
 class EquipmentConfigRequest(BaseModel):
     """Request para configuração de equipamento"""
-    equipment_id: Optional[int] = Field(None, description="ID do equipamento existente")
+    equipment_id: Optional[str] = Field(None, description="ID do equipamento existente")
     etap_device_id: Optional[str] = Field(None, description="ID do dispositivo no ETAP")
     device_name: Optional[str] = Field(None, description="Nome do dispositivo")
     device_type: Optional[str] = Field(None, description="Tipo do dispositivo")
@@ -242,7 +261,7 @@ async def get_study(
     """
     try:
         service = EtapService(db)
-        study_data = await service.get_study_by_id(study_id)
+        study_data = service.get_study_by_id(study_id)
         
         if not study_data:
             raise HTTPException(
@@ -397,7 +416,7 @@ async def export_study_to_csv(
         
         # Criar arquivo temporário para exportação
         with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as temp_file:
-            export_result = await service.export_to_csv(
+            export_result = service.export_to_csv(
                 study_id=study_id,
                 output_path=temp_file.name,
                 export_format=export_format
@@ -516,10 +535,14 @@ async def export_study_to_csv(
     try:
         integration_service = EtapIntegrationService(db)
         
-        filename, csv_content = await integration_service.export_study_to_csv(
-            study_id=study_id,
-            format_type=format_type
+        csv_content = integration_service.export_study_to_csv(
+            study_id=study_id
         )
+        
+        # Generate filename based on study info
+        study = integration_service.etap_service.get_study_by_id(study_id)
+        study_name = study.get('name', f'study_{study_id}') if study else f'study_{study_id}'
+        filename = f"{study_name}_export.csv"
         
         return Response(
             content=csv_content,
@@ -534,42 +557,40 @@ async def export_study_to_csv(
             detail=f"Export failed: {str(e)}"
         )
 
-@router.post("/batch-import", 
-             response_model=BaseResponse,
-             status_code=http_status.HTTP_201_CREATED)
+@router.post("/batch-import")
 async def batch_import_csv_directory(
-    directory_path: str = Query(..., description="Path to directory containing CSV files"),
-    study_prefix: str = Query("CSV_Import", description="Prefix for study names"),
+    directory_path: str,
+    study_prefix: str = "BATCH_IMPORT",
     db: Session = Depends(get_db)
 ):
     """
-    Importa em lote todos os CSVs de um diretório
+    Importa em lote todos os arquivos CSV de um diretório.
     
-    **Funcionalidades:**
-    - Importa múltiplos CSVs automaticamente
-    - Cria estudos individuais para cada arquivo
-    - Relatório detalhado de importação
+    Nota: Atualmente o sistema processa arquivos PDF e TXT.
+    Suporte a CSV está preparado para futuras configurações de relés neste formato.
     """
     try:
-        integration_service = EtapIntegrationService(db)
+        logger.info(f"🔄 Batch import request: {directory_path}")
         
+        integration_service = EtapIntegrationService(db)
         result = await integration_service.batch_import_csv_directory(
             directory_path=directory_path,
             study_prefix=study_prefix
         )
         
-        return BaseResponse(
-            success=True,
-            message=f"Batch import completed: {result['successful_imports']}/{result['total_files']} files",
-            data=result
-        )
-        
+        # Se o serviço retornou resultado controlado (sem exceção), retorna o resultado
+        if result.get("success", False) or result.get("total_files", 0) == 0:
+            logger.info(f"✅ Batch import completed: {result.get('message', 'Success')}")
+            return result
+        else:
+            # Se houve erro, mas foi tratado pelo serviço
+            logger.warning(f"⚠️ Batch import with issues: {result.get('message', 'Unknown error')}")
+            return result
+            
     except Exception as e:
-        logger.error(f"Batch import failed: {e}")
-        raise HTTPException(
-            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Batch import failed: {str(e)}"
-        )
+        error_msg = f"Batch import failed: {str(e)}"
+        logger.error(error_msg)
+        raise HTTPException(status_code=500, detail=error_msg)
 
 @router.get("/studies/{study_id}/migration-status", 
             response_model=BaseResponse)

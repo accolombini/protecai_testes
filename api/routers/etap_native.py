@@ -28,7 +28,7 @@ from api.schemas import BaseResponse
 from api.services.etap_native_service import EtapNativeService, create_native_service
 from api.services.etap_native_adapter import EtapConnectionType, EtapConnectionConfig
 
-router = APIRouter(prefix="/etap-native", tags=["ETAP Native"])
+router = APIRouter()  # Sem prefix - já definido no main.py
 logger = logging.getLogger(__name__)
 
 # ================================

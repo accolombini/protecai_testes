@@ -27,11 +27,18 @@ def count_pdf_lines(pdf_path):
         print(f"Erro ao processar {pdf_path}: {e}")
         return 0, 0, ""
 
-# Analisar os PDFs
-pdf_files = [
-    Path("inputs/pdf/tela1.pdf"),
-    Path("inputs/pdf/tela3.pdf")
-]
+# Analisar os PDFs - DESCOBERTA DINÂMICA
+def find_pdf_files():
+    """Descobre todos os PDFs disponíveis no diretório inputs"""
+    base_dir = Path("inputs")
+    pdf_files = list(base_dir.glob("**/*.pdf"))
+    if not pdf_files:
+        print("❌ Nenhum arquivo PDF encontrado no diretório inputs/")
+        return []
+    print(f"✅ Encontrados {len(pdf_files)} arquivos PDF para análise")
+    return pdf_files
+
+pdf_files = find_pdf_files()
 
 for pdf_file in pdf_files:
     if pdf_file.exists():

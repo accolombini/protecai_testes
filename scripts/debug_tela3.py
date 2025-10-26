@@ -2,9 +2,20 @@ from PyPDF2 import PdfReader
 from pathlib import Path
 import re
 
-def analyze_tela3_content():
-    """Analisa o conteúdo do tela3.pdf para entender o padrão."""
-    pdf_path = Path("inputs/pdf/tela3.pdf")
+def debug_pdf_content():
+    """Analisa o conteúdo de PDFs disponíveis para entender padrões."""
+    
+    # DESCOBERTA DINÂMICA - busca qualquer PDF
+    base_dir = Path("inputs")
+    pdf_files = list(base_dir.glob("**/*.pdf"))
+    
+    if not pdf_files:
+        print("❌ Nenhum arquivo PDF encontrado no diretório inputs/")
+        return
+        
+    # Analisa o primeiro PDF encontrado (ou todos se quiser)
+    pdf_path = pdf_files[0]  # Pode iterar por todos se necessário
+    print(f"📄 Analisando: {pdf_path}")
     
     if not pdf_path.exists():
         print("Arquivo não encontrado!")
@@ -16,7 +27,7 @@ def analyze_tela3_content():
     first_page_text = reader.pages[0].extract_text() or ""
     lines = first_page_text.splitlines()
     
-    print("=== PRIMEIRAS 30 LINHAS DO TELA3.PDF ===")
+    print(f"=== PRIMEIRAS 30 LINHAS DO {pdf_path.name.upper()} ===")
     for i, line in enumerate(lines[:30], 1):
         line = line.strip()
         if line:
@@ -43,4 +54,4 @@ def analyze_tela3_content():
     print(f"Linhas com '=': {sum(1 for line in lines if '=' in line)}")
     print(f"Linhas com números: {sum(1 for line in lines if any(c.isdigit() for c in line))}")
 
-analyze_tela3_content()
+debug_pdf_content()

@@ -3,18 +3,33 @@ from pathlib import Path
 import re
 
 def analyze_all_patterns():
-    """Analisa todos os padrões do tela3.pdf para encontrar o que está sendo perdido."""
-    pdf_path = Path("inputs/pdf/tela3.pdf")
+    """Analisa todos os padrões de PDFs disponíveis para encontrar o que está sendo perdido."""
     
-    reader = PdfReader(str(pdf_path))
-    all_text = ""
-    for page in reader.pages:
-        all_text += page.extract_text() + "\n"
+    # DESCOBERTA DINÂMICA
+    base_dir = Path("inputs")
+    pdf_files = list(base_dir.glob("**/*.pdf"))
     
-    lines = [line.strip() for line in all_text.splitlines() if line.strip()]
+    if not pdf_files:
+        print("❌ Nenhum arquivo PDF encontrado no diretório inputs/")
+        return
+        
+    print(f"📊 Analisando {len(pdf_files)} arquivos PDF encontrados")
     
-    print(f"=== ANÁLISE COMPLETA DO TELA3.PDF ===")
-    print(f"Total de linhas não vazias: {len(lines)}")
+    for pdf_path in pdf_files:
+        print(f"\n=== ANÁLISE COMPLETA DO {pdf_path.name.upper()} ===")
+        
+        if not pdf_path.exists():
+            print(f"❌ Arquivo não encontrado: {pdf_path}")
+            continue
+            
+        reader = PdfReader(str(pdf_path))
+        all_text = ""
+        for page in reader.pages:
+            all_text += page.extract_text() + "\n"
+        
+        lines = [line.strip() for line in all_text.splitlines() if line.strip()]
+        
+        print(f"Total de linhas não vazias: {len(lines)}")
     
     # Padrões atuais
     RE_EASERGY_EQUALS = re.compile(r"^([0-9A-F]{4}):\s*([^=:]+)=:\s*(.*)$")

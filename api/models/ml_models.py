@@ -18,29 +18,29 @@ from api.core.database import Base
 
 
 class MLJobStatus(enum.Enum):
-    """Status of ML analysis jobs"""
-    PENDING = "pending"
-    RUNNING = "running" 
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+    """Status of ML analysis jobs - SYNCHRONIZED WITH POSTGRESQL"""
+    PENDING = "PENDING"
+    RUNNING = "RUNNING" 
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
 
 
 class MLAnalysisType(enum.Enum):
-    """Types of ML analysis supported"""
-    COORDINATION = "coordination"
-    SELECTIVITY = "selectivity"
-    SIMULATION = "simulation"
-    OPTIMIZATION = "optimization"
-    PREDICTION = "prediction"
+    """Types of ML analysis supported - SYNCHRONIZED WITH POSTGRESQL"""
+    COORDINATION = "COORDINATION"
+    SELECTIVITY = "SELECTIVITY"
+    SIMULATION = "SIMULATION"
+    OPTIMIZATION = "OPTIMIZATION"
+    PREDICTION = "PREDICTION"
 
 
 class MLPriority(enum.Enum):
-    """Priority levels for ML jobs"""
-    LOW = "low"
-    NORMAL = "normal"
-    HIGH = "high"
-    CRITICAL = "critical"
+    """Priority levels for ML jobs - SYNCHRONIZED WITH POSTGRESQL"""
+    LOW = "LOW"
+    NORMAL = "NORMAL"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
 
 
 class MLRecommendationType(enum.Enum):

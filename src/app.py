@@ -16,18 +16,17 @@ FORMATOS SUPORTADOS:
   • XLSX: Planilhas Excel com dados de configuração
   • CSV: Arquivos CSV com estrutura Code,Description,Value
 
-ESTRUTURA DE INPUTS:
-  inputs/pdf/     - Relatórios PDF
-  inputs/txt/     - Documentos de texto  
-  inputs/xlsx/    - Planilhas Excel
-  inputs/csv/     - Arquivos CSV
-  inputs/registry/ - Controle de processamento
+Estrutura de diretórios aceita:
+  inputs/pdf/      - Relatórios PDF
+  inputs/txt/      - Configurações TXT
+  inputs/xlsx/     - Planilhas Excel
+  inputs/csv/      - Dados CSV
 
-Uso (exemplos):
-  python app.py --inputs inputs/pdf/tela1.pdf inputs/txt/config.txt
-  python app.py --format pdf --xlsx saida.xlsx
-  python app.py --inputs inputs/xlsx/dados.xlsx --csv resultado.csv
-  python app.py --scan-all  # Processa todos os formatos não processados
+Execução com exemplos:
+  python app.py --inputs arquivo1.pdf arquivo2.xlsx --config config.txt
+  python app.py --help
+
+Opções específicas:
 """
 
 from __future__ import annotations
@@ -286,7 +285,7 @@ def build_argparser() -> argparse.ArgumentParser:
 Exemplos de uso:
 
   # Processar arquivos específicos
-  python app.py --inputs inputs/pdf/tela1.pdf inputs/txt/config.txt
+  python app.py --inputs arquivo1.pdf config.txt
   
   # Processar todos os arquivos PDF não processados
   python app.py --format pdf

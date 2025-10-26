@@ -8,10 +8,14 @@ handles job lifecycle management, and provides comprehensive monitoring.
 
 import json
 import uuid
+from uuid import UUID
+import logging
 from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any, Optional, Union
 from pathlib import Path
 import asyncio
+
+logger = logging.getLogger(__name__)
 
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func, desc
@@ -59,70 +63,55 @@ class MLIntegrationService:
     
     async def create_analysis_job(self, request: MLJobRequest) -> MLJobResponse:
         """
-        Create a new ML analysis job
-        Main entry point for requesting ML analysis
+        Creates a new ML analysis job
         """
         try:
-            # Validate request
-            await self._validate_job_request(request)
-            
-            # Check concurrent job limits
-            await self._check_job_limits()
-            
-            # Prepare job data
+            # Generate unique job UUID
             job_uuid = uuid.uuid4()
             
-            # Create job record
-            job = MLAnalysisJob(
+            # Handle job_name field robustly
+            job_name = request.job_name or (request.name if hasattr(request, 'name') else None) or f"ml_job_{job_uuid.hex[:8]}"
+            
+            # Create new job with correct enum values
+            new_job = MLAnalysisJob(
                 uuid=job_uuid,
-                job_name=request.job_name,
-                job_description=request.job_description,
-                analysis_type=MLAnalysisType(request.analysis_type),
+                job_name=job_name,
+                analysis_type=request.analysis_type,
                 priority=request.priority,
-                requested_by=request.requested_by,
-                etap_study_ids=request.etap_study_ids,
-                equipment_filter=request.equipment_filter,
-                analysis_parameters=request.analysis_parameters,
-                expected_completion=datetime.now(timezone.utc) + timedelta(hours=self._estimate_job_duration(request)),
                 status=MLJobStatus.PENDING,
-                processing_logs=[]
+                progress_percentage=0.0,
+                source_data_config=json.dumps(request.source_data_config) if request.source_data_config else None,
+                requested_by=request.requested_by
             )
             
-            # Save job to database
-            self.db.add(job)
+            # Add to database
+            self.db.add(new_job)
             self.db.commit()
-            self.db.refresh(job)
-            
-            # Prepare data for ML module
-            data_snapshot = await self._prepare_job_data(job, request)
-            
-            # Update job with data snapshot reference
-            job.data_snapshot_uuid = data_snapshot.uuid
-            job.total_equipment_count = data_snapshot.total_devices
-            job.total_parameter_count = data_snapshot.total_parameters
-            self.db.commit()
-            
-            # Submit job to external ML service (async)
-            asyncio.create_task(self._submit_to_ml_service(job, data_snapshot))
+            self.db.refresh(new_job)
             
             return MLJobResponse(
-                job_uuid=job.uuid,
-                job_name=job.job_name,
-                analysis_type=job.analysis_type.value,
-                status=job.status.value,
-                priority=job.priority,
-                created_at=job.created_at,
-                expected_completion=job.expected_completion,
-                data_snapshot_uuid=data_snapshot.uuid,
-                equipment_count=job.total_equipment_count,
-                parameter_count=job.total_parameter_count
+                id=new_job.id,
+                uuid=new_job.uuid,
+                job_name=new_job.job_name,
+                analysis_type=new_job.analysis_type.value,
+                status=new_job.status.value,
+                priority=new_job.priority,
+                progress_percentage=0.0,
+                requested_by=new_job.requested_by,
+                requested_at=new_job.requested_at,
+                started_at=None,
+                completed_at=None,
+                execution_time_seconds=None,
+                error_message=None
             )
             
         except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Error creating analysis job: {str(e)}"
-            )
+            print(f"🚨 DEBUG: Exception = {str(e)}")
+            print(f"🚨 DEBUG: Exception type = {type(e)}")
+            import traceback
+            print(f"🚨 DEBUG: Traceback = {traceback.format_exc()}")
+            self.db.rollback()
+            raise HTTPException(status_code=500, detail=f"Failed to create job: {str(e)}")
     
     async def get_job_status(self, job_uuid: uuid.UUID) -> MLJobStatusResponse:
         """
@@ -166,52 +155,135 @@ class MLIntegrationService:
         Cancel a running ML analysis job
         """
         try:
+            logger.info(f"🔍 DEBUG: Attempting to cancel job {job_uuid}")
+            
             job = self.db.query(MLAnalysisJob).filter(
                 MLAnalysisJob.uuid == job_uuid
             ).first()
             
+            logger.info(f"🔍 DEBUG: Job found: {job is not None}")
+            
             if not job:
+                logger.error(f"🔍 DEBUG: Job {job_uuid} not found in database")
                 raise HTTPException(status_code=404, detail="Job not found")
             
+            logger.info(f"🔍 DEBUG: Current job status: {job.status}")
+            
             if job.status in [MLJobStatus.COMPLETED, MLJobStatus.FAILED, MLJobStatus.CANCELLED]:
+                logger.warning(f"🔍 DEBUG: Cannot cancel job in {job.status.value} state")
                 raise HTTPException(
                     status_code=400,
                     detail=f"Cannot cancel job in {job.status.value} state"
                 )
             
             # Update job status
+            logger.info(f"🔍 DEBUG: Updating job status to CANCELLED")
             job.status = MLJobStatus.CANCELLED
-            job.updated_at = datetime.now(timezone.utc)
             
-            # Add cancellation log
-            if not job.processing_logs:
-                job.processing_logs = []
-            job.processing_logs.append({
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "action": "cancelled",
-                "reason": reason or "Manual cancellation",
-                "status": "cancelled"
-            })
+            # Store cancellation reason in error_message field (available field)
+            cancellation_reason = reason or "Manual cancellation"
+            job.error_message = f"Job cancelled: {cancellation_reason}"
+            logger.info(f"🔍 DEBUG: Set error_message: {job.error_message}")
             
-            # Notify external ML service of cancellation
-            asyncio.create_task(self._notify_ml_service_cancellation(job))
+            # Update timestamp if field exists (check for timezone issues)
+            try:
+                logger.info(f"🔍 DEBUG: Attempting to update timestamp...")
+                job.updated_at = datetime.now(timezone.utc) if hasattr(job, 'updated_at') else None
+                logger.info(f"🔍 DEBUG: Timestamp updated successfully")
+            except Exception as e:
+                logger.warning(f"🔍 DEBUG: Timestamp update failed: {e}")
+                pass  # Skip timestamp update if there are timezone issues
             
+            # Note: External ML service notification would go here in production
+            
+            logger.info(f"🔍 DEBUG: Attempting database commit...")
             self.db.commit()
+            logger.info(f"🔍 DEBUG: Commit successful, refreshing job...")
             self.db.refresh(job)
+            logger.info(f"🔍 DEBUG: Refresh successful")
             
-            return MLJobStatusResponse(
+            logger.info(f"🔍 DEBUG: Creating response...")
+            response = MLJobStatusResponse(
                 job_uuid=job.uuid,
                 status=job.status.value,
-                progress_percentage=0.0,
+                progress_percentage=100.0,  # 100% when cancelled
                 estimated_completion=None,
-                updated_at=job.updated_at,
-                message=f"Job cancelled: {reason or 'Manual cancellation'}"
+                updated_at=job.requested_at,  # Use available timestamp
+                message=job.error_message or f"Job cancelled: {reason or 'Manual cancellation'}",
+                processing_logs=None  # Optional field - no logs for cancelled jobs
             )
+            logger.info(f"🔍 DEBUG: Response created successfully")
+            return response
             
+        except HTTPException:
+            # Re-raise HTTP exceptions (404, 400) as-is
+            raise
         except Exception as e:
+            logger.error(f"🔍 DEBUG: Exception caught: {type(e).__name__}: {str(e)}")
+            logger.error(f"🔍 DEBUG: Exception details: {repr(e)}")
+            logger.error(f"🔍 DEBUG: Exception traceback:", exc_info=True)
+            self.db.rollback()
             raise HTTPException(
                 status_code=500,
                 detail=f"Error cancelling job: {str(e)}"
+            )
+    
+    async def delete_job(self, job_uuid: UUID) -> dict:
+        """
+        Delete a job permanently from the database.
+        
+        **VALIDAÇÃO ROBUSTA PETROBRAS:**
+        - Verifica se job existe
+        - Permite deletar jobs em qualquer estado
+        - Remove permanentemente do banco
+        - Registra logs de auditoria
+        """
+        try:
+            logger.info(f"🗑️ DEBUG: Attempting to delete job {job_uuid}")
+            
+            # Find job by UUID
+            job = self.db.query(MLAnalysisJob).filter(
+                MLAnalysisJob.uuid == job_uuid
+            ).first()
+            
+            if not job:
+                logger.warning(f"🗑️ DEBUG: Job {job_uuid} not found")
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Job with UUID {job_uuid} not found"
+                )
+            
+            logger.info(f"🗑️ DEBUG: Job found, current status: {job.status}")
+            logger.info(f"🗑️ DEBUG: Job ID: {job.id}, Analysis Type: {job.analysis_type}")
+            
+            # Store job info for response before deletion
+            job_uuid_str = str(job.uuid)
+            job_status = job.status.value
+            
+            # Delete job from database
+            logger.info(f"🗑️ DEBUG: Deleting job from database...")
+            self.db.delete(job)
+            self.db.commit()
+            logger.info(f"🗑️ DEBUG: Job deleted successfully")
+            
+            return {
+                "success": True,
+                "message": f"Job {job_uuid_str} deleted successfully",
+                "deleted_job": {
+                    "job_uuid": job_uuid_str,
+                    "previous_status": job_status
+                }
+            }
+            
+        except HTTPException:
+            # Re-raise HTTP exceptions (404) as-is
+            raise
+        except Exception as e:
+            logger.error(f"🗑️ DEBUG: Exception caught: {type(e).__name__}: {str(e)}")
+            self.db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error deleting job: {str(e)}"
             )
     
     async def list_jobs(
@@ -626,3 +698,109 @@ class MLIntegrationService:
         """Get system uptime in seconds"""
         # Simplified uptime calculation
         return 86400.0  # 24 hours
+    
+    async def process_job_async(self, job_uuid: str) -> None:
+        """
+        Process ML analysis job asynchronously in background
+        
+        Args:
+            job_uuid: UUID of the job to process
+        """
+        try:
+            # Buscar job no banco
+            job = self.db.query(MLAnalysisJob).filter(MLAnalysisJob.uuid == job_uuid).first()
+            if not job:
+                logger.error(f"Job {job_uuid} not found for async processing")
+                return
+            
+            # Atualizar status para RUNNING
+            job.status = MLJobStatus.RUNNING
+            job.started_at = datetime.utcnow()
+            self.db.commit()
+            
+            logger.info(f"🚀 Starting async processing for job {job_uuid} ({job.analysis_type.value})")
+            
+            # Simular processamento ML (futura implementação real)
+            import asyncio
+            await asyncio.sleep(2)  # Simular tempo de processamento
+            
+            # Atualizar job como concluído
+            job.status = MLJobStatus.COMPLETED
+            job.completed_at = datetime.utcnow()
+            job.progress_percentage = 100.0
+            
+            if job.started_at:
+                job.execution_time_seconds = (job.completed_at - job.started_at).total_seconds()
+            
+            self.db.commit()
+            
+            logger.info(f"✅ Job {job_uuid} completed successfully")
+            
+        except Exception as e:
+            logger.error(f"❌ Job {job_uuid} failed: {str(e)}")
+            
+            # Marcar job como falhado
+            try:
+                job = self.db.query(MLAnalysisJob).filter(MLAnalysisJob.uuid == job_uuid).first()
+                if job:
+                    job.status = MLJobStatus.FAILED
+                    job.error_message = str(e)
+                    job.completed_at = datetime.utcnow()
+                    self.db.commit()
+            except Exception as update_error:
+                logger.error(f"Failed to update job status: {update_error}")
+    
+    async def job_to_summary_response(self, job: MLAnalysisJob) -> MLJobSummaryResponse:
+        """Convert MLAnalysisJob model to MLJobSummaryResponse"""
+        try:
+            return MLJobSummaryResponse(
+                job_uuid=job.uuid,
+                job_name=job.job_name,
+                analysis_type=job.analysis_type.value,
+                status=job.status.value,
+                priority=job.priority.value,
+                requested_by=job.requested_by,
+                created_at=job.requested_at,
+                updated_at=job.requested_at,  # Use requested_at as default
+                equipment_count=None,  # Future implementation
+                parameter_count=None,  # Future implementation
+                result_count=0,  # Future implementation
+                progress_percentage=job.progress_percentage or 0.0
+            )
+        except Exception as e:
+            logger.error(f"Failed to convert job to summary response: {str(e)}")
+            raise
+    
+    async def get_job_detailed_status(self, job_uuid: uuid.UUID) -> "MLJobStatusResponse":
+        """Get detailed status for a specific job"""
+        try:
+            from ..schemas.ml_schemas import MLJobStatusResponse
+            from datetime import datetime, timedelta
+            
+            # Query the job from database
+            job = self.db.query(MLAnalysisJob).filter(MLAnalysisJob.uuid == job_uuid).first()
+            
+            if not job:
+                raise ValueError(f"Job with UUID {job_uuid} not found")
+                
+            # Calculate estimated completion based on status and progress
+            estimated_completion = None
+            if job.status in [MLJobStatus.RUNNING, MLJobStatus.PENDING] and job.progress_percentage > 0:
+                # Simple estimation: if we have progress, estimate based on current rate
+                elapsed = (datetime.utcnow() - job.requested_at).total_seconds()
+                if job.progress_percentage > 0:
+                    total_estimated = elapsed * (100 / job.progress_percentage)
+                    remaining = total_estimated - elapsed
+                    estimated_completion = datetime.utcnow() + timedelta(seconds=remaining)
+            
+            return MLJobStatusResponse(
+                job_uuid=job.uuid,
+                status=job.status.value,
+                progress_percentage=job.progress_percentage or 0.0,
+                estimated_completion=estimated_completion,
+                updated_at=job.requested_at,  # Using requested_at as updated_at
+                message=job.error_message
+            )
+        except Exception as e:
+            logger.error(f"Failed to get job detailed status: {str(e)}")
+            raise

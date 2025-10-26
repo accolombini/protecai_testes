@@ -24,80 +24,60 @@ from api.services.comparison_service import ComparisonService
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-@router.post("/", response_model=ComparisonResponse)
-async def compare_equipments(
-    comparison_request: ComparisonRequest,
+@router.post("/equipment-configurations", response_model=dict)
+async def compare_equipment_configurations(
+    equipment_ids: List[str],
     db: Session = Depends(get_db)
 ):
     """
-    🔬 **Comparar Equipamentos**
+    🔬 **Comparar Configurações de Equipamentos**
     
-    Realiza comparação inteligente entre dois equipamentos de proteção.
-    
-    **Funcionalidades:**
-    - Comparação de configurações elétricas (TC/TP, tensões)
-    - Análise de funções de proteção (habilitadas/desabilitadas)
-    - Verificação de configurações I/O
-    - Classificação por criticidade (🚨 crítico, ⚠️ aviso, ℹ️ informativo)
-    - Geração de relatório detalhado
-    
-    **Tipos de Comparação:**
-    - `full`: Comparação completa (padrão)
-    - `electrical`: Apenas configurações elétricas
-    - `protection`: Apenas funções de proteção
-    - `io`: Apenas configurações I/O
+    Realiza comparação inteligente entre configurações de equipamentos.
     """
     try:
-        # Validar se os equipamentos existem
-        if comparison_request.equipment_1_id == comparison_request.equipment_2_id:
+        if len(equipment_ids) < 2:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot compare equipment with itself"
+                detail="At least 2 equipment IDs are required for comparison"
             )
         
         service = ComparisonService(db)
         
         # Verificar se os equipamentos existem
-        equipment_1 = await service.get_equipment(comparison_request.equipment_1_id)
-        equipment_2 = await service.get_equipment(comparison_request.equipment_2_id)
-        
-        if not equipment_1:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Equipment with ID {comparison_request.equipment_1_id} not found"
-            )
-        
-        if not equipment_2:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Equipment with ID {comparison_request.equipment_2_id} not found"
-            )
+        equipments = []
+        for eq_id in equipment_ids[:2]:  # Compare first 2 equipments
+            equipment = await service.get_equipment(eq_id)
+            if not equipment:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Equipment with ID {eq_id} not found"
+                )
+            equipments.append(equipment)
         
         # Realizar comparação
         comparison_result = await service.compare_equipments(
-            equipment_1_id=comparison_request.equipment_1_id,
-            equipment_2_id=comparison_request.equipment_2_id,
-            comparison_type=comparison_request.comparison_type,
-            include_details=comparison_request.include_details
+            equipment_1_id=equipment_ids[0],
+            equipment_2_id=equipment_ids[1],
+            comparison_type="full",
+            include_details=True
         )
         
-        # Gerar ID do relatório se solicitado
-        report_id = None
-        if comparison_request.include_details:
-            report_id = str(uuid.uuid4())
-            await service.save_comparison_report(report_id, comparison_result)
+        # Gerar ID do relatório
+        comparison_id = f"comp_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        await service.save_comparison_report(comparison_id, comparison_result)
         
-        logger.info(f"Comparison completed between equipment {comparison_request.equipment_1_id} and {comparison_request.equipment_2_id}")
+        logger.info(f"Comparison completed between equipment {equipment_ids[0]} and {equipment_ids[1]}")
         
-        return ComparisonResponse(
-            equipment_1=equipment_1,
-            equipment_2=equipment_2,
-            summary=comparison_result["summary"],
-            differences=comparison_result["differences"],
-            comparison_type=comparison_request.comparison_type,
-            report_id=report_id,
-            message=f"Comparison completed successfully - {comparison_result['summary']['total_comparisons']} parameters analyzed"
-        )
+        return {
+            "success": True,
+            "comparison_id": comparison_id,
+            "equipment_1": equipments[0],
+            "equipment_2": equipments[1],
+            "summary": comparison_result["summary"],
+            "differences": comparison_result["differences"],
+            "message": f"Comparison completed successfully - {comparison_result['summary']['total_comparisons']} parameters analyzed",
+            "timestamp": datetime.now().isoformat()
+        }
         
     except HTTPException:
         raise
@@ -108,153 +88,29 @@ async def compare_equipments(
             detail="Error performing equipment comparison"
         )
 
-@router.get("/reports/{report_id}", response_model=dict)
-async def get_comparison_report(
-    report_id: str,
+@router.get("/recommendations/{comparison_id}", response_model=dict)
+async def get_comparison_recommendations(
+    comparison_id: str,
     db: Session = Depends(get_db)
 ):
     """
-    📄 **Obter Relatório de Comparação**
+    📄 **Obter Recomendações de Comparação**
     
-    Recupera relatório detalhado de uma comparação previamente executada.
-    
-    - **report_id**: ID único do relatório gerado
+    Recupera recomendações baseadas em uma comparação previamente executada.
     """
     try:
         service = ComparisonService(db)
-        report = await service.get_comparison_report(report_id)
         
-        if not report:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Comparison report with ID {report_id} not found"
-            )
+        # Get recommendations using the service method (doesn't require saved report)
+        recommendations_result = await service.get_recommendations(comparison_id)
         
-        return report
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error retrieving comparison report {report_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving comparison report"
-        )
-
-@router.get("/history/{equipment_id}", response_model=List[dict])
-async def get_comparison_history(
-    equipment_id: int,
-    limit: Optional[int] = 10,
-    db: Session = Depends(get_db)
-):
-    """
-    📚 **Histórico de Comparações**
-    
-    Retorna histórico de comparações envolvendo um equipamento específico.
-    
-    - **equipment_id**: ID do equipamento
-    - **limit**: Número máximo de comparações a retornar (padrão: 10)
-    """
-    try:
-        service = ComparisonService(db)
-        history = await service.get_comparison_history(equipment_id, limit)
-        
-        return history
-    except Exception as e:
-        logger.error(f"Error retrieving comparison history for equipment {equipment_id}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving comparison history"
-        )
-
-@router.post("/batch", response_model=List[ComparisonResponse])
-async def compare_equipment_batch(
-    equipment_pairs: List[ComparisonRequest],
-    db: Session = Depends(get_db)
-):
-    """
-    📊 **Comparação em Lote**
-    
-    Realiza múltiplas comparações em uma única requisição.
-    
-    - **equipment_pairs**: Lista de pares de equipamentos para comparar
-    
-    **Limitações:**
-    - Máximo de 10 comparações por requisição
-    - Timeout de 30 segundos por comparação
-    """
-    try:
-        if len(equipment_pairs) > 10:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Maximum 10 comparisons allowed per batch request"
-            )
-        
-        service = ComparisonService(db)
-        results = []
-        
-        for pair in equipment_pairs:
-            try:
-                # Realizar comparação individual
-                equipment_1 = await service.get_equipment(pair.equipment_1_id)
-                equipment_2 = await service.get_equipment(pair.equipment_2_id)
-                
-                if not equipment_1 or not equipment_2:
-                    continue  # Pular comparações com equipamentos não encontrados
-                
-                comparison_result = await service.compare_equipments(
-                    equipment_1_id=pair.equipment_1_id,
-                    equipment_2_id=pair.equipment_2_id,
-                    comparison_type=pair.comparison_type,
-                    include_details=pair.include_details
-                )
-                
-                results.append(ComparisonResponse(
-                    equipment_1=equipment_1,
-                    equipment_2=equipment_2,
-                    summary=comparison_result["summary"],
-                    differences=comparison_result["differences"],
-                    comparison_type=pair.comparison_type,
-                    message="Batch comparison completed successfully"
-                ))
-                
-            except Exception as e:
-                logger.warning(f"Failed comparison in batch: {pair.equipment_1_id} vs {pair.equipment_2_id}: {e}")
-                continue
-        
-        logger.info(f"Batch comparison completed: {len(results)} successful comparisons")
-        return results
+        return recommendations_result
         
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error in batch comparison: {e}")
+        logger.error(f"Error retrieving recommendations for comparison {comparison_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error performing batch comparison"
-        )
-
-@router.get("/statistics", response_model=dict)
-async def get_comparison_statistics(
-    db: Session = Depends(get_db)
-):
-    """
-    📈 **Estatísticas de Comparações**
-    
-    Retorna estatísticas gerais sobre comparações realizadas no sistema.
-    """
-    try:
-        service = ComparisonService(db)
-        stats = await service.get_comparison_statistics()
-        
-        return {
-            "success": True,
-            "message": "Comparison statistics retrieved successfully",
-            "timestamp": datetime.now().isoformat(),
-            "data": stats
-        }
-    except Exception as e:
-        logger.error(f"Error retrieving comparison statistics: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving comparison statistics"
+            detail="Error retrieving comparison recommendations"
         )

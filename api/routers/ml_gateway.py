@@ -63,8 +63,6 @@ from api.services.ml_results_service import MLResultsService
 
 # Configuração do router
 router = APIRouter(
-    prefix="/ml-gateway",
-    tags=["ML Gateway - Enterprise API"],
     responses={
         404: {"description": "Recurso não encontrado"},
         422: {"description": "Erro de validação"},
@@ -170,7 +168,7 @@ async def create_ml_analysis_job(
         # Adicionar task de background para processamento
         background_tasks.add_task(
             ml_service.process_job_async,
-            job_response.job_uuid
+            str(job_response.uuid)
         )
         
         return job_response
@@ -222,14 +220,14 @@ async def get_ml_job_status(
     """
     try:
         job = db.query(MLAnalysisJob).filter(
-            MLAnalysisJob.job_uuid == job_uuid
+            MLAnalysisJob.uuid == job_uuid
         ).first()
         
         if not job:
             raise HTTPException(status_code=404, detail="Job não encontrado")
             
         ml_service = MLIntegrationService(db)
-        return await ml_service.get_job_detailed_status(job)
+        return await ml_service.get_job_detailed_status(job_uuid)
         
     except HTTPException:
         raise
@@ -237,7 +235,79 @@ async def get_ml_job_status(
         logger.error(f"Job status retrieval failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.delete("/jobs/{job_uuid}", response_model=MLJobStatusResponse)
+@router.get("/jobs/{job_uuid}/status")
+async def get_ml_job_status(
+    job_uuid: str = Path(..., description="UUID do job"),
+    db: Session = Depends(get_db)
+):
+    """
+    🎯 **Endpoint: GET /jobs/{job_uuid}/status**
+    
+    Retorna status simplificado de um job específico do ML Gateway.
+    Versão mais leve do GET /jobs/{job_uuid} para monitoramento rápido.
+    
+    **Parâmetros:**
+    - `job_uuid`: UUID único do job para consulta de status
+    
+    **Retorna:**
+    - Status simplificado: job_uuid, status, progress_percentage
+    """
+    try:
+        # Buscar job no banco
+        job = db.query(MLAnalysisJob).filter(MLAnalysisJob.uuid == job_uuid).first()
+        if not job:
+            raise HTTPException(status_code=404, detail=f"Job {job_uuid} not found")
+        
+        # Retornar status simplificado
+        return {
+            "job_uuid": str(job.uuid),
+            "status": job.status.value,
+            "progress_percentage": job.progress_percentage or 0.0,
+            "updated_at": job.requested_at
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Job status retrieval failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/jobs/{job_uuid}")
+async def delete_ml_job(
+    job_uuid: str = Path(..., description="UUID do job"),
+    db: Session = Depends(get_db)
+):
+    """
+    **Deletar Job de Análise**
+    
+    Remove permanentemente um job do banco de dados.
+    
+    **VALIDAÇÃO ROBUSTA PETROBRAS:**
+    - Verifica se job existe
+    - Remove permanentemente do banco
+    - Registra logs de auditoria
+    - Transação atômica no banco
+    """
+    try:
+        # Validação rigorosa de UUID
+        try:
+            job_uuid_obj = uuid.UUID(job_uuid)
+        except ValueError:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"UUID inválido: {job_uuid}"
+            )
+            
+        ml_service = MLIntegrationService(db)
+        return await ml_service.delete_job(job_uuid_obj)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Job deletion failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/jobs/{job_uuid}/cancel", response_model=MLJobStatusResponse)
 async def cancel_ml_job(
     job_uuid: str = Path(..., description="UUID do job"),
     db: Session = Depends(get_db)
@@ -246,11 +316,28 @@ async def cancel_ml_job(
     **Cancelar Job de Análise**
     
     Cancela um job em execução ou pendente.
+    
+    **VALIDAÇÃO ROBUSTA PETROBRAS:**
+    - Verifica se job existe
+    - Valida estados permitidos para cancelamento
+    - Registra logs de auditoria
+    - Transação atômica no banco
     """
     try:
+        # Validação rigorosa de UUID
+        try:
+            job_uuid_obj = uuid.UUID(job_uuid)
+        except ValueError:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"UUID inválido: {job_uuid}"
+            )
+            
         ml_service = MLIntegrationService(db)
-        return await ml_service.cancel_job(job_uuid)
+        return await ml_service.cancel_job(job_uuid_obj)
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Job cancellation failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

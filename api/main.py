@@ -104,8 +104,8 @@ app.include_router(
 
 app.include_router(
     imports.router,
-    prefix="/api/v1/import",
-    tags=["Import"],
+    prefix="/api/v1/imports",
+    tags=["Imports"],
     responses={422: {"description": "Import validation error"}},
 )
 
@@ -118,7 +118,7 @@ app.include_router(
 
 app.include_router(
     etap_native.router,
-    prefix="/api/v1",
+    prefix="/api/v1/etap-native",
     tags=["ETAP Native"],
     responses={503: {"description": "ETAP Native service unavailable"}},
 )
@@ -139,7 +139,7 @@ app.include_router(
 
 app.include_router(
     ml_gateway.router,
-    prefix="/api/v1",
+    prefix="/api/v1/ml-gateway",
     tags=["ML Gateway"],
     responses={500: {"description": "ML Gateway service error"}},
 )

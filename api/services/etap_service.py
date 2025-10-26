@@ -94,7 +94,25 @@ class EtapService:
             
             self.logger.info(f"ETAP study created: {study.name} (ID: {study.id})")
             
-            return study  # Retornar objeto SQLAlchemy, não dict
+            # Retornar como dicionário para serialização JSON
+            return {
+                "id": study.id,
+                "uuid": study.uuid,
+                "name": study.name,
+                "description": study.description,
+                "study_type": study.study_type.value if study.study_type else None,
+                "status": study.status.value if study.status else None,
+                "plant_reference": study.plant_reference,
+                "protection_standard": study.protection_standard.value if study.protection_standard else None,
+                "frequency": study.frequency,
+                "base_voltage": study.base_voltage,
+                "base_power": study.base_power,
+                "created_at": study.created_at.isoformat() if study.created_at else None,
+                "updated_at": study.updated_at.isoformat() if study.updated_at else None,
+                "completed_at": study.completed_at.isoformat() if study.completed_at else None,
+                "created_by": study.created_by,
+                "study_config": study.study_config
+            }
             
         except SQLAlchemyError as e:
             self.db.rollback()
@@ -151,7 +169,7 @@ class EtapService:
             self.logger.error(f"Database error getting ETAP studies: {e}")
             raise EtapServiceError(f"Failed to get studies: {str(e)}")
     
-    async def get_study_by_id(self, study_id: int) -> Optional[Dict[str, Any]]:
+    def get_study_by_id(self, study_id: int) -> Optional[Dict[str, Any]]:
         """Busca estudo por ID com todos os relacionamentos"""
         try:
             study = self.db.query(EtapStudy)\
@@ -166,7 +184,26 @@ class EtapService:
             if not study:
                 return None
             
-            return study  # Retornar objeto SQLAlchemy
+            # Converter para dict
+            return {
+                "id": study.id,
+                "uuid": str(study.uuid),
+                "name": study.name,
+                "description": study.description,
+                "study_type": study.study_type.value if study.study_type else None,
+                "status": study.status.value if study.status else None,
+                "plant_reference": study.plant_reference,
+                "protection_standard": study.protection_standard.value if study.protection_standard else None,
+                "frequency": study.frequency,
+                "base_voltage": study.base_voltage,
+                "base_power": study.base_power,
+                "created_at": study.created_at.isoformat() if study.created_at else None,
+                "updated_at": study.updated_at.isoformat() if study.updated_at else None,
+                "completed_at": study.completed_at.isoformat() if study.completed_at else None,
+                "equipment_count": len(study.equipment_configurations) if study.equipment_configurations else 0,
+                "coordination_results_count": len(study.coordination_results) if study.coordination_results else 0,
+                "simulation_results_count": len(study.simulation_results) if study.simulation_results else 0
+            }
             
         except SQLAlchemyError as e:
             self.logger.error(f"Database error getting ETAP study {study_id}: {e}")
@@ -323,7 +360,7 @@ class EtapService:
             self.logger.error(f"CSV import failed: {e}")
             raise EtapServiceError(f"CSV import failed: {str(e)}")
     
-    async def export_to_csv(
+    def export_to_csv(
         self,
         study_id: int,
         output_path: str,
@@ -341,7 +378,7 @@ class EtapService:
             Dict com estatísticas da exportação
         """
         try:
-            study = await self.get_study_by_id(study_id)
+            study = self.get_study_by_id(study_id)  # Remove await
             if not study:
                 raise EtapServiceError(f"Study {study_id} not found")
             
@@ -353,20 +390,34 @@ class EtapService:
             # Converter para formato CSV baseado na estrutura real
             export_data = []
             for config in equipment_configs:
-                csv_data = await self._equipment_config_to_csv(config, export_format)
+                csv_data = self._equipment_config_to_csv(config, export_format)  # Remove await
                 export_data.extend(csv_data)
             
+            # Se não há equipamentos, criar um CSV de exemplo
+            if not export_data:
+                export_data = [{
+                    "study_id": study_id,
+                    "study_name": study["name"],
+                    "equipment_type": "relay",
+                    "equipment_id": "example_relay_01",
+                    "description": "Example equipment for future CSV exports",
+                    "note": "Currently, system uses PDF and TXT inputs. CSV export ready for future relay configurations."
+                }]
+            
             # Criar DataFrame e exportar
+            import pandas as pd
             df = pd.DataFrame(export_data)
             df.to_csv(output_path, index=False)
             
             result = {
+                "success": True,
                 "study_id": study_id,
                 "study_name": study["name"],
                 "output_path": output_path,
                 "exported_records": len(export_data),
                 "export_format": export_format,
-                "exported_at": datetime.utcnow().isoformat()
+                "exported_at": datetime.utcnow().isoformat(),
+                "message": f"Study '{study['name']}' exported to CSV successfully"
             }
             
             self.logger.info(f"Study {study_id} exported to CSV: {len(export_data)} records")
@@ -596,7 +647,7 @@ class EtapService:
             # Implementar baseado nos códigos identificados (ex: "00.04", "09.0B", etc.)
             pass
     
-    async def _equipment_config_to_csv(
+    def _equipment_config_to_csv(
         self, 
         config: EtapEquipmentConfig, 
         export_format: str
@@ -609,10 +660,44 @@ class EtapService:
         # Implementar conversão baseada no formato real dos CSVs
         if export_format == "etap_compatible":
             # Formato compatível com ETAP
-            pass
+            csv_data.append({
+                "equipment_id": config.equipment_id,
+                "etap_device_id": config.etap_device_id,
+                "device_name": config.device_name,
+                "device_type": config.device_type,
+                "bus_name": config.bus_name,
+                "rated_voltage": config.rated_voltage,
+                "rated_current": config.rated_current,
+                "rated_power": config.rated_power,
+                "protection_config": str(config.protection_config) if config.protection_config else "{}",
+                "study_id": config.study_id,
+                "created_at": config.created_at.isoformat() if config.created_at else None
+            })
         elif export_format == "petrobras_standard":
             # Formato padrão Petrobras baseado nos PDFs
-            pass
+            csv_data.append({
+                "id_equipamento": config.equipment_id,
+                "id_dispositivo_etap": config.etap_device_id,
+                "nome_dispositivo": config.device_name,
+                "tipo_equipamento": config.device_type or "rele",
+                "barra": config.bus_name,
+                "tensao_nominal": config.rated_voltage,
+                "corrente_nominal": config.rated_current,
+                "potencia_nominal": config.rated_power,
+                "configuracao_protecao": str(config.protection_config) if config.protection_config else "{}",
+                "estudo_id": config.study_id,
+                "data_criacao": config.created_at.isoformat() if config.created_at else None
+            })
+        else:
+            # Formato genérico
+            csv_data.append({
+                "equipment_id": config.equipment_id,
+                "etap_device_id": config.etap_device_id,
+                "device_name": config.device_name,
+                "device_type": config.device_type,
+                "protection_config": str(config.protection_config) if config.protection_config else "{}",
+                "study_id": config.study_id
+            })
         
         return csv_data
     

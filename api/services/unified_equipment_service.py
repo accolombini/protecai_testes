@@ -431,7 +431,7 @@ class UnifiedEquipmentService:
                     f.nome_completo as manufacturer_name,
                     f.pais_origem as manufacturer_country,
                     -- Tokens associados
-                    (SELECT COUNT(*) FROM protec_ai.tokens_valores WHERE campo_id = co.id) as token_count
+                    (SELECT COUNT(*) FROM protec_ai.tokens_valores WHERE valor_id = vo.id) as token_count
                 FROM protec_ai.valores_originais vo
                 JOIN protec_ai.campos_originais co ON vo.campo_id = co.id
                 JOIN protec_ai.arquivos a ON co.arquivo_id = a.id
@@ -450,13 +450,13 @@ class UnifiedEquipmentService:
                     tv.valor_token,
                     tv.significado,
                     tv.confianca,
-                    tv.posicao,
-                    tt.codigo as tipo_token,
+                    tv.posicao_token,
+                    tt.codigo_tipo as tipo_token,
                     tt.descricao as tipo_descricao
                 FROM protec_ai.tokens_valores tv
                 JOIN protec_ai.tipos_token tt ON tv.tipo_token_id = tt.id
                 WHERE tv.valor_id = :value_id
-                ORDER BY tv.posicao
+                ORDER BY tv.posicao_token
             """)
             
             tokens = self.db.execute(tokens_query, {"value_id": value_id}).fetchall()
@@ -486,7 +486,7 @@ class UnifiedEquipmentService:
                         "value": token.valor_token,
                         "meaning": token.significado,
                         "confidence": float(token.confianca) if token.confianca else None,
-                        "position": token.posicao,
+                        "position": token.posicao_token,
                         "type": token.tipo_token,
                         "type_description": token.tipo_descricao
                     }
@@ -629,3 +629,97 @@ class UnifiedEquipmentService:
             self.db.rollback()
             logger.error(f"Error ensuring model exists: {e}")
             raise
+    
+    async def get_unified_equipment_details(self, equipment_id: str) -> Dict[str, Any]:
+        """
+        Obtém detalhes completos de um equipamento por ID unificado
+        
+        ID Format: "relay_1" or "protec_ai_123"
+        """
+        try:
+            logger.info(f"Getting unified equipment details for ID: {equipment_id}")
+            
+            # Parse ID format: "protec_ai_5" or "relay_1" or "1"
+            if "protec_ai_" in equipment_id:
+                source_type = "protec_ai"
+                equipment_numeric_id = int(equipment_id.replace("protec_ai_", ""))
+            elif "relay_" in equipment_id:
+                source_type = "relay"
+                equipment_numeric_id = int(equipment_id.replace("relay_", ""))
+            else:
+                # Assume relay_configs by default for numeric IDs
+                source_type = "relay"
+                equipment_numeric_id = int(equipment_id)
+            
+            if source_type == "relay":
+                # Buscar equipamento estruturado
+                equipment = self.db.query(RelayEquipment).filter(
+                    RelayEquipment.id == equipment_numeric_id
+                ).first()
+                
+                if not equipment:
+                    return None
+                
+                # Carregar dados relacionados
+                manufacturer = self.db.query(Manufacturer).filter(
+                    Manufacturer.id == equipment.model.manufacturer_id
+                ).first() if equipment.model else None
+                
+                return {
+                    "equipment": {
+                        "id": f"relay_{equipment.id}",
+                        "tag_reference": equipment.tag_reference,
+                        "serial_number": equipment.serial_number,
+                        "plant_reference": equipment.plant_reference,
+                        "description": equipment.description,
+                        "status": equipment.status,
+                        "created_at": equipment.created_at.isoformat() if equipment.created_at else None,
+                        "updated_at": equipment.updated_at.isoformat() if equipment.updated_at else None
+                    },
+                    "model": {
+                        "id": equipment.model.id if equipment.model else None,
+                        "name": equipment.model.name if equipment.model else None,
+                        "model_type": equipment.model.model_type if equipment.model else None
+                    },
+                    "manufacturer": {
+                        "id": manufacturer.id if manufacturer else None,
+                        "name": manufacturer.name if manufacturer else None,
+                        "country": manufacturer.country if manufacturer else None
+                    },
+                    "source_schema": "relay_configs",
+                    "data_completeness": "structured"
+                }
+            
+            elif source_type == "protec_ai":
+                # Buscar dados extraídos
+                extracted_details = await self._get_extracted_configuration_details(equipment_numeric_id)
+                if not extracted_details:
+                    return None
+                
+                return {
+                    "equipment": {
+                        "id": f"protec_ai_{equipment_numeric_id}",
+                        "parameter_field": extracted_details["configuration"]["parameter_field"],
+                        "description": extracted_details["configuration"]["description"],
+                        "value": extracted_details["configuration"]["value"],
+                        "unit": extracted_details["configuration"]["unit"],
+                        "source_line": extracted_details["configuration"]["source_line"]
+                    },
+                    "source_file": extracted_details["source_file"],
+                    "manufacturer": extracted_details["manufacturer"],
+                    "parsed_tokens": extracted_details["parsed_tokens"],
+                    "summary": extracted_details["summary"],
+                    "source_schema": "protec_ai",
+                    "data_completeness": "extracted"
+                }
+            
+            else:
+                logger.warning(f"Unknown source type: {source_type}")
+                return None
+                
+        except ValueError as e:
+            logger.error(f"Invalid equipment ID format: {equipment_id}")
+            return None
+        except Exception as e:
+            logger.error(f"Error getting unified equipment details: {e}")
+            raise HTTPException(status_code=500, detail=f"Error retrieving equipment: {str(e)}")

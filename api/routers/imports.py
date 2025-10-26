@@ -171,3 +171,21 @@ async def get_import_status(db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error retrieving import status"
         )
+
+@router.get("/status/{job_id}")
+async def get_import_status_by_id(job_id: str, db: Session = Depends(get_db)):
+    """
+    📊 **Status de Importação Específica**
+    
+    Retorna status de uma importação específica.
+    """
+    try:
+        service = ImportService(db)
+        status_info = await service.get_import_status(job_id)
+        return status_info
+    except Exception as e:
+        logger.error(f"Error getting import status for {job_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving import status for job {job_id}"
+        )

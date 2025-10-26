@@ -883,13 +883,13 @@ def main():
 Exemplos de uso:
 
   # Processar arquivos específicos
-  python enhanced_multi_format_processor.py inputs/pdf/tela1.pdf inputs/xlsx/config.xlsx
+  python enhanced_multi_format_processor.py arquivo1.pdf config.xlsx
   
   # Processar todos os CSVs gerados pelo app.py
   python enhanced_multi_format_processor.py outputs/csv/*_params.csv
   
   # Processar arquivo único
-  python enhanced_multi_format_processor.py inputs/pdf/tela3.pdf
+  python enhanced_multi_format_processor.py arquivo.pdf
 
 Funcionalidades:
   • Análise estratégica completa para reprodução do status do relé

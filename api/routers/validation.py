@@ -11,7 +11,7 @@ from typing import List
 import logging
 
 from api.core.database import get_db
-from api.schemas import ValidationRequest, ValidationResponse, BaseResponse
+from api.schemas.main_schemas import ValidationRequest, ValidationResponse, BaseResponse
 from api.services.validation_service import ValidationService
 
 router = APIRouter()
@@ -41,15 +41,22 @@ async def validate_configuration(
     - Coordenação entre funções
     """
     try:
+        logger.info(f"🔍 VALIDATION DEBUG: Starting validation for {validation_request.equipment_ids}")
+        
         service = ValidationService(db)
+        logger.info(f"🔍 VALIDATION DEBUG: ValidationService created successfully")
+        
         validation_result = await service.validate_equipments(
             equipment_ids=validation_request.equipment_ids,
             validation_type=validation_request.validation_type
         )
+        logger.info(f"🔍 VALIDATION DEBUG: validate_equipments returned: {type(validation_result)}")
         
         return validation_result
     except Exception as e:
-        logger.error(f"Error during validation: {e}")
+        logger.error(f"🚨 VALIDATION ERROR: {type(e).__name__}: {str(e)}")
+        import traceback
+        logger.error(f"🚨 VALIDATION TRACEBACK: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error performing configuration validation"

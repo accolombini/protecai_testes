@@ -14,29 +14,29 @@ import uuid
 
 
 class MLJobStatusEnum(str, Enum):
-    """Status of ML analysis jobs"""
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
+    """Status of ML analysis jobs - SYNCHRONIZED WITH POSTGRESQL"""
+    PENDING = "PENDING"
+    RUNNING = "RUNNING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
 
 
 class MLAnalysisTypeEnum(str, Enum):
-    """Types of ML analysis supported"""
-    COORDINATION = "coordination"
-    SELECTIVITY = "selectivity"
-    SIMULATION = "simulation"
-    OPTIMIZATION = "optimization"
-    PREDICTION = "prediction"
+    """Types of ML analysis supported - SYNCHRONIZED WITH POSTGRESQL"""
+    COORDINATION = "COORDINATION"
+    SELECTIVITY = "SELECTIVITY"
+    SIMULATION = "SIMULATION"
+    OPTIMIZATION = "OPTIMIZATION"
+    PREDICTION = "PREDICTION"
 
 
 class MLPriorityEnum(str, Enum):
-    """Priority levels for ML jobs"""
-    LOW = "low"
-    NORMAL = "normal"
-    HIGH = "high"
-    CRITICAL = "critical"
+    """Priority levels for ML jobs - SYNCHRONIZED WITH POSTGRESQL"""
+    LOW = "LOW"
+    NORMAL = "NORMAL"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
 
 
 # ===== REQUEST SCHEMAS =====
@@ -60,12 +60,17 @@ class MLDataRequest(BaseModel):
 
 class MLJobRequest(BaseModel):
     """Request schema for creating ML analysis jobs"""
-    job_name: str = Field(..., min_length=1, max_length=255, description="Unique job name")
-    analysis_type: MLAnalysisTypeEnum = Field(..., description="Type of analysis to perform")
+    # Primary fields (flexible naming for compatibility)
+    job_name: Optional[str] = Field(None, min_length=1, max_length=255, description="Unique job name")
+    name: Optional[str] = Field(None, min_length=1, max_length=255, description="Job name (alternative)")
+    
+    analysis_type: Optional[MLAnalysisTypeEnum] = Field(None, description="Type of analysis to perform")
+    type: Optional[str] = Field(None, description="Analysis type (alternative)")
+    
     priority: MLPriorityEnum = Field(MLPriorityEnum.NORMAL, description="Job priority level")
     
-    # Data scope
-    source_data_config: Dict[str, Any] = Field(..., description="Configuration for data extraction")
+    # Data scope (optional with defaults)
+    source_data_config: Optional[Dict[str, Any]] = Field(None, description="Configuration for data extraction")
     etap_study_id: Optional[int] = Field(None, description="Specific ETAP study to analyze")
     
     # ML configuration
@@ -73,14 +78,57 @@ class MLJobRequest(BaseModel):
     ml_algorithm: Optional[str] = Field(None, max_length=100, description="ML algorithm to use")
     ml_parameters: Optional[Dict[str, Any]] = Field(None, description="ML-specific parameters")
     
-    # Requester information
-    requested_by: str = Field(..., min_length=1, max_length=100, description="Who requested the analysis")
+    # Requester information (optional with default)
+    requested_by: Optional[str] = Field(None, min_length=1, max_length=100, description="Who requested the analysis")
     
-    @validator('job_name')
-    def validate_job_name(cls, v):
-        if not v or v.isspace():
-            raise ValueError('Job name cannot be empty or whitespace')
-        return v.strip()
+    @validator('job_name', pre=True, always=True)
+    def validate_job_name(cls, v, values):
+        # Use job_name if provided, otherwise use name field
+        if v:
+            return v.strip() if isinstance(v, str) else str(v)
+        if 'name' in values and values['name']:
+            return str(values['name']).strip()
+        # Generate default if neither provided
+        import uuid
+        return f"ml_job_{str(uuid.uuid4())[:8]}"
+    
+    @validator('analysis_type', pre=True, always=True)
+    def validate_analysis_type(cls, v, values):
+        # Use analysis_type if provided, otherwise use type field
+        if v:
+            return MLAnalysisTypeEnum(v) if isinstance(v, str) else v
+        if 'type' in values and values['type']:
+            type_value = str(values['type']).lower()
+            # Map common variations
+            type_mapping = {
+                'coordination': MLAnalysisTypeEnum.COORDINATION,
+                'selectivity': MLAnalysisTypeEnum.SELECTIVITY,
+                'simulation': MLAnalysisTypeEnum.SIMULATION,
+                'optimization': MLAnalysisTypeEnum.OPTIMIZATION,
+                'prediction': MLAnalysisTypeEnum.PREDICTION
+            }
+            return type_mapping.get(type_value, MLAnalysisTypeEnum.COORDINATION)
+        # Default to coordination
+        return MLAnalysisTypeEnum.COORDINATION
+    
+    @validator('source_data_config', pre=True, always=True)
+    def validate_source_data_config(cls, v):
+        # Provide default configuration if not specified
+        if v:
+            return v
+        return {
+            "include_all_studies": True,
+            "include_equipment_configs": True,
+            "include_protection_settings": True,
+            "data_format": "json"
+        }
+    
+    @validator('requested_by', pre=True, always=True)
+    def validate_requested_by(cls, v):
+        # Provide default requester if not specified
+        if v:
+            return str(v).strip()
+        return "system_user"
 
 
 class MLCoordinationResultRequest(BaseModel):
