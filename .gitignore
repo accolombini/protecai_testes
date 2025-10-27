@@ -221,6 +221,11 @@ outputs/csv/
 outputs/atrib_limpos/
 outputs/excel/
 
+# Outputs temporários de teste (gerados pelos scripts)
+outputs/etap_exports/study_test_study_*.csv
+outputs/ml_data/
+outputs/ml_results/test_*
+
 # Input files - should not be tracked in production
 inputs/pdf/
 inputs/txt/
