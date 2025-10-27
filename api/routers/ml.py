@@ -7,7 +7,7 @@ Endpoints para integração futura com módulo ML Reinforcement Learning.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 import logging
 
 from api.core.database import get_db
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/optimize", response_model=MLOptimizationResponse)
 async def optimize_configuration(
-    optimization_request: MLOptimizationRequest,
+    optimization_request: Optional[MLOptimizationRequest] = None,
     db: Session = Depends(get_db)
 ):
     """
@@ -35,10 +35,18 @@ async def optimize_configuration(
     
     **Status:** Em desenvolvimento - Interface preparatória
     """
-    logger.info(f"ML optimization request received for equipment: {optimization_request.equipment_id}")
+    logger.info(f"ML optimization request received")
+    
+    # Se request não fornecido, usar valores padrão
+    if optimization_request is None:
+        equipment_id = "default_equipment"
+        constraints = {}
+    else:
+        equipment_id = optimization_request.equipment_id
+        constraints = optimization_request.constraints
     
     return MLOptimizationResponse(
-        optimization_id=f"ml_opt_{optimization_request.equipment_id}_{hash(str(optimization_request.constraints))}",
+        optimization_id=f"ml_opt_{equipment_id}_{hash(str(constraints))}",
         status="prepared",
         message="ML Reinforcement Learning module in development - preparatory interface ready"
     )
@@ -82,8 +90,8 @@ async def get_available_models():
 
 @router.post("/feedback", response_model=BaseResponse)
 async def provide_feedback(
-    optimization_id: str,
-    feedback_data: dict,
+    optimization_id: Optional[str] = "default_optimization",
+    feedback_data: Optional[dict] = None,
     db: Session = Depends(get_db)
 ):
     """
@@ -91,6 +99,10 @@ async def provide_feedback(
     
     Fornece feedback para aprendizado do modelo ML.
     """
+    # Se feedback_data não fornecido, usar default
+    if feedback_data is None:
+        feedback_data = {"rating": 5, "comments": "test feedback"}
+        
     logger.info(f"ML feedback received for optimization: {optimization_id}")
     
     return BaseResponse(

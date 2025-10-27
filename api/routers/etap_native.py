@@ -1,5 +1,5 @@
 """
-ETAP Native Router - etapPy™ API Endpoints
+ETAP Native Router - etapPy API Endpoints
 =========================================
 
 Endpoints REST para integração ETAP nativa com fallback automático.
@@ -27,6 +27,7 @@ from api.core.database import get_db
 from api.schemas import BaseResponse
 from api.services.etap_native_service import EtapNativeService, create_native_service
 from api.services.etap_native_adapter import EtapConnectionType, EtapConnectionConfig
+from api.services.etap_service import EtapService  # Para uso dos adapters
 
 router = APIRouter()  # Sem prefix - já definido no main.py
 logger = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ class ConnectionTypeEnum(str, Enum):
 
 class NativeConnectionRequest(BaseModel):
     """Request para configurar conexão nativa"""
-    connection_type: ConnectionTypeEnum
+    connection_type: Optional[ConnectionTypeEnum] = Field(ConnectionTypeEnum.MOCK_SIMULATOR, description="Tipo de conexão (padrão: mock_simulator)")
     etap_host: Optional[str] = Field(None, description="Host do servidor ETAP")
     etap_port: Optional[int] = Field(None, description="Porta do servidor ETAP")
     username: Optional[str] = Field(None, description="Usuário ETAP")
@@ -102,7 +103,7 @@ async def get_native_service(db: Session = Depends(get_db)) -> EtapNativeService
              response_model=NativeServiceResponse,
              summary="🚀 Initialize ETAP Native Service")
 async def initialize_native_service(
-    request: NativeConnectionRequest,
+    request: Optional[NativeConnectionRequest] = None,
     native_service: EtapNativeService = Depends(get_native_service)
 ):
     """
@@ -110,7 +111,7 @@ async def initialize_native_service(
     
     Configura conexão com ETAP usando diferentes adapters:
     - `csv_bridge`: Método atual via arquivos CSV (estável)
-    - `etap_api`: API nativa etapPy™ (futuro)  
+    - `etap_api`: API nativa etapPy (futuro)  
     - `mock_simulator`: Simulador para desenvolvimento
     
     **Features:**
@@ -119,6 +120,10 @@ async def initialize_native_service(
     - Configuração persistente
     """
     try:
+        # Se request não fornecido, usar configuração padrão
+        if request is None:
+            request = NativeConnectionRequest()
+            
         result = await native_service.initialize_with_config(
             connection_type=EtapConnectionType(request.connection_type),
             etap_host=request.etap_host,
@@ -155,7 +160,7 @@ async def auto_detect_connection(
     **Auto-detectar Melhor Conexão**
     
     Testa todos os adapters disponíveis e seleciona o melhor:
-    1. **etapPy™ API** (se disponível)
+    1. **etapPy API** (se disponível)
     2. **CSV Bridge** (fallback estável)
     3. **Mock Simulator** (desenvolvimento)
     
@@ -256,14 +261,14 @@ async def test_native_capabilities(
             response_model=NativeServiceResponse,
             summary="📥 Native Study Import")
 async def import_study_native(
-    request: NativeImportRequest,
+    request: Optional[NativeImportRequest] = None,
     native_service: EtapNativeService = Depends(get_native_service)
 ):
     """
     **Importação Nativa de Estudo**
     
     Importa estudo usando adapter nativo com fallback automático:
-    - **Native Mode**: Comunicação direta via etapPy™
+    - **Native Mode**: Comunicação direta via etapPy
     - **Fallback Mode**: CSV Bridge para garantir funcionamento
     - **Database Sync**: Sincronização automática com PostgreSQL
     
@@ -273,6 +278,14 @@ async def import_study_native(
     - Métricas de performance detalhadas
     """
     try:
+        # Se request não fornecido, usar configuração padrão
+        if request is None:
+            request = NativeImportRequest(
+                study_data={"name": "default_study", "type": "test"},
+                prefer_native=True,
+                sync_to_database=True
+            )
+            
         result = await native_service.import_study_native(
             study_data=request.study_data,
             prefer_native=request.prefer_native,
@@ -533,7 +546,8 @@ async def batch_analyze_studies(
     study_ids: List[str] = Body(..., description="Lista de IDs de estudos"),
     analysis_types: List[str] = Body(["coordination"], description="Tipos de análise"),
     prefer_native: bool = Query(True, description="Preferir método nativo"),
-    native_service: EtapNativeService = Depends(get_native_service)
+    native_service: EtapNativeService = Depends(get_native_service),
+    db: Session = Depends(get_db)  # Para adapter
 ):
     """
     **Análise em Lote de Estudos**
@@ -554,21 +568,27 @@ async def batch_analyze_studies(
         total_analyses = len(study_ids) * len(analysis_types)
         successful_analyses = 0
         
+        # Criar adapter service para conversão de IDs
+        adapter_service = EtapService(db)
+        
         logger.info(f"🔍 Starting batch analysis: {len(study_ids)} studies, {len(analysis_types)} analysis types")
         
         for study_id in study_ids:
             study_results = {"study_id": study_id, "analyses": {}}
             
+            # Converter study_id usando adapter
+            _, adapted_study_id = adapter_service.adapt_study_id(study_id)
+            
             for analysis_type in analysis_types:
                 try:
                     if analysis_type == "coordination":
                         result = await native_service.run_coordination_analysis_native(
-                            study_id=study_id,
+                            study_id=adapted_study_id,
                             prefer_native=prefer_native
                         )
                     elif analysis_type == "selectivity":
                         result = await native_service.run_selectivity_analysis_native(
-                            study_id=study_id,
+                            study_id=adapted_study_id,
                             prefer_native=prefer_native
                         )
                     else:

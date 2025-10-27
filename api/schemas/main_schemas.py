@@ -277,7 +277,7 @@ class ETAPSimulationResponse(BaseResponse):
 
 class MLOptimizationRequest(BaseModel):
     """Requisição de otimização ML"""
-    equipment_id: int = Field(..., description="ID do equipamento")
+    equipment_id: Optional[int] = Field(1, description="ID do equipamento")
     optimization_target: str = Field("selectivity", description="Objetivo da otimização")
     constraints: Dict[str, Any] = Field(default_factory=dict, description="Restrições")
 

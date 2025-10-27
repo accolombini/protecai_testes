@@ -296,7 +296,7 @@ async def get_study(
 
 @router.post("/studies/{study_id}/equipment", response_model=BaseResponse, status_code=http_status.HTTP_201_CREATED)
 async def add_equipment_to_study(
-    study_id: int,
+    study_id: str,  # 🎯 CORRIGIDO: str para usar adapter
     equipment_request: EquipmentConfigRequest,
     db: Session = Depends(get_db)
 ):
@@ -312,8 +312,12 @@ async def add_equipment_to_study(
     """
     try:
         service = EtapService(db)
+        
+        # 🎯 CONVERTER string para int usando adapter
+        study_int = service.adapt_study_id(study_id)[1]  # Pegar apenas o int da tupla
+        
         config_data = await service.add_equipment_to_study(
-            study_id=study_id,
+            study_id=study_int,  # usar int convertido
             equipment_id=equipment_request.equipment_id,
             etap_device_id=equipment_request.etap_device_id,
             device_config=equipment_request.dict(exclude_unset=True)
@@ -372,9 +376,14 @@ async def import_csv_data(
         
         try:
             service = EtapService(db)
+            # Adaptar study_id se fornecido
+            adapted_study_id = None
+            if study_id is not None:
+                _, adapted_study_id = service.adapt_study_id(str(study_id))
+            
             import_result = await service.import_from_csv(
                 file_path=temp_file_path,
-                study_id=study_id
+                study_id=adapted_study_id
             )
             
             return ImportResponse(**import_result)
@@ -490,7 +499,7 @@ async def get_integration_status():
              status_code=http_status.HTTP_201_CREATED)
 async def import_csv_to_study(
     file: UploadFile = File(..., description="CSV file in Code,Description,Value format"),
-    study_name: str = Query(..., description="Name for the new study"),
+    study_name: Optional[str] = Query("DEFAULT_STUDY", description="Name for the new study"),
     study_description: Optional[str] = Query(None, description="Optional study description"),
     db: Session = Depends(get_db)
 ):
@@ -539,13 +548,13 @@ async def export_study_to_csv(
     try:
         integration_service = EtapIntegrationService(db)
         
-        csv_content = integration_service.export_study_to_csv(
-            study_id=study_id
-        )
-        
-        # 🎯 SISTEMA ROBUSTO - Usar adapter para converter study_id
+        # 🎯 SISTEMA ROBUSTO - Usar adapter para converter study_id PRIMEIRO
         etap_service = integration_service.etap_service
         study_str, study_int = etap_service.adapt_study_id(study_id)  # Desempacotar tupla
+        
+        csv_content = integration_service.export_study_to_csv(
+            study_id=study_int  # 🛠️ CORREÇÃO: usar int convertido
+        )
         
         # Gerar filename baseado em informações do estudo
         try:
@@ -572,8 +581,8 @@ async def export_study_to_csv(
 
 @router.post("/batch-import")
 async def batch_import_csv_directory(
-    directory_path: str,
-    study_prefix: str = "BATCH_IMPORT",
+    directory_path: str = Query("./inputs/csv", description="Caminho do diretório com arquivos CSV"),
+    study_prefix: str = Query("BATCH_IMPORT", description="Prefixo para estudos importados"),
     db: Session = Depends(get_db)
 ):
     """

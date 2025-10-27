@@ -174,8 +174,11 @@ async def create_ml_analysis_job(
         return job_response
         
     except Exception as e:
-        logger.error(f"Job creation failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Recommendations submission failed: {str(e)}")
+        # Return detailed error for debugging
+        import traceback
+        error_detail = f"Recommendations submission failed: {str(e)} | Traceback: {traceback.format_exc()[:500]}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @router.get("/jobs", response_model=List[MLJobSummaryResponse])
 async def list_ml_jobs(
@@ -352,11 +355,14 @@ async def extract_ml_data(
     """
     try:
         data_service = MLDataService(db)
-        return await data_service.extract_ml_dataset(data_request)
+        return await data_service.extract_data_for_ml(data_request)
         
     except Exception as e:
         logger.error(f"Data extraction failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return detailed error for debugging
+        import traceback
+        error_detail = f"Data extraction failed: {str(e)} | Traceback: {traceback.format_exc()[:500]}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @router.get("/data/studies", response_model=List[MLStudyInfo])
 async def list_available_studies(
@@ -434,11 +440,19 @@ async def submit_coordination_results(
     """
     try:
         results_service = MLResultsService(db)
-        return await results_service.submit_coordination_result(job_uuid, result)
+        
+        # Convert string UUID to uuid.UUID object
+        import uuid
+        job_uuid_obj = uuid.UUID(job_uuid)
+        
+        return await results_service.submit_coordination_result(job_uuid_obj, result)
         
     except Exception as e:
         logger.error(f"Coordination results submission failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return detailed error for debugging - SAME PATTERN
+        import traceback
+        error_detail = f"Coordination results submission failed: {str(e)} | Traceback: {traceback.format_exc()[:500]}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @router.post("/results/selectivity/{job_uuid}", response_model=MLResultResponse)
 async def submit_selectivity_results(
@@ -453,11 +467,19 @@ async def submit_selectivity_results(
     """
     try:
         results_service = MLResultsService(db)
-        return await results_service.submit_selectivity_result(job_uuid, result)
+        
+        # Convert string UUID to uuid.UUID object
+        import uuid
+        job_uuid_obj = uuid.UUID(job_uuid)
+        
+        return await results_service.submit_selectivity_result(job_uuid_obj, result)
         
     except Exception as e:
         logger.error(f"Selectivity results submission failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return detailed error for debugging - SAME PATTERN
+        import traceback
+        error_detail = f"Selectivity results submission failed: {str(e)} | Traceback: {traceback.format_exc()[:500]}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @router.post("/results/simulation/{job_uuid}", response_model=MLResultResponse)
 async def submit_simulation_results(
@@ -472,11 +494,19 @@ async def submit_simulation_results(
     """
     try:
         results_service = MLResultsService(db)
-        return await results_service.submit_simulation_result(job_uuid, result)
+        
+        # Convert string UUID to uuid.UUID object
+        import uuid
+        job_uuid_obj = uuid.UUID(job_uuid)
+        
+        return await results_service.submit_simulation_result(job_uuid_obj, result)
         
     except Exception as e:
         logger.error(f"Simulation results submission failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return detailed error for debugging - SAME PATTERN
+        import traceback
+        error_detail = f"Simulation results submission failed: {str(e)} | Traceback: {traceback.format_exc()[:500]}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 @router.post("/recommendations", response_model=MLRecommendationResponse)
 async def submit_ml_recommendations(
@@ -490,11 +520,19 @@ async def submit_ml_recommendations(
     """
     try:
         results_service = MLResultsService(db)
-        return await results_service.submit_recommendation(recommendation)
+        
+        # Generate a result UUID for the recommendation
+        import uuid
+        result_uuid = uuid.uuid4()
+        
+        return await results_service.submit_recommendation(result_uuid, recommendation)
         
     except Exception as e:
         logger.error(f"Recommendations submission failed: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return detailed error for debugging - SAME PATTERN as data/extract
+        import traceback
+        error_detail = f"Recommendations submission failed: {str(e)} | Traceback: {traceback.format_exc()[:500]}"
+        raise HTTPException(status_code=500, detail=error_detail)
 
 # ========================================================================================
 # ENDPOINTS 12-13: UTILITIES & EXPORT

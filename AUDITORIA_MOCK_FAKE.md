@@ -1,15 +1,85 @@
 # AUDITORIA CRÍTICA - IMPLEMENTAÇÕES MOCK/FAKE NO ProtecAI
 # ========================================================
 
+## 🚨 SITUAÇÃO CRÍTICA ATUALIZADA - 26 OUTUBRO 2025
+**REGRESSÃO FUNCIONAL**: De 91.3% (25/10) para 46.9% (26/10) endpoints funcionais
+**Status:** 🆘 EMERGÊNCIA - 30/64 endpoints funcionais (PERDA DE 28 ENDPOINTS)
+**Sistema Real:** 64 endpoints confirmados via OpenAPI (não 70 como reportado)
+**Problema:** Regressão funcional severa, não expansão de escopo
+
+## 📊 STATUS ATUAL DAS 8 APIS PRINCIPAIS:
+
+### ✅ APIS 100% FUNCIONAIS (3/8):
+- **Health** (1/1): ✅ 100%
+- **Info** (1/1): ✅ 100% 
+- **Root** (1/1): ✅ 100%
+
+### 🟡 API BOA (1/8):
+- **Imports** (7/8): 🟡 87.5% - Apenas 1 endpoint falhando
+
+### 🔴 APIS CRÍTICAS (4/8):
+- **Compare** (1/2): 🔴 50% - POST endpoint falhando HTTP 422
+- **ML** (2/4): 🔴 50% - POST endpoints falhando HTTP 422
+- **ETAP Native** (5/12): 🔴 41.7% - 7 endpoints falhando
+- **Validation** (1/3): 🔴 33.3% - POST endpoints falhando HTTP 422
+
+### 🆘 APIS EXTRAS DESCOBERTAS (3 não previstas):
+- **ML Gateway** (5/16): 🔴 31.2% - Sistema adicional de ML
+- **Equipments** (3/11): 🔴 27.3% - CRUD equipment com falhas
+- **ETAP Integration** (3/11): 🔴 27.3% - Integração ETAP estendida
+
+**RESUMO CRÍTICO**: 11 APIs estáveis vs 8 esperadas, 64 endpoints reais confirmados (OpenAPI)
+
+### 🔍 **VALIDAÇÃO CRÍTICA PARA AMANHÃ**:
+```bash
+# SEMPRE usar este comando para confirmar endpoints:
+curl -s http://localhost:8000/openapi.json | jq '.paths | keys | length'
+# Resultado esperado: 64
+```
+
 ## 🚨 MISSÃO CRÍTICA: ZERO TOLERANCE PARA MOCKS/FAKES
-**Data:** 22 de outubro de 2025 - SESSÃO DE ELIMINAÇÃO MASSIVA
-**Status:** 🎯 GRANDES AVANÇOS - MOCKS CRÍTICOS ELIMINADOS
+**Data:** 26 de outubro de 2025 - SESSÃO DE EMERGÊNCIA PARA RECUPERAÇÃO
+**Status:** 🎯 INVESTIGAÇÃO DE REGRESSÃO + CORREÇÃO URGENTE
 
 **Sistema:** ProtecAI - Proteção de Relés Industriais PETROBRAS  
 **Criticidade:** MÁXIMA - Equipamentos de segurança elétrica  
 **Política:** ZERO mocks em produção - Apenas dados e operações REAIS
 
-## 🏆 CONQUISTAS DO DIA - ELIMINAÇÃO MASSIVA DE MOCKS
+## 🚨 PROBLEMAS CRÍTICOS ATUAIS (26/10/2025)
+
+### 1. 🔴 EQUIPMENT ID VALIDATION (CRÍTICO)
+- **Problema**: Service retorna `'protec_ai_5'` (string) mas schema espera integer
+- **Arquivo**: `api/services/unified_equipment_service.py`  
+- **Impacto**: 8/11 endpoints equipments falhando (HTTP 422, 404)
+- **Origem**: Schema mismatch entre database e validation
+
+### 2. 🔴 REQUEST BODY SCHEMAS (CRÍTICO)  
+- **Problema**: Pydantic models inválidos para POSTs
+- **Endpoints afetados**: 
+  - `POST /api/v1/equipments/` - HTTP 422
+  - `POST /api/v1/compare/equipment-configurations` - HTTP 422
+  - `POST /api/v1/ml-gateway/recommendations` - HTTP 422
+  - `POST /api/v1/validation/` - HTTP 422
+- **Impacto**: Maioria dos POSTs falhando
+
+### 3. 🔴 DATABASE SCHEMA INCONSISTENCY
+- **Investigação**: 5 tabelas equipment no relay_configs
+  - `etap_equipment_configs`: 22 rows ✅ (ÚNICA COM DADOS)
+  - `protection_curves`: 0 rows ❌
+  - `protection_functions`: 0 rows ❌
+  - `relay_equipment`: 0 rows ❌  
+  - `relay_models`: 0 rows ❌
+- **Problema**: Service buscando em tabelas vazias
+
+### 4. 🔴 ID VALIDATION FAILURES
+- **study_id**: ETAP endpoints falhando HTTP 422
+- **job_uuid**: ML Gateway endpoints falhando HTTP 500
+- **equipment_id**: Equipment endpoints HTTP 404
+- **Causa**: Validação rígida sem fallbacks
+
+---
+
+## 🏆 CONQUISTAS HISTÓRICAS (22-23/10/2025) - ERA FUNCIONAL
 
 ### 1. 🔴 CRÍTICO: api/services/import_service.py
 

@@ -228,8 +228,10 @@ inputs/xlsx/
 inputs/csv/
 inputs/glossario/
 
-# Temporary folder for incoming data processing
-temp/
+# Temporary folder for incoming data processing (mas manter arquivos importantes)
+temp/*.json
+temp/*_test_results_*.json
+# Manter scripts e auditorias importantes em temp/
 
 # Generated documentation with timestamps
 outputs/doc/*_2025*.xlsx
@@ -261,3 +263,63 @@ Direcionadores_PROTECAI.docx
 
 # SQL documentation files (keep only final versions)
 docs/
+
+# ================================
+# NOVOS PATTERNS - ORGANIZAÇÃO 27/OUT/2025  
+# ================================
+
+# Arquivos temporários de snapshot e auditoria (raiz do projeto)
+SNAPSHOT_*.json
+smart_post_test_results_*.json
+test_file.txt
+importacao_dados.log
+
+# Resultados de testes temporários (mas manter scripts e auditorias importantes)
+temp/test_results/*.json
+temp/*_test_results_*.json
+temp/endpoint_test_results_*.json
+temp/real_64_endpoints_test_*.json
+
+# PERMITIR arquivos importantes do temp:
+# !temp/test_real_64_endpoints.py
+# !temp/AUDITORIA_ENDPOINTS_FANTASMA.md
+
+# ================================
+# ARQUIVOS DE CONTROLE E MONITORAMENTO  
+# ================================
+# Arquivos .md de controle do desenvolvimento (apenas temporários)
+CORRECAO_ENDPOINTS_*.md
+SITUACAO_CRITICA_*.md
+
+# MANTER arquivos de status finais importantes:
+# STATUS_FINAL_ENDPOINTS_*.md - são importantes para histórico!
+# Arquivos .md de controle do desenvolvimento (interessam apenas aos desenvolvedores)
+CORRECAO_ENDPOINTS_*.md
+SITUACAO_CRITICA_*.md
+STATUS_ENDPOINTS_*.md
+# STATUS_FINAL_ENDPOINTS_*.md - MANTIDOS (são importantes para histórico!)
+AUDITORIA_MOCK_FAKE.md
+AUDITORIA_ENDPOINTS_FANTASMA.md
+
+# Resultados de testes de endpoints (arquivos temporários)
+endpoint_progress_test_*.json
+smart_post_test_results_*.json
+*_test_results_*.json
+real_64_endpoints_test_*.json
+endpoint_test_results_*.json
+
+# Scripts de teste temporários
+test_all_70_endpoints.py
+test_real_64_endpoints.py
+
+# Logs de importação temporários
+importacao_dados.log
+*.log
+
+# Arquivos temporários de teste
+test_file.txt
+
+# Arquivos temporários do Office
+~$*.docx
+~$*.xlsx
+~$*.pptx

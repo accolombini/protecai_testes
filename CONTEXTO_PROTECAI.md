@@ -2,7 +2,29 @@
 # ProtecAI System - Contexto Completo e Permanente
 # =====================================================
 
-## 📊 STATUS ATUAL DO PROJETO
+# CONTEXTO PROTECAI - SISTEMA DE PROTEÇÃO DE RELÉS
+# ProtecAI System - Contexto Completo e Permanente
+# =====================================================
+
+## 🚨 SITUAÇÃO CRÍTICA - 26 OUTUBRO 2025
+**REGRESSÃO SEVERA DETECTADA**: De 91.3% (25/10) para 46.9% (26/10)
+**Status Atual:** 30/64 endpoints funcionais - PERDA DE 28 ENDPOINTS
+**Sistema Real:** 64 endpoints confirmados via OpenAPI (não 70 como reportado)
+**Urgência:** MÁXIMA - Sistema em estado crítico
+
+### �📊 STATUS DAS 8 APIS PRINCIPAIS (26/10/2025 11:36h):
+- **✅ PERFEITAS (3/8)**: health (100%), info (100%), root (100%)
+- **🟡 BOA (1/8)**: imports (87.5% - 7/8 funcionais)  
+- **🔴 CRÍTICAS (4/8)**: compare (50%), ml (50%), etap-native (41.7%), validation (33.3%)
+- **🆘 EXTRAS DESCOBERTAS**: ml-gateway (31.2%), equipments (27.3%), etap-integration (27.3%)
+
+### 🎯 MISSÃO IMEDIATA: RECUPERAR 100% DOS ENDPOINTS
+**Meta:** 64/64 endpoints funcionais (de 30/64 atual)
+**Evolução Real:** 63→64 endpoints (+1 apenas, estabilidade de escopo)
+**Problema:** Regressão funcional, não expansão descontrolada
+**Bloqueio:** Auditoria glossário suspensa até endpoints 100%
+
+## 📊 STATUS ANTERIOR (23/10/2025) - ERA FUNCIONAL
 **Data:** 23 de outubro de 2025 - SESSÃO ÉPICA CONCLUÍDA
 **Objetivo:** Sistema completo de análise e configuração de relés de proteção para PETROBRAS  
 **Progresso:** 95% - ZERO MOCKS ACHIEVED! 🎉
@@ -141,19 +163,37 @@
 
 ```
 
-## 📊 APIS BACKEND (8 funcionando)
+## 📊 APIS BACKEND - SITUAÇÃO CRÍTICA (26/10/2025)
 
-### 📁 FILE REGISTRY (OPERACIONAL)  1. **Equipments**: `/api/v1/equipments/` - CRUD completo
+### 🎯 8 APIS PRINCIPAIS STATUS:
+1. **Health**: `/health` - ✅ 100% (1/1 funcionais) 
+2. **Info**: `/api/v1/info` - ✅ 100% (1/1 funcionais)
+3. **Root**: `/` - ✅ 100% (1/1 funcionais)
+4. **Imports**: `/api/v1/imports/` - 🟡 87.5% (7/8 funcionais)
+5. **Compare**: `/api/v1/compare/` - 🔴 50% (1/2 funcionais) 
+6. **ML**: `/api/v1/ml/` - 🔴 50% (2/4 funcionais)
+7. **ETAP Native**: `/api/v1/etap-native/` - 🔴 41.7% (5/12 funcionais)
+8. **Validation**: `/api/v1/validation/` - 🔴 33.3% (1/3 funcionais)
 
-```2. **ML Gateway**: `/api/v1/ml-gateway/` - 14 endpoints
+### 🆘 APIS EXTRAS DESCOBERTAS:
+- **ML Gateway**: `/api/v1/ml-gateway/` - 🔴 31.2% (5/16 funcionais)  
+- **Equipments**: `/api/v1/equipments/` - 🔴 27.3% (3/11 funcionais)
+- **ETAP Integration**: `/api/v1/etap/` - 🔴 27.3% (3/11 funcionais)
 
-• Localização: inputs/registry/processed_files.json3. **Compare**: `/api/v1/compare/` - ETAP vs PostgreSQL
+**TOTAL DESCOBERTO**: 11 APIs estáveis, 64 endpoints confirmados
 
-• Arquivos Processados: 52+ documentos PDF/Excel4. **Import**: `/api/v1/imports/` - ❌ MOCK implementado
+### 🔍 **VALIDAÇÃO OPENAPI CRÍTICA**:
+```bash
+curl -s http://localhost:8000/openapi.json | jq '.paths | keys | length'
+# Resultado: 64 endpoints (sempre validar por este comando)
+```
 
-• Última Atualização: Tempo real5. **ETAP**: `/api/v1/etap/` - Interface enterprise
-
-• Integração: FileRegistryManager funcional6. **ETAP Native**: `/api/v1/etap-native/` - etapPy prep
+### 📁 FILE REGISTRY (OPERACIONAL)  
+```
+• Localização: inputs/registry/processed_files.json
+• Arquivos Processados: 52+ documentos PDF/Excel
+• Última Atualização: Tempo real
+• Integração: FileRegistryManager funcional
 
 ```7. **Validation**: `/api/v1/validation/` - Integridade dados
 
