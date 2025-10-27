@@ -9,6 +9,7 @@ Baseado na estrutura real dos dados da Petrobras.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile, Response
+from typing import Union
 from fastapi import status as http_status
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
@@ -249,7 +250,7 @@ async def list_studies(
 
 @router.get("/studies/{study_id}", response_model=StudyDetailResponse)
 async def get_study(
-    study_id: int,
+    study_id: Union[str, int],  # 🎯 ACEITAR STRING E INT - ADAPTADOR NO SERVICE
     db: Session = Depends(get_db)
 ):
     """
@@ -399,7 +400,7 @@ async def import_csv_data(
 
 @router.get("/studies/{study_id}/export/csv", response_model=ExportResponse)
 async def export_study_to_csv(
-    study_id: int,
+    study_id: str,  # 🎯 CORRIGIDO: str para usar adapter
     export_format: str = Query("etap_compatible", description="Formato de exportação"),
     db: Session = Depends(get_db)
 ):
@@ -414,10 +415,13 @@ async def export_study_to_csv(
     try:
         service = EtapService(db)
         
+        # 🎯 CONVERTER string para int usando adapter interno do service
+        study_str, study_int = service.adapt_study_id(study_id)  # Desempacotar tupla
+        
         # Criar arquivo temporário para exportação
         with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as temp_file:
             export_result = service.export_to_csv(
-                study_id=study_id,
+                study_id=study_int,  # usar int convertido
                 output_path=temp_file.name,
                 export_format=export_format
             )
@@ -539,9 +543,18 @@ async def export_study_to_csv(
             study_id=study_id
         )
         
-        # Generate filename based on study info
-        study = integration_service.etap_service.get_study_by_id(study_id)
-        study_name = study.get('name', f'study_{study_id}') if study else f'study_{study_id}'
+        # 🎯 SISTEMA ROBUSTO - Usar adapter para converter study_id
+        etap_service = integration_service.etap_service
+        study_str, study_int = etap_service.adapt_study_id(study_id)  # Desempacotar tupla
+        
+        # Gerar filename baseado em informações do estudo
+        try:
+            study = await etap_service.get_study_by_id(study_int)
+            study_name = study.get('name', f'study_{study_id}') if study else f'robust_study_{study_id}'
+        except:
+            # Fallback robusto se não conseguir obter o estudo
+            study_name = f'robust_study_{study_id}'
+        
         filename = f"{study_name}_export.csv"
         
         return Response(
