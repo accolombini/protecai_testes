@@ -1,0 +1,91 @@
+{
+  "test_suite": "ETAP Integration FASE 1",
+  "timestamp": "2025-10-20T12:05:22.637943",
+  "summary": {
+    "total_tests": 5,
+    "passed_tests": 3,
+    "success_rate": 60.0,
+    "status": "NEEDS_WORK"
+  },
+  "detailed_results": {
+    "database_setup": {
+      "status": "success",
+      "tables_created": 18,
+      "table_list": [
+        "comparison_reports",
+        "coordination_results",
+        "electrical_configuration",
+        "etap_equipment_configs",
+        "etap_field_mappings",
+        "etap_import_history",
+        "etap_studies",
+        "etap_sync_logs",
+        "import_history",
+        "io_configuration",
+        "manufacturers",
+        "pg_stat_statements",
+        "pg_stat_statements_info",
+        "protection_curves",
+        "protection_functions",
+        "relay_equipment",
+        "relay_models",
+        "simulation_results"
+      ]
+    },
+    "csv_bridge": {
+      "status": "success",
+      "files_processed": 2,
+      "results": [
+        {
+          "file": "tela3_params.csv",
+          "device_type": "easergy_p3",
+          "parameters_count": 151,
+          "categories_found": [
+            "device_type",
+            "identification",
+            "electrical_configuration",
+            "protection_functions",
+            "io_configuration",
+            "additional_parameters",
+            "raw_parameters"
+          ],
+          "validation_status": "warnings",
+          "validation_errors": [
+            "Missing critical field: identification.device_description",
+            "Missing critical field: identification.model_number"
+          ]
+        },
+        {
+          "file": "tela1_params.csv",
+          "device_type": "micom_p143",
+          "parameters_count": 338,
+          "categories_found": [
+            "device_type",
+            "identification",
+            "electrical_configuration",
+            "protection_functions",
+            "io_configuration",
+            "additional_parameters",
+            "raw_parameters"
+          ],
+          "validation_status": "valid",
+          "validation_errors": []
+        }
+      ]
+    },
+    "etap_service": {
+      "status": "failed",
+      "error": "'EtapStudy' object is not subscriptable"
+    },
+    "integration_service": {
+      "status": "failed",
+      "error": ""
+    },
+    "database_queries": {
+      "status": "success",
+      "study_count": 2,
+      "equipment_count": 2,
+      "relationships": 2
+    }
+  }
+}

@@ -24,7 +24,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Imports dos módulos do projeto
-from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway
+from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway, reports
 from api.core.config import settings
 from api.core.database import engine, get_db
 
@@ -144,6 +144,13 @@ app.include_router(
     responses={500: {"description": "ML Gateway service error"}},
 )
 
+app.include_router(
+    reports.router,
+    prefix="/api/v1/reports",
+    tags=["Reports"],
+    responses={400: {"description": "Invalid report parameters"}},
+)
+
 # Event handlers
 @app.on_event("startup")
 async def startup_event():
@@ -208,6 +215,53 @@ async def health_check():
         },
         "uptime": "Active since startup"
     }
+
+@app.get("/health/connections", tags=["Health"])
+async def health_connections():
+    """
+    🔧 DIAGNÓSTICO: Monitora pool de conexões PostgreSQL
+    Útil para detectar connection leaks durante desenvolvimento
+    """
+    try:
+        from api.core.database import get_connection_stats, engine
+        from sqlalchemy import text
+        
+        # Stats do pool SQLAlchemy
+        pool_stats = get_connection_stats()
+        
+        # Stats do PostgreSQL
+        with engine.connect() as conn:
+            pg_stats = conn.execute(text("""
+                SELECT 
+                    count(*) as total_connections,
+                    count(*) FILTER (WHERE state = 'active') as active,
+                    count(*) FILTER (WHERE state = 'idle') as idle,
+                    max_conn.setting::int as max_connections
+                FROM pg_stat_activity,
+                    (SELECT setting FROM pg_settings WHERE name = 'max_connections') as max_conn
+                WHERE datname = 'protecai_db'
+                GROUP BY max_conn.setting
+            """)).fetchone()
+        
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "sqlalchemy_pool": pool_stats,
+            "postgresql": {
+                "total_connections": pg_stats.total_connections if pg_stats else 0,
+                "active": pg_stats.active if pg_stats else 0,
+                "idle": pg_stats.idle if pg_stats else 0,
+                "max_connections": pg_stats.max_connections if pg_stats else 100,
+                "usage_percent": round((pg_stats.total_connections / pg_stats.max_connections * 100), 2) if pg_stats else 0
+            },
+            "status": "healthy" if (pg_stats and pg_stats.total_connections < pg_stats.max_connections * 0.8) else "warning"
+        }
+    except Exception as e:
+        logger.error(f"Erro ao obter stats de conexões: {e}")
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "status": "error"
+        }
 
 @app.get("/api/v1/info", tags=["Info"])
 async def api_info():

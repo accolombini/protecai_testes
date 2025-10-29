@@ -1,0 +1,273 @@
+{
+  "comparison_metadata": {
+    "timestamp": "2025-10-18T18:05:51.464344",
+    "equipment_1": {
+      "id": 3,
+      "tag_reference": null,
+      "serial_number": "690927U",
+      "manufacturer": "Schneider Electric (MiCOM)",
+      "model_type": "protection",
+      "family": null,
+      "status": "active",
+      "software_version": "P241 60C"
+    },
+    "equipment_2": {
+      "id": 4,
+      "tag_reference": "MF09",
+      "serial_number": null,
+      "manufacturer": "Schneider Electric (Easergy)",
+      "model_type": "protection",
+      "family": null,
+      "status": "active",
+      "software_version": "6.A"
+    }
+  },
+  "electrical_comparison": [
+    {
+      "field_name": "phase_ct_primary",
+      "comparison_type": "ComparisonType.DIFFERENT",
+      "left_value": "150.000",
+      "right_value": "100.000",
+      "difference": "Diferença: 33.33%",
+      "severity": "critical",
+      "notes": "Diferença: 33.33%"
+    },
+    {
+      "field_name": "phase_ct_secondary",
+      "comparison_type": "ComparisonType.IDENTICAL",
+      "left_value": "5.000",
+      "right_value": "5.000",
+      "difference": "Valores idênticos",
+      "severity": "critical",
+      "notes": "Valores idênticos"
+    },
+    {
+      "field_name": "neutral_ct_primary",
+      "comparison_type": "ComparisonType.IDENTICAL",
+      "left_value": "50.000",
+      "right_value": "50.000",
+      "difference": "Valores idênticos",
+      "severity": "critical",
+      "notes": "Valores idênticos"
+    },
+    {
+      "field_name": "neutral_ct_secondary",
+      "comparison_type": "ComparisonType.IDENTICAL",
+      "left_value": "5.000",
+      "right_value": "5.000",
+      "difference": "Valores idênticos",
+      "severity": "critical",
+      "notes": "Valores idênticos"
+    },
+    {
+      "field_name": "vt_primary",
+      "comparison_type": "ComparisonType.IDENTICAL",
+      "left_value": null,
+      "right_value": null,
+      "difference": "Ambos valores não configurados",
+      "severity": "critical",
+      "notes": "Ambos valores não configurados"
+    },
+    {
+      "field_name": "vt_secondary",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "120.00",
+      "right_value": null,
+      "difference": "Valor não configurado no equipamento direito",
+      "severity": "critical",
+      "notes": "Valor não configurado no equipamento direito"
+    },
+    {
+      "field_name": "nominal_voltage",
+      "comparison_type": "ComparisonType.IDENTICAL",
+      "left_value": null,
+      "right_value": null,
+      "difference": "Ambos valores não configurados",
+      "severity": "critical",
+      "notes": "Ambos valores não configurados"
+    },
+    {
+      "field_name": "nvd_vt_primary",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "110.00",
+      "right_value": null,
+      "difference": "Valor não configurado no equipamento direito",
+      "severity": "info",
+      "notes": "Valor não configurado no equipamento direito"
+    },
+    {
+      "field_name": "nvd_vt_secondary",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "110.00",
+      "right_value": null,
+      "difference": "Valor não configurado no equipamento direito",
+      "severity": "info",
+      "notes": "Valor não configurado no equipamento direito"
+    },
+    {
+      "field_name": "equipment_load",
+      "comparison_type": "ComparisonType.IDENTICAL",
+      "left_value": null,
+      "right_value": null,
+      "difference": "Ambos valores não configurados",
+      "severity": "info",
+      "notes": "Ambos valores não configurados"
+    },
+    {
+      "field_name": "vt_connection_mode",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "2 VT + Residual",
+      "right_value": null,
+      "difference": "Valor não configurado no equipamento direito",
+      "severity": "info",
+      "notes": "Valor não configurado no equipamento direito"
+    },
+    {
+      "field_name": "power_supply",
+      "comparison_type": "ComparisonType.IDENTICAL",
+      "left_value": null,
+      "right_value": null,
+      "difference": "Ambos valores não configurados",
+      "severity": "info",
+      "notes": "Ambos valores não configurados"
+    }
+  ],
+  "protection_comparison": [
+    {
+      "field_name": "protection_function_0106_existence",
+      "comparison_type": "ComparisonType.MISSING_LEFT",
+      "left_value": null,
+      "right_value": "Motor",
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 0106 ausente no equipamento esquerdo"
+    },
+    {
+      "field_name": "protection_function_0200_existence",
+      "comparison_type": "ComparisonType.MISSING_LEFT",
+      "left_value": null,
+      "right_value": "Thermal",
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 0200 ausente no equipamento esquerdo"
+    },
+    {
+      "field_name": "protection_function_0210_existence",
+      "comparison_type": "ComparisonType.MISSING_LEFT",
+      "left_value": null,
+      "right_value": "Overcurrent",
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 0210 ausente no equipamento esquerdo"
+    },
+    {
+      "field_name": "protection_function_0220_existence",
+      "comparison_type": "ComparisonType.MISSING_LEFT",
+      "left_value": null,
+      "right_value": "Earth Fault",
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 0220 ausente no equipamento esquerdo"
+    },
+    {
+      "field_name": "protection_function_0230_existence",
+      "comparison_type": "ComparisonType.MISSING_LEFT",
+      "left_value": null,
+      "right_value": "Negative Sequence",
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 0230 ausente no equipamento esquerdo"
+    },
+    {
+      "field_name": "protection_function_08.24_existence",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "Motor",
+      "right_value": null,
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 08.24 ausente no equipamento direito"
+    },
+    {
+      "field_name": "protection_function_09.0B_existence",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "Thermal",
+      "right_value": null,
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 09.0B ausente no equipamento direito"
+    },
+    {
+      "field_name": "protection_function_09.0C_existence",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "Overcurrent",
+      "right_value": null,
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 09.0C ausente no equipamento direito"
+    },
+    {
+      "field_name": "protection_function_09.16_existence",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "Earth Fault",
+      "right_value": null,
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 09.16 ausente no equipamento direito"
+    },
+    {
+      "field_name": "protection_function_09.1E_existence",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "Voltage",
+      "right_value": null,
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 09.1E ausente no equipamento direito"
+    },
+    {
+      "field_name": "protection_function_33.01_existence",
+      "comparison_type": "ComparisonType.MISSING_RIGHT",
+      "left_value": "Negative Sequence",
+      "right_value": null,
+      "difference": null,
+      "severity": "warning",
+      "notes": "Função 33.01 ausente no equipamento direito"
+    }
+  ],
+  "io_comparison": [
+    {
+      "field_name": "io_count_analog_input",
+      "comparison_type": "ComparisonType.DIFFERENT",
+      "left_value": 8,
+      "right_value": 0,
+      "difference": null,
+      "severity": "info",
+      "notes": "Contagem diferente: 8 vs 0"
+    },
+    {
+      "field_name": "io_count_digital_input",
+      "comparison_type": "ComparisonType.DIFFERENT",
+      "left_value": 8,
+      "right_value": 0,
+      "difference": null,
+      "severity": "info",
+      "notes": "Contagem diferente: 8 vs 0"
+    },
+    {
+      "field_name": "io_count_relay_output",
+      "comparison_type": "ComparisonType.DIFFERENT",
+      "left_value": 9,
+      "right_value": 0,
+      "difference": null,
+      "severity": "info",
+      "notes": "Contagem diferente: 9 vs 0"
+    }
+  ],
+  "summary": {
+    "total_comparisons": 26,
+    "identical": 7,
+    "different": 4,
+    "missing": 15,
+    "critical_differences": 7,
+    "warnings": 11
+  }
+}

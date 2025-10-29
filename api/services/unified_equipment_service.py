@@ -85,43 +85,66 @@ class UnifiedEquipmentService:
         try:
             with self.engine.connect() as conn:
                 # Buscar em protec_ai.fabricantes
-                protec_ai_query = text("""
-                SELECT 
-                    'protec_ai' as source_schema,
-                    id,
-                    nome_completo as name,
-                    pais_origem as country,
-                    created_at,
-                    (SELECT COUNT(*) FROM protec_ai.arquivos WHERE fabricante_id = f.id) as file_count
-                FROM protec_ai.fabricantes f
-                WHERE (:query = '' OR nome_completo ILIKE :search_pattern)
-                ORDER BY nome_completo
-            """)
-                
-                search_pattern = f"%{query}%" if query else "%"
-                protec_ai_result = conn.execute(protec_ai_query, {
-                    "query": query,
-                    "search_pattern": search_pattern
-                }).fetchall()
+                if query:
+                    protec_ai_query = text("""
+                        SELECT 
+                            'protec_ai' as source_schema,
+                            id,
+                            nome_completo as name,
+                            pais_origem as country,
+                            created_at,
+                            (SELECT COUNT(*) FROM protec_ai.arquivos WHERE fabricante_id = f.id) as file_count
+                        FROM protec_ai.fabricantes f
+                        WHERE nome_completo ILIKE :search_pattern
+                        ORDER BY nome_completo
+                    """)
+                    protec_ai_result = conn.execute(protec_ai_query, {
+                        "search_pattern": f"%{query}%"
+                    }).fetchall()
+                else:
+                    protec_ai_query = text("""
+                        SELECT 
+                            'protec_ai' as source_schema,
+                            id,
+                            nome_completo as name,
+                            pais_origem as country,
+                            created_at,
+                            (SELECT COUNT(*) FROM protec_ai.arquivos WHERE fabricante_id = f.id) as file_count
+                        FROM protec_ai.fabricantes f
+                        ORDER BY nome_completo
+                    """)
+                    protec_ai_result = conn.execute(protec_ai_query).fetchall()
                 
                 # Buscar em relay_configs.manufacturers (pode estar vazio)
-                relay_configs_query = text("""
-                SELECT 
-                    'relay_configs' as source_schema,
-                    id,
-                    name,
-                    country,
-                    created_at,
-                    (SELECT COUNT(*) FROM relay_configs.relay_models WHERE manufacturer_id = m.id) as model_count
-                FROM relay_configs.manufacturers m
-                WHERE (:query = '' OR name ILIKE :search_pattern)
-                ORDER BY name
-            """)
-                
-                relay_configs_result = conn.execute(relay_configs_query, {
-                    "query": query,
-                    "search_pattern": search_pattern
-                }).fetchall()
+                if query:
+                    relay_configs_query = text("""
+                        SELECT 
+                            'relay_configs' as source_schema,
+                            id,
+                            name,
+                            country,
+                            created_at,
+                            (SELECT COUNT(*) FROM relay_configs.relay_models WHERE manufacturer_id = m.id) as model_count
+                        FROM relay_configs.manufacturers m
+                        WHERE name ILIKE :search_pattern
+                        ORDER BY name
+                    """)
+                    relay_configs_result = conn.execute(relay_configs_query, {
+                        "search_pattern": f"%{query}%"
+                    }).fetchall()
+                else:
+                    relay_configs_query = text("""
+                        SELECT 
+                            'relay_configs' as source_schema,
+                            id,
+                            name,
+                            country,
+                            created_at,
+                            (SELECT COUNT(*) FROM relay_configs.relay_models WHERE manufacturer_id = m.id) as model_count
+                        FROM relay_configs.manufacturers m
+                        ORDER BY name
+                    """)
+                    relay_configs_result = conn.execute(relay_configs_query).fetchall()
                 
                 # Consolidar resultados
                 manufacturers = []
@@ -170,113 +193,260 @@ class UnifiedEquipmentService:
         try:
             results = []
             
-            # 1. Equipamentos estruturados (relay_configs)
-            structured_query = text("""
-                SELECT 
-                    'relay_configs' as source_schema,
-                    re.id,
-                    re.tag_reference,
-                    re.serial_number,
-                    re.plant_reference,
-                    re.bay_position,
-                    re.status,
-                    re.description,
-                    rm.name as model_name,
-                    rm.model_type,
-                    rm.family,
-                    m.name as manufacturer_name,
-                    m.country as manufacturer_country,
-                    re.created_at
-                FROM relay_configs.relay_equipment re
-                JOIN relay_configs.relay_models rm ON re.model_id = rm.id
-                JOIN relay_configs.manufacturers m ON rm.manufacturer_id = m.id
-                WHERE (:manufacturer_filter = '' OR m.name ILIKE :manufacturer_pattern)
-                ORDER BY re.id
-            """)
+            # 1. Equipamentos estruturados - TODAS AS QUERIES EM UMA ÚNICA CONEXÃO
+            logger.info(f"[parameters: {{'manufacturer_filter': '{manufacturer_filter}', 'manufacturer_pattern': '%{manufacturer_filter}%'}}]")
             
-            structured_equipment = self.db.execute(structured_query, {
-                "manufacturer_filter": manufacturer_filter,
-                "manufacturer_pattern": f"%{manufacturer_filter}%" if manufacturer_filter else "%"
-            }).fetchall()
+            # MANTER CONEXÃO ABERTA PARA TODAS AS OPERAÇÕES
+            with self.engine.connect() as conn:
+                # 1.1. Verificar relay_configs
+                check_query = text("""
+                    SELECT COUNT(*) as count 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'relay_configs' 
+                    AND table_name = 'relay_equipment'
+                """)
+                table_exists = conn.execute(check_query).fetchone()
+                
+                structured_equipment = []
+                if table_exists and table_exists.count > 0:
+                    # Query corrigida sem problemas de parâmetros
+                    if manufacturer_filter:
+                        structured_query = text("""
+                            SELECT 
+                                'relay_configs' as source_schema,
+                                re.id,
+                                re.tag as equipment_tag,
+                                '' as serial_number,
+                                re.location as substation_name,
+                                '' as bay_name,
+                                re.status,
+                                '' as position_description,
+                                rm.model_name,
+                                rm.series,
+                                '' as family,
+                                m.nome_completo as manufacturer_name,
+                                '' as manufacturer_country,
+                                re.created_at
+                            FROM relay_configs.relay_equipment re
+                            JOIN relay_configs.relay_models rm ON re.relay_model_id = rm.id
+                            JOIN relay_configs.fabricantes m ON rm.manufacturer_id = m.id
+                            WHERE m.nome_completo ILIKE :manufacturer_pattern
+                            ORDER BY re.id
+                        """)
+                        structured_equipment = conn.execute(structured_query, {
+                            "manufacturer_pattern": f"%{manufacturer_filter}%"
+                        }).fetchall()
+                    else:
+                        structured_query = text("""
+                            SELECT 
+                                'relay_configs' as source_schema,
+                                re.id,
+                                re.tag as equipment_tag,
+                                '' as serial_number,
+                                re.location as substation_name,
+                                '' as bay_name,
+                                re.status,
+                                '' as position_description,
+                                rm.model_name,
+                                rm.series,
+                                '' as family,
+                                m.nome_completo as manufacturer_name,
+                                '' as manufacturer_country,
+                                re.created_at
+                            FROM relay_configs.relay_equipment re
+                            JOIN relay_configs.relay_models rm ON re.relay_model_id = rm.id
+                            JOIN relay_configs.fabricantes m ON rm.manufacturer_id = m.id
+                            ORDER BY re.id
+                        """)
+                        structured_equipment = conn.execute(structured_query).fetchall()
+                else:
+                    logger.warning("⚠️ relay_configs.relay_equipment table does not exist - using fallback")
+                
+                # Processar equipamentos relay_configs
+                for eq in structured_equipment:
+                    results.append({
+                        "id": f"relay_configs_{eq.id}",
+                        "source": "relay_configs",
+                        "tag_reference": eq.equipment_tag,
+                        "serial_number": eq.serial_number,
+                        "plant_reference": eq.substation_name,
+                        "bay_position": eq.bay_name,
+                        "status": eq.status,
+                        "description": eq.position_description,
+                        "model": {
+                            "name": eq.model_name,
+                            "type": getattr(eq, 'model_type', ''),
+                            "family": eq.family
+                        },
+                        "manufacturer": {
+                            "name": eq.manufacturer_name,
+                            "country": eq.manufacturer_country
+                        },
+                        "data_completeness": "structured",
+                        "created_at": eq.created_at
+                    })
+                
+                # 1.2. Verificar protec_ai (DENTRO DA MESMA CONEXÃO)
+                protec_ai_check_query = text("""
+                    SELECT COUNT(*) as count 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'protec_ai' 
+                    AND table_name = 'relay_equipment'
+                """)
+                protec_ai_table_exists = conn.execute(protec_ai_check_query).fetchone()
+                
+                # Processar protec_ai (DENTRO DA MESMA CONEXÃO)
+                if protec_ai_table_exists and protec_ai_table_exists.count > 0:
+                    if manufacturer_filter:
+                        protec_ai_structured_query = text("""
+                            SELECT 
+                                'protec_ai' as source_schema,
+                                re.id,
+                                re.equipment_tag,
+                                re.serial_number,
+                                re.substation_name,
+                                re.bay_name,
+                                re.status,
+                                re.position_description,
+                                rm.model_name,
+                                rm.technology as model_type,
+                                '' as family,
+                                f.nome_completo as manufacturer_name,
+                                f.pais_origem as manufacturer_country,
+                                re.created_at
+                            FROM protec_ai.relay_equipment re
+                            JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                            JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+                            WHERE f.nome_completo ILIKE :manufacturer_pattern
+                            ORDER BY re.id
+                        """)
+                        protec_ai_equipment = conn.execute(protec_ai_structured_query, {
+                            "manufacturer_pattern": f"%{manufacturer_filter}%"
+                        }).fetchall()
+                    else:
+                        protec_ai_structured_query = text("""
+                            SELECT 
+                                'protec_ai' as source_schema,
+                                re.id,
+                                re.equipment_tag,
+                                re.serial_number,
+                                re.substation_name,
+                                re.bay_name,
+                                re.status,
+                                re.position_description,
+                                rm.model_name,
+                                rm.technology as model_type,
+                                '' as family,
+                                f.nome_completo as manufacturer_name,
+                                f.pais_origem as manufacturer_country,
+                                re.created_at
+                            FROM protec_ai.relay_equipment re
+                            JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                            JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+                            ORDER BY re.id
+                        """)
+                        protec_ai_equipment = conn.execute(protec_ai_structured_query).fetchall()
+                    
+                    # Processar equipamentos protec_ai
+                    for eq in protec_ai_equipment:
+                        results.append({
+                            "id": f"protec_ai_{eq.id}",
+                            "source": "protec_ai",
+                            "tag_reference": eq.equipment_tag,
+                            "serial_number": eq.serial_number,
+                            "plant_reference": eq.substation_name,
+                            "bay_position": eq.bay_name,
+                            "status": eq.status,
+                            "description": eq.position_description,
+                            "model": {
+                                "name": eq.model_name,
+                                "type": eq.model_type,
+                                "family": eq.family
+                            },
+                            "manufacturer": {
+                                "name": eq.manufacturer_name,
+                                "country": eq.manufacturer_country
+                            },
+                            "data_completeness": "structured",
+                            "created_at": eq.created_at
+                        })
+                
+                # 2. Configurações extraídas (protec_ai) - MANTER NA MESMA CONEXÃO
+                if manufacturer_filter:
+                    extracted_query = text("""
+                        SELECT DISTINCT
+                        'protec_ai' as source_schema,
+                        vo.id,
+                        co.codigo_campo,
+                        vo.valor_original,
+                        'N/A' as unidade,
+                        f.nome_completo as manufacturer_name,
+                        f.pais_origem as manufacturer_country,
+                        a.nome_arquivo,
+                        co.created_at as data_criacao
+                    FROM protec_ai.valores_originais vo
+                    JOIN protec_ai.campos_originais co ON vo.campo_id = co.id
+                    JOIN protec_ai.arquivos a ON co.arquivo_id = a.id
+                    JOIN protec_ai.fabricantes f ON a.fabricante_id = f.id
+                    WHERE f.nome_completo ILIKE :manufacturer_pattern
+                    AND co.descricao_campo ILIKE '%model%'
+                    ORDER BY vo.id
+                    LIMIT 50
+                """)
+                    extracted_configs = conn.execute(extracted_query, {
+                        "manufacturer_pattern": f"%{manufacturer_filter}%"
+                    }).fetchall()
+                else:
+                    extracted_query = text("""
+                        SELECT DISTINCT
+                            'protec_ai' as source_schema,
+                            vo.id,
+                            co.codigo_campo,
+                            vo.valor_original,
+                            'N/A' as unidade,
+                            f.nome_completo as manufacturer_name,
+                            f.pais_origem as manufacturer_country,
+                            a.nome_arquivo,
+                            co.created_at as data_criacao
+                        FROM protec_ai.valores_originais vo
+                        JOIN protec_ai.campos_originais co ON vo.campo_id = co.id
+                        JOIN protec_ai.arquivos a ON co.arquivo_id = a.id
+                        JOIN protec_ai.fabricantes f ON a.fabricante_id = f.id
+                        WHERE co.descricao_campo ILIKE '%model%'
+                        ORDER BY vo.id
+                        LIMIT 50
+                    """)
+                    extracted_configs = conn.execute(extracted_query).fetchall()
+                
+                # Processar configurações extraídas
+                for config in extracted_configs:
+                    results.append({
+                        "id": f"protec_ai_{config.id}",
+                        "source": "protec_ai", 
+                        "tag_reference": None,
+                        "serial_number": None,
+                        "plant_reference": None,
+                        "bay_position": None,
+                        "status": "extracted",
+                        "description": f"Extracted parameter: {config.codigo_campo}",
+                        "model": {
+                            "name": config.valor_original,
+                            "type": "extracted",
+                            "family": None
+                        },
+                        "manufacturer": {
+                            "name": config.manufacturer_name,
+                            "country": config.manufacturer_country
+                        },
+                        "data_completeness": "extracted",
+                        "source_file": config.nome_arquivo,
+                        "parameter_field": config.codigo_campo,
+                        "value": config.valor_original,
+                        "unit": getattr(config, 'unidade', 'N/A'),
+                        "created_at": config.data_criacao
+                    })
             
-            for eq in structured_equipment:
-                results.append({
-                    "id": f"relay_configs_{eq.id}",
-                    "source": "relay_configs",
-                    "tag_reference": eq.tag_reference,
-                    "serial_number": eq.serial_number,
-                    "plant_reference": eq.plant_reference,
-                    "bay_position": eq.bay_position,
-                    "status": eq.status,
-                    "description": eq.description,
-                    "model": {
-                        "name": eq.model_name,
-                        "type": eq.model_type,
-                        "family": eq.family
-                    },
-                    "manufacturer": {
-                        "name": eq.manufacturer_name,
-                        "country": eq.manufacturer_country
-                    },
-                    "data_completeness": "structured",
-                    "created_at": eq.created_at
-                })
-            
-            # 2. Configurações extraídas (protec_ai) - amostras representativas
-            extracted_query = text("""
-                SELECT DISTINCT
-                    'protec_ai' as source_schema,
-                    vo.id,
-                    co.codigo_campo,
-                    vo.valor_original,
-                    'N/A' as unidade,
-                    f.nome_completo as manufacturer_name,
-                    f.pais_origem as manufacturer_country,
-                    a.nome_arquivo,
-                    co.created_at as data_criacao
-                FROM protec_ai.valores_originais vo
-                JOIN protec_ai.campos_originais co ON vo.campo_id = co.id
-                JOIN protec_ai.arquivos a ON co.arquivo_id = a.id
-                JOIN protec_ai.fabricantes f ON a.fabricante_id = f.id
-                WHERE (:manufacturer_filter = '' OR f.nome_completo ILIKE :manufacturer_pattern)
-                AND co.descricao_campo ILIKE '%model%'
-                ORDER BY vo.id
-                LIMIT 50
-            """)
-            
-            extracted_configs = self.db.execute(extracted_query, {
-                "manufacturer_filter": manufacturer_filter,
-                "manufacturer_pattern": f"%{manufacturer_filter}%" if manufacturer_filter else "%"
-            }).fetchall()
-            
-            for config in extracted_configs:
-                results.append({
-                    "id": f"protec_ai_{config.id}",
-                    "source": "protec_ai", 
-                    "tag_reference": None,
-                    "serial_number": None,
-                    "plant_reference": None,
-                    "bay_position": None,
-                    "status": "extracted",
-                    "description": f"Extracted parameter: {config.codigo_campo}",
-                    "model": {
-                        "name": config.valor_original,
-                        "type": "extracted",
-                        "family": None
-                    },
-                    "manufacturer": {
-                        "name": config.manufacturer_name,
-                        "country": config.manufacturer_country
-                    },
-                    "data_completeness": "extracted",
-                    "source_file": config.nome_arquivo,
-                    "parameter_field": config.codigo_campo,
-                    "value": config.valor_original,
-                    "unit": config.unidade,
-                    "created_at": config.data_criacao
-                })
-            
-            # 3. Aplicar paginação aos resultados unificados
+            # 3. Aplicar paginação aos resultados unificados (FORA DA CONEXÃO)
             total = len(results)
             offset = (page - 1) * size
             paginated_results = results[offset:offset + size]
@@ -355,13 +525,14 @@ class UnifiedEquipmentService:
                     -- Contagem de I/O
                     (SELECT COUNT(*) FROM relay_configs.io_configuration WHERE equipment_id = re.id) as io_count
                 FROM relay_configs.relay_equipment re
-                JOIN relay_configs.relay_models rm ON re.model_id = rm.id
+                JOIN relay_configs.relay_models rm ON re.relay_model_id = rm.id
                 JOIN relay_configs.manufacturers m ON rm.manufacturer_id = m.id
                 LEFT JOIN relay_configs.electrical_configuration ec ON re.id = ec.equipment_id
                 WHERE re.id = :equipment_id
             """)
             
-            result = self.db.execute(query, {"equipment_id": equipment_id}).fetchone()
+            with self.engine.connect() as conn:
+                result = conn.execute(query, {"equipment_id": equipment_id}).fetchone()
             
             if not result:
                 return None
@@ -439,11 +610,6 @@ class UnifiedEquipmentService:
                 WHERE vo.id = :value_id
             """)
             
-            main_result = self.db.execute(main_query, {"value_id": value_id}).fetchone()
-            
-            if not main_result:
-                return None
-            
             # Buscar tokens detalhados
             tokens_query = text("""
                 SELECT 
@@ -459,7 +625,13 @@ class UnifiedEquipmentService:
                 ORDER BY tv.posicao_token
             """)
             
-            tokens = self.db.execute(tokens_query, {"value_id": value_id}).fetchall()
+            with self.engine.connect() as conn:
+                main_result = conn.execute(main_query, {"value_id": value_id}).fetchone()
+                
+                if not main_result:
+                    return None
+                
+                tokens = conn.execute(tokens_query, {"value_id": value_id}).fetchall()
             
             return {
                 "source": "protec_ai",

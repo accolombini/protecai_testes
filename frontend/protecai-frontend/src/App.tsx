@@ -3,9 +3,10 @@ import TestComponent from './components/TestComponent'
 import RealFileUpload from './components/RealFileUpload'
 import SimpleAPITest from './components/SimpleAPITest'
 import MainDashboard from './components/MainDashboard'
+import Reports from './components/Reports'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'upload' | 'api' | 'test'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'upload' | 'api' | 'test'>('dashboard')
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -32,6 +33,16 @@ function App() {
                 }`}
               >
                 📊 Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('reports')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  activeTab === 'reports'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                📄 Relatórios
               </button>
               <button
                 onClick={() => setActiveTab('upload')}
@@ -71,6 +82,7 @@ function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && <MainDashboard />}
+        {activeTab === 'reports' && <Reports />}
         {activeTab === 'upload' && <RealFileUpload />}
         {activeTab === 'api' && <SimpleAPITest />}
         {activeTab === 'test' && <TestComponent />}

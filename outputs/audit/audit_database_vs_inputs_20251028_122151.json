@@ -1,0 +1,294 @@
+{
+  "timestamp": "2025-10-28T12:21:51.647632",
+  "summary": {
+    "input_files_total_relays": 50,
+    "database_total_records": 0,
+    "discrepancy": 50,
+    "consistency_ratio": 0.0
+  },
+  "file_audit": {
+    "pdf_files": [
+      {
+        "file": "P220 52-MP-30.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_204-PN-05_2014-08-09.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P_122 52-MF-03B1_2021-03-17.pdf",
+        "model": "Unknown",
+        "manufacturer": "Unknown"
+      },
+      {
+        "file": "P220 52-MP-06A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P143_204-MF-2B_2018-06-13.pdf",
+        "model": "MICOM P143",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-06B.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_52-Z-08_L_REATOR_2014-08-07.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_204-PN-06_LADO_B_2014-08-09.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P922 52-MF-02AC.pdf",
+        "model": "MICOM P922",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P922 52-MF-2BC_2021-03-06.pdf",
+        "model": "MICOM P922",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P143_204-MF-2C_2018-06-13.pdf",
+        "model": "MICOM P143",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P143_204-MF-03B_2014-08-14.pdf",
+        "model": "MICOM P143",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P143 52-MF-03A.pdf",
+        "model": "MICOM P143",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P241_53-MK-01_2019-08-15.pdf",
+        "model": "MICOM P241",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P143_204-MF-2A_2018-06-13.pdf",
+        "model": "MICOM P143",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 53-MP-08B.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-01A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-21B.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_52-MP-20_2018-08-20.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122 52-MF-02A_2021-03-08.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 53-MP-08A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-21A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P922 52-MF-03AC.pdf",
+        "model": "MICOM P922",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P922 52-MF-03BC.pdf",
+        "model": "MICOM P922",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P922 52-MF-01BC.pdf",
+        "model": "MICOM P922",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_204-MF-2B1_2014-07-28.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_204-PN-06_LADO_A_2014-08-01.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 223-MP-01B.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P922S_204-MF-1AC_2014-07-28.pdf",
+        "model": "MICOM P922",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 223-MP-01A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_205-TF-3B_2018-06-13.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_205-TF-3A_2021-03-08.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_52-Z-08_L_PATIO_2014-08-06.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220_52-MK-02A_2020-07-08.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 53-MP-01A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P143_204-MF-3C_2014-08-09.pdf",
+        "model": "MICOM P143",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-04A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 53-MP-01B.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-04B.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-08A.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122_204-PN-04_2014-08-02.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220 52-MP-29B.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220_54-MP-1A_2018-11-13.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P241_52-MP-20_2019-08-15.pdf",
+        "model": "MICOM P241",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P122 52-MF-03A1_2021-03-11.pdf",
+        "model": "MICOM P122",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220-52-MP-08B_2016-03-11.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "P220_52-MK-02B_2017-11-07.pdf",
+        "model": "MICOM P220",
+        "manufacturer": "Schneider Electric"
+      }
+    ],
+    "txt_files": [
+      {
+        "file": "00-MF-24_2024-09-10.S40",
+        "model": "MICOM S40 Format",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "00-MF-14_2016-03-31.S40",
+        "model": "MICOM S40 Format",
+        "manufacturer": "Schneider Electric"
+      },
+      {
+        "file": "00-MF-12_2016-03-31.S40",
+        "model": "MICOM S40 Format",
+        "manufacturer": "Schneider Electric"
+      }
+    ],
+    "csv_files": [],
+    "xlsx_files": [],
+    "total_relays": 50,
+    "by_manufacturer": {
+      "Schneider Electric": 49,
+      "Unknown": 1
+    },
+    "by_model": {
+      "MICOM P220": 20,
+      "MICOM P122": 12,
+      "Unknown": 1,
+      "MICOM P143": 6,
+      "MICOM P922": 6,
+      "MICOM P241": 2,
+      "MICOM S40 Format": 3
+    }
+  },
+  "database_audit": {
+    "error": "connection to server at \"localhost\" (::1), port 5432 failed: FATAL:  password authentication failed for user \"protecai\"\n",
+    "total_records": 0,
+    "schemas": {}
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "issue": "Discrepância crítica entre arquivos e banco",
+      "description": "Diferença de 50 registros é muito alta",
+      "action": "Revisar processo de importação e limpeza do banco"
+    }
+  ]
+}

@@ -1,0 +1,1025 @@
+2025-10-28 16:12:46,613 - INFO - ✅ Conexão PostgreSQL estabelecida com AUTOCOMMIT
+2025-10-28 16:12:46,614 - INFO - 🧹 LIMPANDO tabelas para eliminar duplicatas...
+2025-10-28 16:12:46,640 - INFO - ✅ Tabela protec_ai.relay_equipment limpa
+2025-10-28 16:12:46,664 - INFO - ✅ Tabela protec_ai.relay_models limpa
+2025-10-28 16:12:46,716 - INFO - ✅ Tabela protec_ai.fabricantes limpa
+2025-10-28 16:12:46,716 - INFO - 🧹 Limpeza completa realizada
+2025-10-28 16:12:46,716 - INFO - 🏗️ Configurando dados base...
+2025-10-28 16:12:46,718 - INFO - ✅ Fabricante criado: Schneider Electric
+2025-10-28 16:12:46,720 - INFO - ✅ Fabricante criado: ABB Ltd
+2025-10-28 16:12:46,721 - INFO - ✅ Fabricante criado: General Electric
+2025-10-28 16:12:46,722 - INFO - ✅ Fabricante criado: Siemens AG
+2025-10-28 16:12:46,724 - INFO - ✅ Modelo criado: MiCOM P122 Overcurrent Protection
+2025-10-28 16:12:46,725 - INFO - ✅ Modelo criado: MiCOM P143 Feeder Protection
+2025-10-28 16:12:46,726 - INFO - ✅ Modelo criado: MiCOM P220 Generator Protection
+2025-10-28 16:12:46,728 - INFO - ✅ Modelo criado: MiCOM P241 Line Protection
+2025-10-28 16:12:46,729 - INFO - ✅ Modelo criado: MiCOM P922 Busbar Protection
+2025-10-28 16:12:46,731 - INFO - ✅ Modelo criado: MiCOM P922S Busbar Protection
+2025-10-28 16:12:46,732 - INFO - ✅ Modelo criado: ABB REF615 Feeder Protection
+2025-10-28 16:12:46,733 - INFO - ✅ Modelo criado: ABB RET650 Transformer Protection
+2025-10-28 16:12:46,733 - INFO - ✅ Modelo criado: Schneider Electric SEPAM S40
+2025-10-28 16:12:46,734 - INFO - ✅ Modelo criado: Schneider Electric SEPAM S80
+2025-10-28 16:12:46,734 - INFO - 🏗️ Dados base configurados com sucesso
+2025-10-28 16:12:46,734 - INFO - 🔄 EXECUTANDO CONVERSOR UNIVERSAL para processar TODOS os formatos
+2025-10-28 16:13:27,778 - INFO - ✅ Conversor universal executado com sucesso
+2025-10-28 16:13:27,779 - INFO - Output: 🔧 Conversor Universal iniciado
+
+🔍 Arquivos encontrados: {'pdf': 47, 'txt': 3, 'xlsx': 0, 'csv': 0}
+📋 Total: 50 arquivo(s)
+
+ℹ️  Convertendo PDF: P220 52-MP-30.pdf
+✅ PDF convertido: P220 52-MP-30.pdf → P220 52-MP-30_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-05_2014-08-09.pdf
+✅ PDF convertido: P122_204-PN-05_2014-08-09.pdf → P122_204-PN-05_2014-08-09_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P_122 52-MF-03B1_2021-03-17.pdf
+✅ PDF convertido: P_122 52-MF-03B1_2021-03-17.pdf → P_122 52-MF-03B1_2021-03-17_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-06A.pdf
+✅ PDF convertido: P220 52-MP-06A.pdf → P220 52-MP-06A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-2B_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2B_2018-06-13.pdf → P143_204-MF-2B_2018-06-13_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P220 52-MP-06B.pdf
+✅ PDF convertido: P220 52-MP-06B.pdf → P220 52-MP-06B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-Z-08_L_REATOR_2014-08-07.pdf
+✅ PDF convertido: P122_52-Z-08_L_REATOR_2014-08-07.pdf → P122_52-Z-08_L_REATOR_2014-08-07_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-06_LADO_B_2014-08-09.pdf
+✅ PDF convertido: P122_204-PN-06_LADO_B_2014-08-09.pdf → P122_204-PN-06_LADO_B_2014-08-09_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-02AC.pdf
+✅ PDF convertido: P922 52-MF-02AC.pdf → P922 52-MF-02AC_params.csv (191 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-2BC_2021-03-06.pdf
+✅ PDF convertido: P922 52-MF-2BC_2021-03-06.pdf → P922 52-MF-2BC_2021-03-06_params.csv (501 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-2C_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2C_2018-06-13.pdf → P143_204-MF-2C_2018-06-13_params.csv (336 linhas, micom)
+ℹ️  Convertendo PDF: P143_204-MF-03B_2014-08-14.pdf
+✅ PDF convertido: P143_204-MF-03B_2014-08-14.pdf → P143_204-MF-03B_2014-08-14_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P143 52-MF-03A.pdf
+✅ PDF convertido: P143 52-MF-03A.pdf → P143 52-MF-03A_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P241_53-MK-01_2019-08-15.pdf
+✅ PDF convertido: P241_53-MK-01_2019-08-15.pdf → P241_53-MK-01_2019-08-15_params.csv (235 linhas, micom)
+ℹ️  Convertendo PDF: P143_204-MF-2A_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2A_2018-06-13.pdf → P143_204-MF-2A_2018-06-13_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P220 53-MP-08B.pdf
+✅ PDF convertido: P220 53-MP-08B.pdf → P220 53-MP-08B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-01A.pdf
+✅ PDF convertido: P220 52-MP-01A.pdf → P220 52-MP-01A_params.csv (190 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-21B.pdf
+✅ PDF convertido: P220 52-MP-21B.pdf → P220 52-MP-21B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-MP-20_2018-08-20.pdf
+✅ PDF convertido: P122_52-MP-20_2018-08-20.pdf → P122_52-MP-20_2018-08-20_params.csv (440 linhas, easergy)
+ℹ️  Convertendo PDF: P122 52-MF-02A_2021-03-08.pdf
+✅ PDF convertido: P122 52-MF-02A_2021-03-08.pdf → P122 52-MF-02A_2021-03-08_params.csv (444 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-08A.pdf
+✅ PDF convertido: P220 53-MP-08A.pdf → P220 53-MP-08A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-21A.pdf
+✅ PDF convertido: P220 52-MP-21A.pdf → P220 52-MP-21A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-03AC.pdf
+✅ PDF convertido: P922 52-MF-03AC.pdf → P922 52-MF-03AC_params.csv (194 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-03BC.pdf
+✅ PDF convertido: P922 52-MF-03BC.pdf → P922 52-MF-03BC_params.csv (194 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-01BC.pdf
+✅ PDF convertido: P922 52-MF-01BC.pdf → P922 52-MF-01BC_params.csv (199 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-MF-2B1_2014-07-28.pdf
+✅ PDF convertido: P122_204-MF-2B1_2014-07-28.pdf → P122_204-MF-2B1_2014-07-28_params.csv (435 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-06_LADO_A_2014-08-01.pdf
+✅ PDF convertido: P122_204-PN-06_LADO_A_2014-08-01.pdf → P122_204-PN-06_LADO_A_2014-08-01_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P220 223-MP-01B.pdf
+✅ PDF convertido: P220 223-MP-01B.pdf → P220 223-MP-01B_params.csv (153 linhas, easergy)
+ℹ️  Convertendo PDF: P922S_204-MF-1AC_2014-07-28.pdf
+✅ PDF convertido: P922S_204-MF-1AC_2014-07-28.pdf → P922S_204-MF-1AC_2014-07-28_params.csv (232 linhas, easergy)
+ℹ️  Convertendo PDF: P220 223-MP-01A.pdf
+✅ PDF convertido: P220 223-MP-01A.pdf → P220 223-MP-01A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_205-TF-3B_2018-06-13.pdf
+✅ PDF convertido: P122_205-TF-3B_2018-06-13.pdf → P122_205-TF-3B_2018-06-13_params.csv (142 linhas, easergy)
+ℹ️  Convertendo PDF: P122_205-TF-3A_2021-03-08.pdf
+✅ PDF convertido: P122_205-TF-3A_2021-03-08.pdf → P122_205-TF-3A_2021-03-08_params.csv (462 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-Z-08_L_PATIO_2014-08-06.pdf
+✅ PDF convertido: P122_52-Z-08_L_PATIO_2014-08-06.pdf → P122_52-Z-08_L_PATIO_2014-08-06_params.csv (438 linhas, easergy)
+ℹ️  Convertendo PDF: P220_52-MK-02A_2020-07-08.pdf
+✅ PDF convertido: P220_52-MK-02A_2020-07-08.pdf → P220_52-MK-02A_2020-07-08_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-01A.pdf
+✅ PDF convertido: P220 53-MP-01A.pdf → P220 53-MP-01A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-3C_2014-08-09.pdf
+✅ PDF convertido: P143_204-MF-3C_2014-08-09.pdf → P143_204-MF-3C_2014-08-09_params.csv (324 linhas, micom)
+ℹ️  Convertendo PDF: P220 52-MP-04A.pdf
+✅ PDF convertido: P220 52-MP-04A.pdf → P220 52-MP-04A_params.csv (157 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-01B.pdf
+✅ PDF convertido: P220 53-MP-01B.pdf → P220 53-MP-01B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-04B.pdf
+✅ PDF convertido: P220 52-MP-04B.pdf → P220 52-MP-04B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-08A.pdf
+✅ PDF convertido: P220 52-MP-08A.pdf → P220 52-MP-08A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-04_2014-08-02.pdf
+✅ PDF convertido: P122_204-PN-04_2014-08-02.pdf → P122_204-PN-04_2014-08-02_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-29B.pdf
+✅ PDF convertido: P220 52-MP-29B.pdf → P220 52-MP-29B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220_54-MP-1A_2018-11-13.pdf
+✅ PDF convertido: P220_54-MP-1A_2018-11-13.pdf → P220_54-MP-1A_2018-11-13_params.csv (189 linhas, easergy)
+ℹ️  Convertendo PDF: P241_52-MP-20_2019-08-15.pdf
+✅ PDF convertido: P241_52-MP-20_2019-08-15.pdf → P241_52-MP-20_2019-08-15_params.csv (338 linhas, micom)
+ℹ️  Convertendo PDF: P122 52-MF-03A1_2021-03-11.pdf
+✅ PDF convertido: P122 52-MF-03A1_2021-03-11.pdf → P122 52-MF-03A1_2021-03-11_params.csv (450 linhas, easergy)
+ℹ️  Convertendo PDF: P220-52-MP-08B_2016-03-11.pdf
+✅ PDF convertido: P220-52-MP-08B_2016-03-11.pdf → P220-52-MP-08B_2016-03-11_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220_52-MK-02B_2017-11-07.pdf
+✅ PDF convertido: P220_52-MK-02B_2017-11-07.pdf → P220_52-MK-02B_2017-11-07_params.csv (202 linhas, easergy)
+ℹ️  Convertendo TXT: 00-MF-24_2024-09-10.S40
+✅ TXT convertido: 00-MF-24_2024-09-10.S40 → 00-MF-24_2024-09-10_params.csv (1162 linhas, sepam_s40)
+ℹ️  Convertendo TXT: 00-MF-14_2016-03-31.S40
+✅ TXT convertido: 00-MF-14_2016-03-31.S40 → 00-MF-14_2016-03-31_params.csv (1137 linhas, sepam_s40)
+ℹ️  Convertendo TXT: 00-MF-12_2016-03-31.S40
+✅ TXT convertido: 00-MF-12_2016-03-31.S40 → 00-MF-12_2016-03-31_params.csv (1140 linhas, sepam_s40)
+
+============================================================
+📊 RESUMO DA CONVERSÃO UNIVERSAL
+============================================================
+📁 Formatos encontrados: {'pdf': 47, 'txt': 3, 'xlsx': 0, 'csv': 0}
+✅ Convertidos: 50
+⏭️  Ignorados: 0
+❌ Erros: 0
+
+📋 Arquivos convertidos:
+  • PDF: P220 52-MP-30.pdf → P220 52-MP-30_params.csv
+  • PDF: P122_204-PN-05_2014-08-09.pdf → P122_204-PN-05_2014-08-09_params.csv
+  • PDF: P_122 52-MF-03B1_2021-03-17.pdf → P_122 52-MF-03B1_2021-03-17_params.csv
+  • PDF: P220 52-MP-06A.pdf → P220 52-MP-06A_params.csv
+  • PDF: P143_204-MF-2B_2018-06-13.pdf → P143_204-MF-2B_2018-06-13_params.csv
+  • PDF: P220 52-MP-06B.pdf → P220 52-MP-06B_params.csv
+  • PDF: P122_52-Z-08_L_REATOR_2014-08-07.pdf → P122_52-Z-08_L_REATOR_2014-08-07_params.csv
+  • PDF: P122_204-PN-06_LADO_B_2014-08-09.pdf → P122_204-PN-06_LADO_B_2014-08-09_params.csv
+  • PDF: P922 52-MF-02AC.pdf → P922 52-MF-02AC_params.csv
+  • PDF: P922 52-MF-2BC_2021-03-06.pdf → P922 52-MF-2BC_2021-03-06_params.csv
+  • PDF: P143_204-MF-2C_2018-06-13.pdf → P143_204-MF-2C_2018-06-13_params.csv
+  • PDF: P143_204-MF-03B_2014-08-14.pdf → P143_204-MF-03B_2014-08-14_params.csv
+  • PDF: P143 52-MF-03A.pdf → P143 52-MF-03A_params.csv
+  • PDF: P241_53-MK-01_2019-08-15.pdf → P241_53-MK-01_2019-08-15_params.csv
+  • PDF: P143_204-MF-2A_2018-06-13.pdf → P143_204-MF-2A_2018-06-13_params.csv
+  • PDF: P220 53-MP-08B.pdf → P220 53-MP-08B_params.csv
+  • PDF: P220 52-MP-01A.pdf → P220 52-MP-01A_params.csv
+  • PDF: P220 52-MP-21B.pdf → P220 52-MP-21B_params.csv
+  • PDF: P122_52-MP-20_2018-08-20.pdf → P122_52-MP-20_2018-08-20_params.csv
+  • PDF: P122 52-MF-02A_2021-03-08.pdf → P122 52-MF-02A_2021-03-08_params.csv
+  • PDF: P220 53-MP-08A.pdf → P220 53-MP-08A_params.csv
+  • PDF: P220 52-MP-21A.pdf → P220 52-MP-21A_params.csv
+  • PDF: P922 52-MF-03AC.pdf → P922 52-MF-03AC_params.csv
+  • PDF: P922 52-MF-03BC.pdf → P922 52-MF-03BC_params.csv
+  • PDF: P922 52-MF-01BC.pdf → P922 52-MF-01BC_params.csv
+  • PDF: P122_204-MF-2B1_2014-07-28.pdf → P122_204-MF-2B1_2014-07-28_params.csv
+  • PDF: P122_204-PN-06_LADO_A_2014-08-01.pdf → P122_204-PN-06_LADO_A_2014-08-01_params.csv
+  • PDF: P220 223-MP-01B.pdf → P220 223-MP-01B_params.csv
+  • PDF: P922S_204-MF-1AC_2014-07-28.pdf → P922S_204-MF-1AC_2014-07-28_params.csv
+  • PDF: P220 223-MP-01A.pdf → P220 223-MP-01A_params.csv
+  • PDF: P122_205-TF-3B_2018-06-13.pdf → P122_205-TF-3B_2018-06-13_params.csv
+  • PDF: P122_205-TF-3A_2021-03-08.pdf → P122_205-TF-3A_2021-03-08_params.csv
+  • PDF: P122_52-Z-08_L_PATIO_2014-08-06.pdf → P122_52-Z-08_L_PATIO_2014-08-06_params.csv
+  • PDF: P220_52-MK-02A_2020-07-08.pdf → P220_52-MK-02A_2020-07-08_params.csv
+  • PDF: P220 53-MP-01A.pdf → P220 53-MP-01A_params.csv
+  • PDF: P143_204-MF-3C_2014-08-09.pdf → P143_204-MF-3C_2014-08-09_params.csv
+  • PDF: P220 52-MP-04A.pdf → P220 52-MP-04A_params.csv
+  • PDF: P220 53-MP-01B.pdf → P220 53-MP-01B_params.csv
+  • PDF: P220 52-MP-04B.pdf → P220 52-MP-04B_params.csv
+  • PDF: P220 52-MP-08A.pdf → P220 52-MP-08A_params.csv
+  • PDF: P122_204-PN-04_2014-08-02.pdf → P122_204-PN-04_2014-08-02_params.csv
+  • PDF: P220 52-MP-29B.pdf → P220 52-MP-29B_params.csv
+  • PDF: P220_54-MP-1A_2018-11-13.pdf → P220_54-MP-1A_2018-11-13_params.csv
+  • PDF: P241_52-MP-20_2019-08-15.pdf → P241_52-MP-20_2019-08-15_params.csv
+  • PDF: P122 52-MF-03A1_2021-03-11.pdf → P122 52-MF-03A1_2021-03-11_params.csv
+  • PDF: P220-52-MP-08B_2016-03-11.pdf → P220-52-MP-08B_2016-03-11_params.csv
+  • PDF: P220_52-MK-02B_2017-11-07.pdf → P220_52-MK-02B_2017-11-07_params.csv
+  • TXT: 00-MF-24_2024-09-10.S40 → 00-MF-24_2024-09-10_params.csv
+  • TXT: 00-MF-14_2016-03-31.S40 → 00-MF-14_2016-03-31_params.csv
+  • TXT: 00-MF-12_2016-03-31.S40 → 00-MF-12_2016-03-31_params.csv
+
+📂 Saídas em: outputs/csv
+============================================================
+
+📄 Relatório salvo: outputs/logs/universal_conversion_20251028_161327.json
+
+2025-10-28 16:13:27,781 - INFO - 📁 Encontrados 79 arquivos CSV convertidos
+2025-10-28 16:13:27,781 - INFO - 📄 Processando: 00-MF-12_2016-03-31
+2025-10-28 16:13:27,843 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-122016-0 (Modelo: SEPAM_S40)
+2025-10-28 16:13:27,843 - INFO - 📄 Processando: 00-MF-14_2016-03-31
+2025-10-28 16:13:27,871 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-142016-0 (Modelo: SEPAM_S40)
+2025-10-28 16:13:27,871 - INFO - 📄 Processando: 00-MF-24_2024-09-10
+2025-10-28 16:13:27,898 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-242024-0 (Modelo: SEPAM_S40)
+2025-10-28 16:13:27,898 - INFO - 📄 Processando: P122 52-MF-02A_2021-03-08
+2025-10-28 16:13:27,920 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-02A (Modelo: P122)
+2025-10-28 16:13:27,920 - INFO - 📄 Processando: P122 52-MF-03A1_2021-03-11
+2025-10-28 16:13:27,941 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-03A1 (Modelo: P122)
+2025-10-28 16:13:27,941 - INFO - 📄 Processando: P122_204-MF-2B1_2014-07-28
+2025-10-28 16:13:27,961 - INFO - ✅ Equipamento criado: REL-P122-P122204-MF-2B1 (Modelo: P122)
+2025-10-28 16:13:27,961 - INFO - 📄 Processando: P122_204-PN-04_2014-08-02
+2025-10-28 16:13:27,972 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-04 (Modelo: P122)
+2025-10-28 16:13:27,972 - INFO - 📄 Processando: P122_204-PN-05_2014-08-09
+2025-10-28 16:13:27,980 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-05 (Modelo: P122)
+2025-10-28 16:13:27,980 - INFO - 📄 Processando: P122_204-PN-06_LADO_A_2014-08-01
+2025-10-28 16:13:27,987 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-06 (Modelo: P122)
+2025-10-28 16:13:27,988 - INFO - 📄 Processando: P122_204-PN-06_LADO_B_2014-08-09
+2025-10-28 16:13:27,995 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-06-f291841f (Modelo: P122)
+2025-10-28 16:13:27,995 - INFO - 📄 Processando: P122_205-TF-3A_2021-03-08
+2025-10-28 16:13:28,015 - INFO - ✅ Equipamento criado: REL-P122-P122205-TF-3A (Modelo: P122)
+2025-10-28 16:13:28,015 - INFO - 📄 Processando: P122_205-TF-3B_2018-06-13
+2025-10-28 16:13:28,023 - INFO - ✅ Equipamento criado: REL-P122-P122205-TF-3B (Modelo: P122)
+2025-10-28 16:13:28,023 - INFO - 📄 Processando: P122_52-MP-20_2018-08-20
+2025-10-28 16:13:28,042 - INFO - ✅ Equipamento criado: REL-P122-P12252-MP-202 (Modelo: P122)
+2025-10-28 16:13:28,042 - INFO - 📄 Processando: P122_52-Z-08_L_PATIO_2014-08-06
+2025-10-28 16:13:28,062 - INFO - ✅ Equipamento criado: REL-P122-P12252-Z-08L (Modelo: P122)
+2025-10-28 16:13:28,062 - INFO - 📄 Processando: P122_52-Z-08_L_REATOR_2014-08-07
+2025-10-28 16:13:28,071 - INFO - ✅ Equipamento criado: REL-P122-P12252-Z-08L-8cdd528c (Modelo: P122)
+2025-10-28 16:13:28,071 - INFO - 📄 Processando: P143 52-MF-03A
+2025-10-28 16:13:28,081 - INFO - ✅ Equipamento criado: REL-P143-P14352-MF-03A (Modelo: P143)
+2025-10-28 16:13:28,081 - INFO - 📄 Processando: P143_204-MF-03B_2014-08-14
+2025-10-28 16:13:28,092 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-03B (Modelo: P143)
+2025-10-28 16:13:28,092 - INFO - 📄 Processando: P143_204-MF-2A_2018-06-13
+2025-10-28 16:13:28,104 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2A (Modelo: P143)
+2025-10-28 16:13:28,104 - INFO - 📄 Processando: P143_204-MF-2B_2018-06-13
+2025-10-28 16:13:28,116 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2B (Modelo: P143)
+2025-10-28 16:13:28,116 - INFO - 📄 Processando: P143_204-MF-2C_2018-06-13
+2025-10-28 16:13:28,129 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2C (Modelo: P143)
+2025-10-28 16:13:28,129 - INFO - 📄 Processando: P143_204-MF-3C_2014-08-09
+2025-10-28 16:13:28,141 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-3C (Modelo: P143)
+2025-10-28 16:13:28,141 - INFO - 📄 Processando: P220 223-MP-01A
+2025-10-28 16:13:28,152 - INFO - ✅ Equipamento criado: REL-P122-P220223-MP-01A (Modelo: P122)
+2025-10-28 16:13:28,152 - INFO - 📄 Processando: P220 223-MP-01B
+2025-10-28 16:13:28,161 - INFO - ✅ Equipamento criado: REL-P122-P220223-MP-01B (Modelo: P122)
+2025-10-28 16:13:28,162 - INFO - 📄 Processando: P220 52-MP-01A
+2025-10-28 16:13:28,172 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-01A (Modelo: P122)
+2025-10-28 16:13:28,172 - INFO - 📄 Processando: P220 52-MP-04A
+2025-10-28 16:13:28,183 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-04A (Modelo: P122)
+2025-10-28 16:13:28,183 - INFO - 📄 Processando: P220 52-MP-04B
+2025-10-28 16:13:28,192 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-04B (Modelo: P122)
+2025-10-28 16:13:28,192 - INFO - 📄 Processando: P220 52-MP-06A
+2025-10-28 16:13:28,200 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-06A (Modelo: P122)
+2025-10-28 16:13:28,200 - INFO - 📄 Processando: P220 52-MP-06B
+2025-10-28 16:13:28,210 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-06B (Modelo: P122)
+2025-10-28 16:13:28,210 - INFO - 📄 Processando: P220 52-MP-08A
+2025-10-28 16:13:28,218 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-08A (Modelo: P122)
+2025-10-28 16:13:28,218 - INFO - 📄 Processando: P220 52-MP-21A
+2025-10-28 16:13:28,226 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-21A (Modelo: P122)
+2025-10-28 16:13:28,226 - INFO - 📄 Processando: P220 52-MP-21B
+2025-10-28 16:13:28,234 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-21B (Modelo: P122)
+2025-10-28 16:13:28,234 - INFO - 📄 Processando: P220 52-MP-29B
+2025-10-28 16:13:28,242 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-29B (Modelo: P122)
+2025-10-28 16:13:28,242 - INFO - 📄 Processando: P220 52-MP-30
+2025-10-28 16:13:28,250 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-30 (Modelo: P122)
+2025-10-28 16:13:28,250 - INFO - 📄 Processando: P220 53-MP-01A
+2025-10-28 16:13:28,258 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-01A (Modelo: P122)
+2025-10-28 16:13:28,258 - INFO - 📄 Processando: P220 53-MP-01B
+2025-10-28 16:13:28,265 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-01B (Modelo: P122)
+2025-10-28 16:13:28,265 - INFO - 📄 Processando: P220 53-MP-08A
+2025-10-28 16:13:28,273 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-08A (Modelo: P122)
+2025-10-28 16:13:28,273 - INFO - 📄 Processando: P220 53-MP-08B
+2025-10-28 16:13:28,280 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-08B (Modelo: P122)
+2025-10-28 16:13:28,280 - INFO - 📄 Processando: P220-52-MP-08B_2016-03-11
+2025-10-28 16:13:28,287 - INFO - ✅ Equipamento criado: REL-P122-P220-52-MP-08B (Modelo: P122)
+2025-10-28 16:13:28,287 - INFO - 📄 Processando: P220_52-MK-02A_2020-07-08
+2025-10-28 16:13:28,295 - INFO - ✅ Equipamento criado: REL-P122-P22052-MK-02A (Modelo: P122)
+2025-10-28 16:13:28,295 - INFO - 📄 Processando: P220_52-MK-02B_2017-11-07
+2025-10-28 16:13:28,304 - INFO - ✅ Equipamento criado: REL-P122-P22052-MK-02B (Modelo: P122)
+2025-10-28 16:13:28,304 - INFO - 📄 Processando: P220_54-MP-1A_2018-11-13
+2025-10-28 16:13:28,313 - INFO - ✅ Equipamento criado: REL-P122-P22054-MP-1A2 (Modelo: P122)
+2025-10-28 16:13:28,313 - INFO - 📄 Processando: P241_52-MP-20_2019-08-15
+2025-10-28 16:13:28,322 - INFO - ✅ Equipamento criado: REL-P241-P24152-MP-202 (Modelo: P241)
+2025-10-28 16:13:28,322 - INFO - 📄 Processando: P241_53-MK-01_2019-08-15
+2025-10-28 16:13:28,329 - INFO - ✅ Equipamento criado: REL-P241-P24153-MK-012 (Modelo: P241)
+2025-10-28 16:13:28,329 - INFO - 📄 Processando: P922 52-MF-01BC
+2025-10-28 16:13:28,338 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-01BC (Modelo: P122)
+2025-10-28 16:13:28,338 - INFO - 📄 Processando: P922 52-MF-02AC
+2025-10-28 16:13:28,347 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-02AC (Modelo: P122)
+2025-10-28 16:13:28,347 - INFO - 📄 Processando: P922 52-MF-03AC
+2025-10-28 16:13:28,356 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-03AC (Modelo: P122)
+2025-10-28 16:13:28,356 - INFO - 📄 Processando: P922 52-MF-03BC
+2025-10-28 16:13:28,368 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-03BC (Modelo: P122)
+2025-10-28 16:13:28,368 - INFO - 📄 Processando: P922 52-MF-2BC_2021-03-06
+2025-10-28 16:13:28,389 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-2BC (Modelo: P122)
+2025-10-28 16:13:28,389 - INFO - 📄 Processando: P922S_204-MF-1AC_2014-07-28
+2025-10-28 16:13:28,401 - INFO - ✅ Equipamento criado: REL-P122-P922S204-MF-1A (Modelo: P122)
+2025-10-28 16:13:28,401 - INFO - 📄 Processando: P_122 52-MF-03B1_2021-03-17
+2025-10-28 16:13:28,410 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-03B (Modelo: P122)
+2025-10-28 16:13:28,410 - INFO - 📄 Processando: reprocess_12345_20251027_175254
+2025-10-28 16:13:28,414 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345 (Modelo: P122)
+2025-10-28 16:13:28,414 - INFO - 📄 Processando: reprocess_12345_20251027_175752
+2025-10-28 16:13:28,417 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345-6a6b32ab (Modelo: P122)
+2025-10-28 16:13:28,417 - INFO - 📄 Processando: reprocess_12345_20251027_180108
+2025-10-28 16:13:28,421 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345-70b315a6 (Modelo: P122)
+2025-10-28 16:13:28,421 - INFO - 📄 Processando: reprocess_12345_20251027_180239
+2025-10-28 16:13:28,424 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345-b2781cd2 (Modelo: P122)
+2025-10-28 16:13:28,424 - INFO - 📄 Processando: reprocess_1_20251024_152431
+2025-10-28 16:13:28,428 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202 (Modelo: P122)
+2025-10-28 16:13:28,429 - INFO - 📄 Processando: reprocess_1_20251024_153421
+2025-10-28 16:13:28,432 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-842f869b (Modelo: P122)
+2025-10-28 16:13:28,432 - INFO - 📄 Processando: reprocess_1_20251024_190131
+2025-10-28 16:13:28,435 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-d3735e81 (Modelo: P122)
+2025-10-28 16:13:28,435 - INFO - 📄 Processando: reprocess_1_20251024_190611
+2025-10-28 16:13:28,438 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-0a0be6b9 (Modelo: P122)
+2025-10-28 16:13:28,439 - INFO - 📄 Processando: reprocess_1_20251024_192222
+2025-10-28 16:13:28,442 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-76433445 (Modelo: P122)
+2025-10-28 16:13:28,443 - INFO - 📄 Processando: reprocess_1_20251024_194054
+2025-10-28 16:13:28,446 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-3efd0b2e (Modelo: P122)
+2025-10-28 16:13:28,447 - INFO - 📄 Processando: reprocess_1_20251024_194220
+2025-10-28 16:13:28,450 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-c5e9437c (Modelo: P122)
+2025-10-28 16:13:28,450 - INFO - 📄 Processando: reprocess_1_20251024_194321
+2025-10-28 16:13:28,453 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-b2df889f (Modelo: P122)
+2025-10-28 16:13:28,453 - INFO - 📄 Processando: reprocess_1_20251024_194654
+2025-10-28 16:13:28,456 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-859bb980 (Modelo: P122)
+2025-10-28 16:13:28,456 - INFO - 📄 Processando: reprocess_1_20251024_194848
+2025-10-28 16:13:28,459 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-3f9f3481 (Modelo: P122)
+2025-10-28 16:13:28,460 - INFO - 📄 Processando: reprocess_1_20251024_195028
+2025-10-28 16:13:28,463 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-64b9bbdb (Modelo: P122)
+2025-10-28 16:13:28,463 - INFO - 📄 Processando: reprocess_1_20251024_195116
+2025-10-28 16:13:28,466 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-f0329827 (Modelo: P122)
+2025-10-28 16:13:28,466 - INFO - 📄 Processando: reprocess_1_20251024_195159
+2025-10-28 16:13:28,468 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-73da6af8 (Modelo: P122)
+2025-10-28 16:13:28,468 - INFO - 📄 Processando: reprocess_1_20251024_195331
+2025-10-28 16:13:28,472 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-0f9f289f (Modelo: P122)
+2025-10-28 16:13:28,472 - INFO - 📄 Processando: reprocess_1_20251024_195654
+2025-10-28 16:13:28,476 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-2d32bfa9 (Modelo: P122)
+2025-10-28 16:13:28,476 - INFO - 📄 Processando: reprocess_1_20251024_195807
+2025-10-28 16:13:28,480 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-ad254665 (Modelo: P122)
+2025-10-28 16:13:28,480 - INFO - 📄 Processando: reprocess_1_20251025_103200
+2025-10-28 16:13:28,485 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-daad1152 (Modelo: P122)
+2025-10-28 16:13:28,485 - INFO - 📄 Processando: reprocess_1_20251025_103225
+2025-10-28 16:13:28,489 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-c971a6e7 (Modelo: P122)
+2025-10-28 16:13:28,489 - INFO - 📄 Processando: reprocess_1_20251025_104857
+2025-10-28 16:13:28,493 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-17048c0a (Modelo: P122)
+2025-10-28 16:13:28,493 - INFO - 📄 Processando: reprocess_P122_20251022_162132
+2025-10-28 16:13:28,497 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSP122 (Modelo: P122)
+2025-10-28 16:13:28,497 - INFO - 📄 Processando: reprocess_protec_1_20251022_174740
+2025-10-28 16:13:28,501 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSPROTE (Modelo: P122)
+2025-10-28 16:13:28,501 - INFO - 📄 Processando: reprocess_protec_1_20251023_121145
+2025-10-28 16:13:28,505 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSPROTE-3e3c64bb (Modelo: P122)
+2025-10-28 16:13:28,505 - INFO - 📄 Processando: reprocess_test_import_123_20251027_155339
+2025-10-28 16:13:28,509 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSTEST (Modelo: P122)
+2025-10-28 16:13:28,509 - INFO - 📄 Processando: tela1
+2025-10-28 16:13:28,519 - INFO - ✅ Equipamento criado: REL-P241-TELA1 (Modelo: P241)
+2025-10-28 16:13:28,519 - INFO - 📄 Processando: tela3
+2025-10-28 16:13:28,529 - INFO - ✅ Equipamento criado: REL-P122-TELA3 (Modelo: P122)
+2025-10-28 16:13:28,529 - INFO - 📊 PROCESSAMENTO UNIVERSAL CONCLUÍDO:
+2025-10-28 16:13:28,529 - INFO -    📁 Arquivos CSV encontrados: 79
+2025-10-28 16:13:28,529 - INFO -    ✅ Arquivos processados: 79
+2025-10-28 16:13:28,529 - INFO -    ❌ Erros: 0
+2025-10-28 16:13:28,529 - INFO -    🔧 Equipamentos criados: 79
+2025-10-28 16:13:28,532 - INFO -    🗄️ Equipamentos no banco: 79
+2025-10-28 16:13:28,532 - INFO - 🎉 Processamento 100% bem sucedido! 79 arquivos processados
+2025-10-28 16:14:11,968 - INFO - ✅ Conexão PostgreSQL estabelecida com AUTOCOMMIT
+2025-10-28 16:14:11,968 - INFO - 🧹 LIMPANDO tabelas para eliminar duplicatas...
+2025-10-28 16:14:11,993 - INFO - ✅ Tabela protec_ai.relay_equipment limpa
+2025-10-28 16:14:12,019 - INFO - ✅ Tabela protec_ai.relay_models limpa
+2025-10-28 16:14:12,072 - INFO - ✅ Tabela protec_ai.fabricantes limpa
+2025-10-28 16:14:12,072 - INFO - 🧹 Limpeza completa realizada
+2025-10-28 16:14:12,073 - INFO - 🏗️ Configurando dados base...
+2025-10-28 16:14:12,075 - INFO - ✅ Fabricante criado: Schneider Electric
+2025-10-28 16:14:12,076 - INFO - ✅ Fabricante criado: ABB Ltd
+2025-10-28 16:14:12,076 - INFO - ✅ Fabricante criado: General Electric
+2025-10-28 16:14:12,077 - INFO - ✅ Fabricante criado: Siemens AG
+2025-10-28 16:14:12,079 - INFO - ✅ Modelo criado: MiCOM P122 Overcurrent Protection
+2025-10-28 16:14:12,080 - INFO - ✅ Modelo criado: MiCOM P143 Feeder Protection
+2025-10-28 16:14:12,081 - INFO - ✅ Modelo criado: MiCOM P220 Generator Protection
+2025-10-28 16:14:12,082 - INFO - ✅ Modelo criado: MiCOM P241 Line Protection
+2025-10-28 16:14:12,082 - INFO - ✅ Modelo criado: MiCOM P922 Busbar Protection
+2025-10-28 16:14:12,084 - INFO - ✅ Modelo criado: MiCOM P922S Busbar Protection
+2025-10-28 16:14:12,085 - INFO - ✅ Modelo criado: ABB REF615 Feeder Protection
+2025-10-28 16:14:12,086 - INFO - ✅ Modelo criado: ABB RET650 Transformer Protection
+2025-10-28 16:14:12,087 - INFO - ✅ Modelo criado: Schneider Electric SEPAM S40
+2025-10-28 16:14:12,088 - INFO - ✅ Modelo criado: Schneider Electric SEPAM S80
+2025-10-28 16:14:12,088 - INFO - 🏗️ Dados base configurados com sucesso
+2025-10-28 16:14:12,088 - INFO - 🔄 EXECUTANDO CONVERSOR UNIVERSAL para processar TODOS os formatos
+2025-10-28 16:14:51,680 - INFO - ✅ Conversor universal executado com sucesso
+2025-10-28 16:14:51,680 - INFO - Output: 🔧 Conversor Universal iniciado
+
+🔍 Arquivos encontrados: {'pdf': 47, 'txt': 3, 'xlsx': 0, 'csv': 0}
+📋 Total: 50 arquivo(s)
+
+ℹ️  Convertendo PDF: P220 52-MP-30.pdf
+✅ PDF convertido: P220 52-MP-30.pdf → P220 52-MP-30_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-05_2014-08-09.pdf
+✅ PDF convertido: P122_204-PN-05_2014-08-09.pdf → P122_204-PN-05_2014-08-09_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P_122 52-MF-03B1_2021-03-17.pdf
+✅ PDF convertido: P_122 52-MF-03B1_2021-03-17.pdf → P_122 52-MF-03B1_2021-03-17_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-06A.pdf
+✅ PDF convertido: P220 52-MP-06A.pdf → P220 52-MP-06A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-2B_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2B_2018-06-13.pdf → P143_204-MF-2B_2018-06-13_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P220 52-MP-06B.pdf
+✅ PDF convertido: P220 52-MP-06B.pdf → P220 52-MP-06B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-Z-08_L_REATOR_2014-08-07.pdf
+✅ PDF convertido: P122_52-Z-08_L_REATOR_2014-08-07.pdf → P122_52-Z-08_L_REATOR_2014-08-07_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-06_LADO_B_2014-08-09.pdf
+✅ PDF convertido: P122_204-PN-06_LADO_B_2014-08-09.pdf → P122_204-PN-06_LADO_B_2014-08-09_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-02AC.pdf
+✅ PDF convertido: P922 52-MF-02AC.pdf → P922 52-MF-02AC_params.csv (191 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-2BC_2021-03-06.pdf
+✅ PDF convertido: P922 52-MF-2BC_2021-03-06.pdf → P922 52-MF-2BC_2021-03-06_params.csv (501 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-2C_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2C_2018-06-13.pdf → P143_204-MF-2C_2018-06-13_params.csv (336 linhas, micom)
+ℹ️  Convertendo PDF: P143_204-MF-03B_2014-08-14.pdf
+✅ PDF convertido: P143_204-MF-03B_2014-08-14.pdf → P143_204-MF-03B_2014-08-14_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P143 52-MF-03A.pdf
+✅ PDF convertido: P143 52-MF-03A.pdf → P143 52-MF-03A_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P241_53-MK-01_2019-08-15.pdf
+✅ PDF convertido: P241_53-MK-01_2019-08-15.pdf → P241_53-MK-01_2019-08-15_params.csv (235 linhas, micom)
+ℹ️  Convertendo PDF: P143_204-MF-2A_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2A_2018-06-13.pdf → P143_204-MF-2A_2018-06-13_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P220 53-MP-08B.pdf
+✅ PDF convertido: P220 53-MP-08B.pdf → P220 53-MP-08B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-01A.pdf
+✅ PDF convertido: P220 52-MP-01A.pdf → P220 52-MP-01A_params.csv (190 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-21B.pdf
+✅ PDF convertido: P220 52-MP-21B.pdf → P220 52-MP-21B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-MP-20_2018-08-20.pdf
+✅ PDF convertido: P122_52-MP-20_2018-08-20.pdf → P122_52-MP-20_2018-08-20_params.csv (440 linhas, easergy)
+ℹ️  Convertendo PDF: P122 52-MF-02A_2021-03-08.pdf
+✅ PDF convertido: P122 52-MF-02A_2021-03-08.pdf → P122 52-MF-02A_2021-03-08_params.csv (444 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-08A.pdf
+✅ PDF convertido: P220 53-MP-08A.pdf → P220 53-MP-08A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-21A.pdf
+✅ PDF convertido: P220 52-MP-21A.pdf → P220 52-MP-21A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-03AC.pdf
+✅ PDF convertido: P922 52-MF-03AC.pdf → P922 52-MF-03AC_params.csv (194 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-03BC.pdf
+✅ PDF convertido: P922 52-MF-03BC.pdf → P922 52-MF-03BC_params.csv (194 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-01BC.pdf
+✅ PDF convertido: P922 52-MF-01BC.pdf → P922 52-MF-01BC_params.csv (199 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-MF-2B1_2014-07-28.pdf
+✅ PDF convertido: P122_204-MF-2B1_2014-07-28.pdf → P122_204-MF-2B1_2014-07-28_params.csv (435 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-06_LADO_A_2014-08-01.pdf
+✅ PDF convertido: P122_204-PN-06_LADO_A_2014-08-01.pdf → P122_204-PN-06_LADO_A_2014-08-01_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P220 223-MP-01B.pdf
+✅ PDF convertido: P220 223-MP-01B.pdf → P220 223-MP-01B_params.csv (153 linhas, easergy)
+ℹ️  Convertendo PDF: P922S_204-MF-1AC_2014-07-28.pdf
+✅ PDF convertido: P922S_204-MF-1AC_2014-07-28.pdf → P922S_204-MF-1AC_2014-07-28_params.csv (232 linhas, easergy)
+ℹ️  Convertendo PDF: P220 223-MP-01A.pdf
+✅ PDF convertido: P220 223-MP-01A.pdf → P220 223-MP-01A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_205-TF-3B_2018-06-13.pdf
+✅ PDF convertido: P122_205-TF-3B_2018-06-13.pdf → P122_205-TF-3B_2018-06-13_params.csv (142 linhas, easergy)
+ℹ️  Convertendo PDF: P122_205-TF-3A_2021-03-08.pdf
+✅ PDF convertido: P122_205-TF-3A_2021-03-08.pdf → P122_205-TF-3A_2021-03-08_params.csv (462 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-Z-08_L_PATIO_2014-08-06.pdf
+✅ PDF convertido: P122_52-Z-08_L_PATIO_2014-08-06.pdf → P122_52-Z-08_L_PATIO_2014-08-06_params.csv (438 linhas, easergy)
+ℹ️  Convertendo PDF: P220_52-MK-02A_2020-07-08.pdf
+✅ PDF convertido: P220_52-MK-02A_2020-07-08.pdf → P220_52-MK-02A_2020-07-08_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-01A.pdf
+✅ PDF convertido: P220 53-MP-01A.pdf → P220 53-MP-01A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-3C_2014-08-09.pdf
+✅ PDF convertido: P143_204-MF-3C_2014-08-09.pdf → P143_204-MF-3C_2014-08-09_params.csv (324 linhas, micom)
+ℹ️  Convertendo PDF: P220 52-MP-04A.pdf
+✅ PDF convertido: P220 52-MP-04A.pdf → P220 52-MP-04A_params.csv (157 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-01B.pdf
+✅ PDF convertido: P220 53-MP-01B.pdf → P220 53-MP-01B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-04B.pdf
+✅ PDF convertido: P220 52-MP-04B.pdf → P220 52-MP-04B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-08A.pdf
+✅ PDF convertido: P220 52-MP-08A.pdf → P220 52-MP-08A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-04_2014-08-02.pdf
+✅ PDF convertido: P122_204-PN-04_2014-08-02.pdf → P122_204-PN-04_2014-08-02_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-29B.pdf
+✅ PDF convertido: P220 52-MP-29B.pdf → P220 52-MP-29B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220_54-MP-1A_2018-11-13.pdf
+✅ PDF convertido: P220_54-MP-1A_2018-11-13.pdf → P220_54-MP-1A_2018-11-13_params.csv (189 linhas, easergy)
+ℹ️  Convertendo PDF: P241_52-MP-20_2019-08-15.pdf
+✅ PDF convertido: P241_52-MP-20_2019-08-15.pdf → P241_52-MP-20_2019-08-15_params.csv (338 linhas, micom)
+ℹ️  Convertendo PDF: P122 52-MF-03A1_2021-03-11.pdf
+✅ PDF convertido: P122 52-MF-03A1_2021-03-11.pdf → P122 52-MF-03A1_2021-03-11_params.csv (450 linhas, easergy)
+ℹ️  Convertendo PDF: P220-52-MP-08B_2016-03-11.pdf
+✅ PDF convertido: P220-52-MP-08B_2016-03-11.pdf → P220-52-MP-08B_2016-03-11_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220_52-MK-02B_2017-11-07.pdf
+✅ PDF convertido: P220_52-MK-02B_2017-11-07.pdf → P220_52-MK-02B_2017-11-07_params.csv (202 linhas, easergy)
+ℹ️  Convertendo TXT: 00-MF-24_2024-09-10.S40
+✅ TXT convertido: 00-MF-24_2024-09-10.S40 → 00-MF-24_2024-09-10_params.csv (1162 linhas, sepam_s40)
+ℹ️  Convertendo TXT: 00-MF-14_2016-03-31.S40
+✅ TXT convertido: 00-MF-14_2016-03-31.S40 → 00-MF-14_2016-03-31_params.csv (1137 linhas, sepam_s40)
+ℹ️  Convertendo TXT: 00-MF-12_2016-03-31.S40
+✅ TXT convertido: 00-MF-12_2016-03-31.S40 → 00-MF-12_2016-03-31_params.csv (1140 linhas, sepam_s40)
+
+============================================================
+📊 RESUMO DA CONVERSÃO UNIVERSAL
+============================================================
+📁 Formatos encontrados: {'pdf': 47, 'txt': 3, 'xlsx': 0, 'csv': 0}
+✅ Convertidos: 50
+⏭️  Ignorados: 0
+❌ Erros: 0
+
+📋 Arquivos convertidos:
+  • PDF: P220 52-MP-30.pdf → P220 52-MP-30_params.csv
+  • PDF: P122_204-PN-05_2014-08-09.pdf → P122_204-PN-05_2014-08-09_params.csv
+  • PDF: P_122 52-MF-03B1_2021-03-17.pdf → P_122 52-MF-03B1_2021-03-17_params.csv
+  • PDF: P220 52-MP-06A.pdf → P220 52-MP-06A_params.csv
+  • PDF: P143_204-MF-2B_2018-06-13.pdf → P143_204-MF-2B_2018-06-13_params.csv
+  • PDF: P220 52-MP-06B.pdf → P220 52-MP-06B_params.csv
+  • PDF: P122_52-Z-08_L_REATOR_2014-08-07.pdf → P122_52-Z-08_L_REATOR_2014-08-07_params.csv
+  • PDF: P122_204-PN-06_LADO_B_2014-08-09.pdf → P122_204-PN-06_LADO_B_2014-08-09_params.csv
+  • PDF: P922 52-MF-02AC.pdf → P922 52-MF-02AC_params.csv
+  • PDF: P922 52-MF-2BC_2021-03-06.pdf → P922 52-MF-2BC_2021-03-06_params.csv
+  • PDF: P143_204-MF-2C_2018-06-13.pdf → P143_204-MF-2C_2018-06-13_params.csv
+  • PDF: P143_204-MF-03B_2014-08-14.pdf → P143_204-MF-03B_2014-08-14_params.csv
+  • PDF: P143 52-MF-03A.pdf → P143 52-MF-03A_params.csv
+  • PDF: P241_53-MK-01_2019-08-15.pdf → P241_53-MK-01_2019-08-15_params.csv
+  • PDF: P143_204-MF-2A_2018-06-13.pdf → P143_204-MF-2A_2018-06-13_params.csv
+  • PDF: P220 53-MP-08B.pdf → P220 53-MP-08B_params.csv
+  • PDF: P220 52-MP-01A.pdf → P220 52-MP-01A_params.csv
+  • PDF: P220 52-MP-21B.pdf → P220 52-MP-21B_params.csv
+  • PDF: P122_52-MP-20_2018-08-20.pdf → P122_52-MP-20_2018-08-20_params.csv
+  • PDF: P122 52-MF-02A_2021-03-08.pdf → P122 52-MF-02A_2021-03-08_params.csv
+  • PDF: P220 53-MP-08A.pdf → P220 53-MP-08A_params.csv
+  • PDF: P220 52-MP-21A.pdf → P220 52-MP-21A_params.csv
+  • PDF: P922 52-MF-03AC.pdf → P922 52-MF-03AC_params.csv
+  • PDF: P922 52-MF-03BC.pdf → P922 52-MF-03BC_params.csv
+  • PDF: P922 52-MF-01BC.pdf → P922 52-MF-01BC_params.csv
+  • PDF: P122_204-MF-2B1_2014-07-28.pdf → P122_204-MF-2B1_2014-07-28_params.csv
+  • PDF: P122_204-PN-06_LADO_A_2014-08-01.pdf → P122_204-PN-06_LADO_A_2014-08-01_params.csv
+  • PDF: P220 223-MP-01B.pdf → P220 223-MP-01B_params.csv
+  • PDF: P922S_204-MF-1AC_2014-07-28.pdf → P922S_204-MF-1AC_2014-07-28_params.csv
+  • PDF: P220 223-MP-01A.pdf → P220 223-MP-01A_params.csv
+  • PDF: P122_205-TF-3B_2018-06-13.pdf → P122_205-TF-3B_2018-06-13_params.csv
+  • PDF: P122_205-TF-3A_2021-03-08.pdf → P122_205-TF-3A_2021-03-08_params.csv
+  • PDF: P122_52-Z-08_L_PATIO_2014-08-06.pdf → P122_52-Z-08_L_PATIO_2014-08-06_params.csv
+  • PDF: P220_52-MK-02A_2020-07-08.pdf → P220_52-MK-02A_2020-07-08_params.csv
+  • PDF: P220 53-MP-01A.pdf → P220 53-MP-01A_params.csv
+  • PDF: P143_204-MF-3C_2014-08-09.pdf → P143_204-MF-3C_2014-08-09_params.csv
+  • PDF: P220 52-MP-04A.pdf → P220 52-MP-04A_params.csv
+  • PDF: P220 53-MP-01B.pdf → P220 53-MP-01B_params.csv
+  • PDF: P220 52-MP-04B.pdf → P220 52-MP-04B_params.csv
+  • PDF: P220 52-MP-08A.pdf → P220 52-MP-08A_params.csv
+  • PDF: P122_204-PN-04_2014-08-02.pdf → P122_204-PN-04_2014-08-02_params.csv
+  • PDF: P220 52-MP-29B.pdf → P220 52-MP-29B_params.csv
+  • PDF: P220_54-MP-1A_2018-11-13.pdf → P220_54-MP-1A_2018-11-13_params.csv
+  • PDF: P241_52-MP-20_2019-08-15.pdf → P241_52-MP-20_2019-08-15_params.csv
+  • PDF: P122 52-MF-03A1_2021-03-11.pdf → P122 52-MF-03A1_2021-03-11_params.csv
+  • PDF: P220-52-MP-08B_2016-03-11.pdf → P220-52-MP-08B_2016-03-11_params.csv
+  • PDF: P220_52-MK-02B_2017-11-07.pdf → P220_52-MK-02B_2017-11-07_params.csv
+  • TXT: 00-MF-24_2024-09-10.S40 → 00-MF-24_2024-09-10_params.csv
+  • TXT: 00-MF-14_2016-03-31.S40 → 00-MF-14_2016-03-31_params.csv
+  • TXT: 00-MF-12_2016-03-31.S40 → 00-MF-12_2016-03-31_params.csv
+
+📂 Saídas em: outputs/csv
+============================================================
+
+📄 Relatório salvo: outputs/logs/universal_conversion_20251028_161451.json
+
+2025-10-28 16:14:51,681 - INFO - 📁 Encontrados 79 arquivos CSV convertidos
+2025-10-28 16:14:51,681 - INFO - 📄 Processando: 00-MF-12_2016-03-31
+2025-10-28 16:14:51,711 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-122016-0 (Modelo: SEPAM_S40)
+2025-10-28 16:14:51,711 - INFO - 📄 Processando: 00-MF-14_2016-03-31
+2025-10-28 16:14:51,737 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-142016-0 (Modelo: SEPAM_S40)
+2025-10-28 16:14:51,737 - INFO - 📄 Processando: 00-MF-24_2024-09-10
+2025-10-28 16:14:51,766 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-242024-0 (Modelo: SEPAM_S40)
+2025-10-28 16:14:51,766 - INFO - 📄 Processando: P122 52-MF-02A_2021-03-08
+2025-10-28 16:14:51,787 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-02A (Modelo: P122)
+2025-10-28 16:14:51,787 - INFO - 📄 Processando: P122 52-MF-03A1_2021-03-11
+2025-10-28 16:14:51,808 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-03A1 (Modelo: P122)
+2025-10-28 16:14:51,808 - INFO - 📄 Processando: P122_204-MF-2B1_2014-07-28
+2025-10-28 16:14:51,825 - INFO - ✅ Equipamento criado: REL-P122-P122204-MF-2B1 (Modelo: P122)
+2025-10-28 16:14:51,826 - INFO - 📄 Processando: P122_204-PN-04_2014-08-02
+2025-10-28 16:14:51,834 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-04 (Modelo: P122)
+2025-10-28 16:14:51,834 - INFO - 📄 Processando: P122_204-PN-05_2014-08-09
+2025-10-28 16:14:51,841 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-05 (Modelo: P122)
+2025-10-28 16:14:51,841 - INFO - 📄 Processando: P122_204-PN-06_LADO_A_2014-08-01
+2025-10-28 16:14:51,850 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-06 (Modelo: P122)
+2025-10-28 16:14:51,850 - INFO - 📄 Processando: P122_204-PN-06_LADO_B_2014-08-09
+2025-10-28 16:14:51,858 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-06-f291841f (Modelo: P122)
+2025-10-28 16:14:51,858 - INFO - 📄 Processando: P122_205-TF-3A_2021-03-08
+2025-10-28 16:14:51,878 - INFO - ✅ Equipamento criado: REL-P122-P122205-TF-3A (Modelo: P122)
+2025-10-28 16:14:51,878 - INFO - 📄 Processando: P122_205-TF-3B_2018-06-13
+2025-10-28 16:14:51,887 - INFO - ✅ Equipamento criado: REL-P122-P122205-TF-3B (Modelo: P122)
+2025-10-28 16:14:51,887 - INFO - 📄 Processando: P122_52-MP-20_2018-08-20
+2025-10-28 16:14:51,906 - INFO - ✅ Equipamento criado: REL-P122-P12252-MP-202 (Modelo: P122)
+2025-10-28 16:14:51,906 - INFO - 📄 Processando: P122_52-Z-08_L_PATIO_2014-08-06
+2025-10-28 16:14:51,926 - INFO - ✅ Equipamento criado: REL-P122-P12252-Z-08L (Modelo: P122)
+2025-10-28 16:14:51,926 - INFO - 📄 Processando: P122_52-Z-08_L_REATOR_2014-08-07
+2025-10-28 16:14:51,935 - INFO - ✅ Equipamento criado: REL-P122-P12252-Z-08L-8cdd528c (Modelo: P122)
+2025-10-28 16:14:51,935 - INFO - 📄 Processando: P143 52-MF-03A
+2025-10-28 16:14:51,946 - INFO - ✅ Equipamento criado: REL-P143-P14352-MF-03A (Modelo: P143)
+2025-10-28 16:14:51,946 - INFO - 📄 Processando: P143_204-MF-03B_2014-08-14
+2025-10-28 16:14:51,956 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-03B (Modelo: P143)
+2025-10-28 16:14:51,956 - INFO - 📄 Processando: P143_204-MF-2A_2018-06-13
+2025-10-28 16:14:51,968 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2A (Modelo: P143)
+2025-10-28 16:14:51,968 - INFO - 📄 Processando: P143_204-MF-2B_2018-06-13
+2025-10-28 16:14:51,979 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2B (Modelo: P143)
+2025-10-28 16:14:51,979 - INFO - 📄 Processando: P143_204-MF-2C_2018-06-13
+2025-10-28 16:14:51,989 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2C (Modelo: P143)
+2025-10-28 16:14:51,989 - INFO - 📄 Processando: P143_204-MF-3C_2014-08-09
+2025-10-28 16:14:52,000 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-3C (Modelo: P143)
+2025-10-28 16:14:52,000 - INFO - 📄 Processando: P220 223-MP-01A
+2025-10-28 16:14:52,008 - INFO - ✅ Equipamento criado: REL-P122-P220223-MP-01A (Modelo: P122)
+2025-10-28 16:14:52,009 - INFO - 📄 Processando: P220 223-MP-01B
+2025-10-28 16:14:52,018 - INFO - ✅ Equipamento criado: REL-P122-P220223-MP-01B (Modelo: P122)
+2025-10-28 16:14:52,018 - INFO - 📄 Processando: P220 52-MP-01A
+2025-10-28 16:14:52,029 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-01A (Modelo: P122)
+2025-10-28 16:14:52,029 - INFO - 📄 Processando: P220 52-MP-04A
+2025-10-28 16:14:52,038 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-04A (Modelo: P122)
+2025-10-28 16:14:52,038 - INFO - 📄 Processando: P220 52-MP-04B
+2025-10-28 16:14:52,048 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-04B (Modelo: P122)
+2025-10-28 16:14:52,048 - INFO - 📄 Processando: P220 52-MP-06A
+2025-10-28 16:14:52,057 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-06A (Modelo: P122)
+2025-10-28 16:14:52,057 - INFO - 📄 Processando: P220 52-MP-06B
+2025-10-28 16:14:52,067 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-06B (Modelo: P122)
+2025-10-28 16:14:52,067 - INFO - 📄 Processando: P220 52-MP-08A
+2025-10-28 16:14:52,075 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-08A (Modelo: P122)
+2025-10-28 16:14:52,075 - INFO - 📄 Processando: P220 52-MP-21A
+2025-10-28 16:14:52,084 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-21A (Modelo: P122)
+2025-10-28 16:14:52,084 - INFO - 📄 Processando: P220 52-MP-21B
+2025-10-28 16:14:52,093 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-21B (Modelo: P122)
+2025-10-28 16:14:52,093 - INFO - 📄 Processando: P220 52-MP-29B
+2025-10-28 16:14:52,102 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-29B (Modelo: P122)
+2025-10-28 16:14:52,102 - INFO - 📄 Processando: P220 52-MP-30
+2025-10-28 16:14:52,110 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-30 (Modelo: P122)
+2025-10-28 16:14:52,110 - INFO - 📄 Processando: P220 53-MP-01A
+2025-10-28 16:14:52,120 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-01A (Modelo: P122)
+2025-10-28 16:14:52,120 - INFO - 📄 Processando: P220 53-MP-01B
+2025-10-28 16:14:52,129 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-01B (Modelo: P122)
+2025-10-28 16:14:52,129 - INFO - 📄 Processando: P220 53-MP-08A
+2025-10-28 16:14:52,138 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-08A (Modelo: P122)
+2025-10-28 16:14:52,138 - INFO - 📄 Processando: P220 53-MP-08B
+2025-10-28 16:14:52,148 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-08B (Modelo: P122)
+2025-10-28 16:14:52,148 - INFO - 📄 Processando: P220-52-MP-08B_2016-03-11
+2025-10-28 16:14:52,156 - INFO - ✅ Equipamento criado: REL-P122-P220-52-MP-08B (Modelo: P122)
+2025-10-28 16:14:52,156 - INFO - 📄 Processando: P220_52-MK-02A_2020-07-08
+2025-10-28 16:14:52,175 - INFO - ✅ Equipamento criado: REL-P122-P22052-MK-02A (Modelo: P122)
+2025-10-28 16:14:52,175 - INFO - 📄 Processando: P220_52-MK-02B_2017-11-07
+2025-10-28 16:14:52,185 - INFO - ✅ Equipamento criado: REL-P122-P22052-MK-02B (Modelo: P122)
+2025-10-28 16:14:52,185 - INFO - 📄 Processando: P220_54-MP-1A_2018-11-13
+2025-10-28 16:14:52,194 - INFO - ✅ Equipamento criado: REL-P122-P22054-MP-1A2 (Modelo: P122)
+2025-10-28 16:14:52,194 - INFO - 📄 Processando: P241_52-MP-20_2019-08-15
+2025-10-28 16:14:52,207 - INFO - ✅ Equipamento criado: REL-P241-P24152-MP-202 (Modelo: P241)
+2025-10-28 16:14:52,207 - INFO - 📄 Processando: P241_53-MK-01_2019-08-15
+2025-10-28 16:14:52,217 - INFO - ✅ Equipamento criado: REL-P241-P24153-MK-012 (Modelo: P241)
+2025-10-28 16:14:52,217 - INFO - 📄 Processando: P922 52-MF-01BC
+2025-10-28 16:14:52,231 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-01BC (Modelo: P122)
+2025-10-28 16:14:52,231 - INFO - 📄 Processando: P922 52-MF-02AC
+2025-10-28 16:14:52,262 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-02AC (Modelo: P122)
+2025-10-28 16:14:52,262 - INFO - 📄 Processando: P922 52-MF-03AC
+2025-10-28 16:14:52,273 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-03AC (Modelo: P122)
+2025-10-28 16:14:52,273 - INFO - 📄 Processando: P922 52-MF-03BC
+2025-10-28 16:14:52,285 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-03BC (Modelo: P122)
+2025-10-28 16:14:52,285 - INFO - 📄 Processando: P922 52-MF-2BC_2021-03-06
+2025-10-28 16:14:52,318 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-2BC (Modelo: P122)
+2025-10-28 16:14:52,319 - INFO - 📄 Processando: P922S_204-MF-1AC_2014-07-28
+2025-10-28 16:14:52,331 - INFO - ✅ Equipamento criado: REL-P122-P922S204-MF-1A (Modelo: P122)
+2025-10-28 16:14:52,331 - INFO - 📄 Processando: P_122 52-MF-03B1_2021-03-17
+2025-10-28 16:14:52,340 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-03B (Modelo: P122)
+2025-10-28 16:14:52,340 - INFO - 📄 Processando: reprocess_12345_20251027_175254
+2025-10-28 16:14:52,348 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345 (Modelo: P122)
+2025-10-28 16:14:52,349 - INFO - 📄 Processando: reprocess_12345_20251027_175752
+2025-10-28 16:14:52,354 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345-6a6b32ab (Modelo: P122)
+2025-10-28 16:14:52,354 - INFO - 📄 Processando: reprocess_12345_20251027_180108
+2025-10-28 16:14:52,359 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345-70b315a6 (Modelo: P122)
+2025-10-28 16:14:52,359 - INFO - 📄 Processando: reprocess_12345_20251027_180239
+2025-10-28 16:14:52,362 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS12345-b2781cd2 (Modelo: P122)
+2025-10-28 16:14:52,362 - INFO - 📄 Processando: reprocess_1_20251024_152431
+2025-10-28 16:14:52,365 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202 (Modelo: P122)
+2025-10-28 16:14:52,366 - INFO - 📄 Processando: reprocess_1_20251024_153421
+2025-10-28 16:14:52,369 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-842f869b (Modelo: P122)
+2025-10-28 16:14:52,369 - INFO - 📄 Processando: reprocess_1_20251024_190131
+2025-10-28 16:14:52,371 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-d3735e81 (Modelo: P122)
+2025-10-28 16:14:52,371 - INFO - 📄 Processando: reprocess_1_20251024_190611
+2025-10-28 16:14:52,375 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-0a0be6b9 (Modelo: P122)
+2025-10-28 16:14:52,375 - INFO - 📄 Processando: reprocess_1_20251024_192222
+2025-10-28 16:14:52,379 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-76433445 (Modelo: P122)
+2025-10-28 16:14:52,379 - INFO - 📄 Processando: reprocess_1_20251024_194054
+2025-10-28 16:14:52,382 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-3efd0b2e (Modelo: P122)
+2025-10-28 16:14:52,383 - INFO - 📄 Processando: reprocess_1_20251024_194220
+2025-10-28 16:14:52,386 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-c5e9437c (Modelo: P122)
+2025-10-28 16:14:52,386 - INFO - 📄 Processando: reprocess_1_20251024_194321
+2025-10-28 16:14:52,391 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-b2df889f (Modelo: P122)
+2025-10-28 16:14:52,391 - INFO - 📄 Processando: reprocess_1_20251024_194654
+2025-10-28 16:14:52,394 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-859bb980 (Modelo: P122)
+2025-10-28 16:14:52,394 - INFO - 📄 Processando: reprocess_1_20251024_194848
+2025-10-28 16:14:52,398 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-3f9f3481 (Modelo: P122)
+2025-10-28 16:14:52,398 - INFO - 📄 Processando: reprocess_1_20251024_195028
+2025-10-28 16:14:52,402 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-64b9bbdb (Modelo: P122)
+2025-10-28 16:14:52,402 - INFO - 📄 Processando: reprocess_1_20251024_195116
+2025-10-28 16:14:52,405 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-f0329827 (Modelo: P122)
+2025-10-28 16:14:52,406 - INFO - 📄 Processando: reprocess_1_20251024_195159
+2025-10-28 16:14:52,409 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-73da6af8 (Modelo: P122)
+2025-10-28 16:14:52,409 - INFO - 📄 Processando: reprocess_1_20251024_195331
+2025-10-28 16:14:52,412 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-0f9f289f (Modelo: P122)
+2025-10-28 16:14:52,412 - INFO - 📄 Processando: reprocess_1_20251024_195654
+2025-10-28 16:14:52,415 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-2d32bfa9 (Modelo: P122)
+2025-10-28 16:14:52,415 - INFO - 📄 Processando: reprocess_1_20251024_195807
+2025-10-28 16:14:52,417 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-ad254665 (Modelo: P122)
+2025-10-28 16:14:52,418 - INFO - 📄 Processando: reprocess_1_20251025_103200
+2025-10-28 16:14:52,424 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-daad1152 (Modelo: P122)
+2025-10-28 16:14:52,424 - INFO - 📄 Processando: reprocess_1_20251025_103225
+2025-10-28 16:14:52,430 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-c971a6e7 (Modelo: P122)
+2025-10-28 16:14:52,430 - INFO - 📄 Processando: reprocess_1_20251025_104857
+2025-10-28 16:14:52,433 - INFO - ✅ Equipamento criado: REL-P122-REPROCESS1202-17048c0a (Modelo: P122)
+2025-10-28 16:14:52,433 - INFO - 📄 Processando: reprocess_P122_20251022_162132
+2025-10-28 16:14:52,438 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSP122 (Modelo: P122)
+2025-10-28 16:14:52,438 - INFO - 📄 Processando: reprocess_protec_1_20251022_174740
+2025-10-28 16:14:52,442 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSPROTE (Modelo: P122)
+2025-10-28 16:14:52,442 - INFO - 📄 Processando: reprocess_protec_1_20251023_121145
+2025-10-28 16:14:52,445 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSPROTE-3e3c64bb (Modelo: P122)
+2025-10-28 16:14:52,445 - INFO - 📄 Processando: reprocess_test_import_123_20251027_155339
+2025-10-28 16:14:52,448 - INFO - ✅ Equipamento criado: REL-P122-REPROCESSTEST (Modelo: P122)
+2025-10-28 16:14:52,448 - INFO - 📄 Processando: tela1
+2025-10-28 16:14:52,457 - INFO - ✅ Equipamento criado: REL-P241-TELA1 (Modelo: P241)
+2025-10-28 16:14:52,457 - INFO - 📄 Processando: tela3
+2025-10-28 16:14:52,464 - INFO - ✅ Equipamento criado: REL-P122-TELA3 (Modelo: P122)
+2025-10-28 16:14:52,465 - INFO - 📊 PROCESSAMENTO UNIVERSAL CONCLUÍDO:
+2025-10-28 16:14:52,465 - INFO -    📁 Arquivos CSV encontrados: 79
+2025-10-28 16:14:52,465 - INFO -    ✅ Arquivos processados: 79
+2025-10-28 16:14:52,465 - INFO -    ❌ Erros: 0
+2025-10-28 16:14:52,465 - INFO -    🔧 Equipamentos criados: 79
+2025-10-28 16:14:52,465 - INFO -    🗄️ Equipamentos no banco: 79
+2025-10-28 16:14:52,465 - INFO - 🎉 Processamento 100% bem sucedido! 79 arquivos processados
+2025-10-28 16:25:06,873 - INFO - ✅ Conexão PostgreSQL estabelecida com AUTOCOMMIT
+2025-10-28 16:25:06,873 - INFO - 🧹 LIMPANDO tabelas para eliminar duplicatas...
+2025-10-28 16:25:06,899 - INFO - ✅ Tabela protec_ai.relay_equipment limpa
+2025-10-28 16:25:06,924 - INFO - ✅ Tabela protec_ai.relay_models limpa
+2025-10-28 16:25:06,973 - INFO - ✅ Tabela protec_ai.fabricantes limpa
+2025-10-28 16:25:06,973 - INFO - 🧹 Limpeza completa realizada
+2025-10-28 16:25:06,973 - INFO - 🏗️ Configurando dados base...
+2025-10-28 16:25:06,976 - INFO - ✅ Fabricante criado: Schneider Electric
+2025-10-28 16:25:06,977 - INFO - ✅ Fabricante criado: ABB Ltd
+2025-10-28 16:25:06,978 - INFO - ✅ Fabricante criado: General Electric
+2025-10-28 16:25:06,979 - INFO - ✅ Fabricante criado: Siemens AG
+2025-10-28 16:25:06,981 - INFO - ✅ Modelo criado: MiCOM P122 Overcurrent Protection
+2025-10-28 16:25:06,982 - INFO - ✅ Modelo criado: MiCOM P143 Feeder Protection
+2025-10-28 16:25:06,983 - INFO - ✅ Modelo criado: MiCOM P220 Generator Protection
+2025-10-28 16:25:06,984 - INFO - ✅ Modelo criado: MiCOM P241 Line Protection
+2025-10-28 16:25:06,985 - INFO - ✅ Modelo criado: MiCOM P922 Busbar Protection
+2025-10-28 16:25:06,986 - INFO - ✅ Modelo criado: MiCOM P922S Busbar Protection
+2025-10-28 16:25:06,987 - INFO - ✅ Modelo criado: ABB REF615 Feeder Protection
+2025-10-28 16:25:06,988 - INFO - ✅ Modelo criado: ABB RET650 Transformer Protection
+2025-10-28 16:25:06,989 - INFO - ✅ Modelo criado: Schneider Electric SEPAM S40
+2025-10-28 16:25:06,990 - INFO - ✅ Modelo criado: Schneider Electric SEPAM S80
+2025-10-28 16:25:06,990 - INFO - 🏗️ Dados base configurados com sucesso
+2025-10-28 16:25:06,990 - INFO - 🔄 EXECUTANDO CONVERSOR UNIVERSAL para processar TODOS os formatos
+2025-10-28 16:25:47,249 - INFO - ✅ Conversor universal executado com sucesso
+2025-10-28 16:25:47,250 - INFO - Output: 🔧 Conversor Universal iniciado
+
+🔍 Arquivos encontrados: {'pdf': 47, 'txt': 3, 'xlsx': 0, 'csv': 0}
+📋 Total: 50 arquivo(s)
+
+ℹ️  Convertendo PDF: P220 52-MP-30.pdf
+✅ PDF convertido: P220 52-MP-30.pdf → P220 52-MP-30_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-05_2014-08-09.pdf
+✅ PDF convertido: P122_204-PN-05_2014-08-09.pdf → P122_204-PN-05_2014-08-09_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P_122 52-MF-03B1_2021-03-17.pdf
+✅ PDF convertido: P_122 52-MF-03B1_2021-03-17.pdf → P_122 52-MF-03B1_2021-03-17_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-06A.pdf
+✅ PDF convertido: P220 52-MP-06A.pdf → P220 52-MP-06A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-2B_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2B_2018-06-13.pdf → P143_204-MF-2B_2018-06-13_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P220 52-MP-06B.pdf
+✅ PDF convertido: P220 52-MP-06B.pdf → P220 52-MP-06B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-Z-08_L_REATOR_2014-08-07.pdf
+✅ PDF convertido: P122_52-Z-08_L_REATOR_2014-08-07.pdf → P122_52-Z-08_L_REATOR_2014-08-07_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-06_LADO_B_2014-08-09.pdf
+✅ PDF convertido: P122_204-PN-06_LADO_B_2014-08-09.pdf → P122_204-PN-06_LADO_B_2014-08-09_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-02AC.pdf
+✅ PDF convertido: P922 52-MF-02AC.pdf → P922 52-MF-02AC_params.csv (191 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-2BC_2021-03-06.pdf
+✅ PDF convertido: P922 52-MF-2BC_2021-03-06.pdf → P922 52-MF-2BC_2021-03-06_params.csv (501 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-2C_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2C_2018-06-13.pdf → P143_204-MF-2C_2018-06-13_params.csv (336 linhas, micom)
+ℹ️  Convertendo PDF: P143_204-MF-03B_2014-08-14.pdf
+✅ PDF convertido: P143_204-MF-03B_2014-08-14.pdf → P143_204-MF-03B_2014-08-14_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P143 52-MF-03A.pdf
+✅ PDF convertido: P143 52-MF-03A.pdf → P143 52-MF-03A_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P241_53-MK-01_2019-08-15.pdf
+✅ PDF convertido: P241_53-MK-01_2019-08-15.pdf → P241_53-MK-01_2019-08-15_params.csv (235 linhas, micom)
+ℹ️  Convertendo PDF: P143_204-MF-2A_2018-06-13.pdf
+✅ PDF convertido: P143_204-MF-2A_2018-06-13.pdf → P143_204-MF-2A_2018-06-13_params.csv (341 linhas, micom)
+ℹ️  Convertendo PDF: P220 53-MP-08B.pdf
+✅ PDF convertido: P220 53-MP-08B.pdf → P220 53-MP-08B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-01A.pdf
+✅ PDF convertido: P220 52-MP-01A.pdf → P220 52-MP-01A_params.csv (190 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-21B.pdf
+✅ PDF convertido: P220 52-MP-21B.pdf → P220 52-MP-21B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-MP-20_2018-08-20.pdf
+✅ PDF convertido: P122_52-MP-20_2018-08-20.pdf → P122_52-MP-20_2018-08-20_params.csv (440 linhas, easergy)
+ℹ️  Convertendo PDF: P122 52-MF-02A_2021-03-08.pdf
+✅ PDF convertido: P122 52-MF-02A_2021-03-08.pdf → P122 52-MF-02A_2021-03-08_params.csv (444 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-08A.pdf
+✅ PDF convertido: P220 53-MP-08A.pdf → P220 53-MP-08A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-21A.pdf
+✅ PDF convertido: P220 52-MP-21A.pdf → P220 52-MP-21A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-03AC.pdf
+✅ PDF convertido: P922 52-MF-03AC.pdf → P922 52-MF-03AC_params.csv (194 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-03BC.pdf
+✅ PDF convertido: P922 52-MF-03BC.pdf → P922 52-MF-03BC_params.csv (194 linhas, easergy)
+ℹ️  Convertendo PDF: P922 52-MF-01BC.pdf
+✅ PDF convertido: P922 52-MF-01BC.pdf → P922 52-MF-01BC_params.csv (199 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-MF-2B1_2014-07-28.pdf
+✅ PDF convertido: P122_204-MF-2B1_2014-07-28.pdf → P122_204-MF-2B1_2014-07-28_params.csv (435 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-06_LADO_A_2014-08-01.pdf
+✅ PDF convertido: P122_204-PN-06_LADO_A_2014-08-01.pdf → P122_204-PN-06_LADO_A_2014-08-01_params.csv (135 linhas, easergy)
+ℹ️  Convertendo PDF: P220 223-MP-01B.pdf
+✅ PDF convertido: P220 223-MP-01B.pdf → P220 223-MP-01B_params.csv (153 linhas, easergy)
+ℹ️  Convertendo PDF: P922S_204-MF-1AC_2014-07-28.pdf
+✅ PDF convertido: P922S_204-MF-1AC_2014-07-28.pdf → P922S_204-MF-1AC_2014-07-28_params.csv (232 linhas, easergy)
+ℹ️  Convertendo PDF: P220 223-MP-01A.pdf
+✅ PDF convertido: P220 223-MP-01A.pdf → P220 223-MP-01A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_205-TF-3B_2018-06-13.pdf
+✅ PDF convertido: P122_205-TF-3B_2018-06-13.pdf → P122_205-TF-3B_2018-06-13_params.csv (142 linhas, easergy)
+ℹ️  Convertendo PDF: P122_205-TF-3A_2021-03-08.pdf
+✅ PDF convertido: P122_205-TF-3A_2021-03-08.pdf → P122_205-TF-3A_2021-03-08_params.csv (462 linhas, easergy)
+ℹ️  Convertendo PDF: P122_52-Z-08_L_PATIO_2014-08-06.pdf
+✅ PDF convertido: P122_52-Z-08_L_PATIO_2014-08-06.pdf → P122_52-Z-08_L_PATIO_2014-08-06_params.csv (438 linhas, easergy)
+ℹ️  Convertendo PDF: P220_52-MK-02A_2020-07-08.pdf
+✅ PDF convertido: P220_52-MK-02A_2020-07-08.pdf → P220_52-MK-02A_2020-07-08_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-01A.pdf
+✅ PDF convertido: P220 53-MP-01A.pdf → P220 53-MP-01A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P143_204-MF-3C_2014-08-09.pdf
+✅ PDF convertido: P143_204-MF-3C_2014-08-09.pdf → P143_204-MF-3C_2014-08-09_params.csv (324 linhas, micom)
+ℹ️  Convertendo PDF: P220 52-MP-04A.pdf
+✅ PDF convertido: P220 52-MP-04A.pdf → P220 52-MP-04A_params.csv (157 linhas, easergy)
+ℹ️  Convertendo PDF: P220 53-MP-01B.pdf
+✅ PDF convertido: P220 53-MP-01B.pdf → P220 53-MP-01B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-04B.pdf
+✅ PDF convertido: P220 52-MP-04B.pdf → P220 52-MP-04B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-08A.pdf
+✅ PDF convertido: P220 52-MP-08A.pdf → P220 52-MP-08A_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P122_204-PN-04_2014-08-02.pdf
+✅ PDF convertido: P122_204-PN-04_2014-08-02.pdf → P122_204-PN-04_2014-08-02_params.csv (133 linhas, easergy)
+ℹ️  Convertendo PDF: P220 52-MP-29B.pdf
+✅ PDF convertido: P220 52-MP-29B.pdf → P220 52-MP-29B_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220_54-MP-1A_2018-11-13.pdf
+✅ PDF convertido: P220_54-MP-1A_2018-11-13.pdf → P220_54-MP-1A_2018-11-13_params.csv (189 linhas, easergy)
+ℹ️  Convertendo PDF: P241_52-MP-20_2019-08-15.pdf
+✅ PDF convertido: P241_52-MP-20_2019-08-15.pdf → P241_52-MP-20_2019-08-15_params.csv (338 linhas, micom)
+ℹ️  Convertendo PDF: P122 52-MF-03A1_2021-03-11.pdf
+✅ PDF convertido: P122 52-MF-03A1_2021-03-11.pdf → P122 52-MF-03A1_2021-03-11_params.csv (450 linhas, easergy)
+ℹ️  Convertendo PDF: P220-52-MP-08B_2016-03-11.pdf
+✅ PDF convertido: P220-52-MP-08B_2016-03-11.pdf → P220-52-MP-08B_2016-03-11_params.csv (151 linhas, easergy)
+ℹ️  Convertendo PDF: P220_52-MK-02B_2017-11-07.pdf
+✅ PDF convertido: P220_52-MK-02B_2017-11-07.pdf → P220_52-MK-02B_2017-11-07_params.csv (202 linhas, easergy)
+ℹ️  Convertendo TXT: 00-MF-24_2024-09-10.S40
+✅ TXT convertido: 00-MF-24_2024-09-10.S40 → 00-MF-24_2024-09-10_params.csv (1162 linhas, sepam_s40)
+ℹ️  Convertendo TXT: 00-MF-14_2016-03-31.S40
+✅ TXT convertido: 00-MF-14_2016-03-31.S40 → 00-MF-14_2016-03-31_params.csv (1137 linhas, sepam_s40)
+ℹ️  Convertendo TXT: 00-MF-12_2016-03-31.S40
+✅ TXT convertido: 00-MF-12_2016-03-31.S40 → 00-MF-12_2016-03-31_params.csv (1140 linhas, sepam_s40)
+
+============================================================
+📊 RESUMO DA CONVERSÃO UNIVERSAL
+============================================================
+📁 Formatos encontrados: {'pdf': 47, 'txt': 3, 'xlsx': 0, 'csv': 0}
+✅ Convertidos: 50
+⏭️  Ignorados: 0
+❌ Erros: 0
+
+📋 Arquivos convertidos:
+  • PDF: P220 52-MP-30.pdf → P220 52-MP-30_params.csv
+  • PDF: P122_204-PN-05_2014-08-09.pdf → P122_204-PN-05_2014-08-09_params.csv
+  • PDF: P_122 52-MF-03B1_2021-03-17.pdf → P_122 52-MF-03B1_2021-03-17_params.csv
+  • PDF: P220 52-MP-06A.pdf → P220 52-MP-06A_params.csv
+  • PDF: P143_204-MF-2B_2018-06-13.pdf → P143_204-MF-2B_2018-06-13_params.csv
+  • PDF: P220 52-MP-06B.pdf → P220 52-MP-06B_params.csv
+  • PDF: P122_52-Z-08_L_REATOR_2014-08-07.pdf → P122_52-Z-08_L_REATOR_2014-08-07_params.csv
+  • PDF: P122_204-PN-06_LADO_B_2014-08-09.pdf → P122_204-PN-06_LADO_B_2014-08-09_params.csv
+  • PDF: P922 52-MF-02AC.pdf → P922 52-MF-02AC_params.csv
+  • PDF: P922 52-MF-2BC_2021-03-06.pdf → P922 52-MF-2BC_2021-03-06_params.csv
+  • PDF: P143_204-MF-2C_2018-06-13.pdf → P143_204-MF-2C_2018-06-13_params.csv
+  • PDF: P143_204-MF-03B_2014-08-14.pdf → P143_204-MF-03B_2014-08-14_params.csv
+  • PDF: P143 52-MF-03A.pdf → P143 52-MF-03A_params.csv
+  • PDF: P241_53-MK-01_2019-08-15.pdf → P241_53-MK-01_2019-08-15_params.csv
+  • PDF: P143_204-MF-2A_2018-06-13.pdf → P143_204-MF-2A_2018-06-13_params.csv
+  • PDF: P220 53-MP-08B.pdf → P220 53-MP-08B_params.csv
+  • PDF: P220 52-MP-01A.pdf → P220 52-MP-01A_params.csv
+  • PDF: P220 52-MP-21B.pdf → P220 52-MP-21B_params.csv
+  • PDF: P122_52-MP-20_2018-08-20.pdf → P122_52-MP-20_2018-08-20_params.csv
+  • PDF: P122 52-MF-02A_2021-03-08.pdf → P122 52-MF-02A_2021-03-08_params.csv
+  • PDF: P220 53-MP-08A.pdf → P220 53-MP-08A_params.csv
+  • PDF: P220 52-MP-21A.pdf → P220 52-MP-21A_params.csv
+  • PDF: P922 52-MF-03AC.pdf → P922 52-MF-03AC_params.csv
+  • PDF: P922 52-MF-03BC.pdf → P922 52-MF-03BC_params.csv
+  • PDF: P922 52-MF-01BC.pdf → P922 52-MF-01BC_params.csv
+  • PDF: P122_204-MF-2B1_2014-07-28.pdf → P122_204-MF-2B1_2014-07-28_params.csv
+  • PDF: P122_204-PN-06_LADO_A_2014-08-01.pdf → P122_204-PN-06_LADO_A_2014-08-01_params.csv
+  • PDF: P220 223-MP-01B.pdf → P220 223-MP-01B_params.csv
+  • PDF: P922S_204-MF-1AC_2014-07-28.pdf → P922S_204-MF-1AC_2014-07-28_params.csv
+  • PDF: P220 223-MP-01A.pdf → P220 223-MP-01A_params.csv
+  • PDF: P122_205-TF-3B_2018-06-13.pdf → P122_205-TF-3B_2018-06-13_params.csv
+  • PDF: P122_205-TF-3A_2021-03-08.pdf → P122_205-TF-3A_2021-03-08_params.csv
+  • PDF: P122_52-Z-08_L_PATIO_2014-08-06.pdf → P122_52-Z-08_L_PATIO_2014-08-06_params.csv
+  • PDF: P220_52-MK-02A_2020-07-08.pdf → P220_52-MK-02A_2020-07-08_params.csv
+  • PDF: P220 53-MP-01A.pdf → P220 53-MP-01A_params.csv
+  • PDF: P143_204-MF-3C_2014-08-09.pdf → P143_204-MF-3C_2014-08-09_params.csv
+  • PDF: P220 52-MP-04A.pdf → P220 52-MP-04A_params.csv
+  • PDF: P220 53-MP-01B.pdf → P220 53-MP-01B_params.csv
+  • PDF: P220 52-MP-04B.pdf → P220 52-MP-04B_params.csv
+  • PDF: P220 52-MP-08A.pdf → P220 52-MP-08A_params.csv
+  • PDF: P122_204-PN-04_2014-08-02.pdf → P122_204-PN-04_2014-08-02_params.csv
+  • PDF: P220 52-MP-29B.pdf → P220 52-MP-29B_params.csv
+  • PDF: P220_54-MP-1A_2018-11-13.pdf → P220_54-MP-1A_2018-11-13_params.csv
+  • PDF: P241_52-MP-20_2019-08-15.pdf → P241_52-MP-20_2019-08-15_params.csv
+  • PDF: P122 52-MF-03A1_2021-03-11.pdf → P122 52-MF-03A1_2021-03-11_params.csv
+  • PDF: P220-52-MP-08B_2016-03-11.pdf → P220-52-MP-08B_2016-03-11_params.csv
+  • PDF: P220_52-MK-02B_2017-11-07.pdf → P220_52-MK-02B_2017-11-07_params.csv
+  • TXT: 00-MF-24_2024-09-10.S40 → 00-MF-24_2024-09-10_params.csv
+  • TXT: 00-MF-14_2016-03-31.S40 → 00-MF-14_2016-03-31_params.csv
+  • TXT: 00-MF-12_2016-03-31.S40 → 00-MF-12_2016-03-31_params.csv
+
+📂 Saídas em: outputs/csv
+============================================================
+
+📄 Relatório salvo: outputs/logs/universal_conversion_20251028_162547.json
+
+2025-10-28 16:25:47,251 - INFO - 📁 Encontrados 50 arquivos CSV convertidos
+2025-10-28 16:25:47,251 - INFO - 📄 Processando: 00-MF-12_2016-03-31
+2025-10-28 16:25:47,302 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-122016-0 (Modelo: SEPAM_S40)
+2025-10-28 16:25:47,302 - INFO - 📄 Processando: 00-MF-14_2016-03-31
+2025-10-28 16:25:47,328 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-142016-0 (Modelo: SEPAM_S40)
+2025-10-28 16:25:47,328 - INFO - 📄 Processando: 00-MF-24_2024-09-10
+2025-10-28 16:25:47,355 - INFO - ✅ Equipamento criado: REL-SEPAMS40-00-MF-242024-0 (Modelo: SEPAM_S40)
+2025-10-28 16:25:47,355 - INFO - 📄 Processando: P122 52-MF-02A_2021-03-08
+2025-10-28 16:25:47,375 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-02A (Modelo: P122)
+2025-10-28 16:25:47,375 - INFO - 📄 Processando: P122 52-MF-03A1_2021-03-11
+2025-10-28 16:25:47,396 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-03A1 (Modelo: P122)
+2025-10-28 16:25:47,396 - INFO - 📄 Processando: P122_204-MF-2B1_2014-07-28
+2025-10-28 16:25:47,415 - INFO - ✅ Equipamento criado: REL-P122-P122204-MF-2B1 (Modelo: P122)
+2025-10-28 16:25:47,416 - INFO - 📄 Processando: P122_204-PN-04_2014-08-02
+2025-10-28 16:25:47,424 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-04 (Modelo: P122)
+2025-10-28 16:25:47,424 - INFO - 📄 Processando: P122_204-PN-05_2014-08-09
+2025-10-28 16:25:47,432 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-05 (Modelo: P122)
+2025-10-28 16:25:47,432 - INFO - 📄 Processando: P122_204-PN-06_LADO_A_2014-08-01
+2025-10-28 16:25:47,440 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-06 (Modelo: P122)
+2025-10-28 16:25:47,440 - INFO - 📄 Processando: P122_204-PN-06_LADO_B_2014-08-09
+2025-10-28 16:25:47,448 - INFO - ✅ Equipamento criado: REL-P122-P122204-PN-06-f291841f (Modelo: P122)
+2025-10-28 16:25:47,448 - INFO - 📄 Processando: P122_205-TF-3A_2021-03-08
+2025-10-28 16:25:47,466 - INFO - ✅ Equipamento criado: REL-P122-P122205-TF-3A (Modelo: P122)
+2025-10-28 16:25:47,466 - INFO - 📄 Processando: P122_205-TF-3B_2018-06-13
+2025-10-28 16:25:47,474 - INFO - ✅ Equipamento criado: REL-P122-P122205-TF-3B (Modelo: P122)
+2025-10-28 16:25:47,474 - INFO - 📄 Processando: P122_52-MP-20_2018-08-20
+2025-10-28 16:25:47,492 - INFO - ✅ Equipamento criado: REL-P122-P12252-MP-202 (Modelo: P122)
+2025-10-28 16:25:47,492 - INFO - 📄 Processando: P122_52-Z-08_L_PATIO_2014-08-06
+2025-10-28 16:25:47,510 - INFO - ✅ Equipamento criado: REL-P122-P12252-Z-08L (Modelo: P122)
+2025-10-28 16:25:47,510 - INFO - 📄 Processando: P122_52-Z-08_L_REATOR_2014-08-07
+2025-10-28 16:25:47,518 - INFO - ✅ Equipamento criado: REL-P122-P12252-Z-08L-8cdd528c (Modelo: P122)
+2025-10-28 16:25:47,518 - INFO - 📄 Processando: P143 52-MF-03A
+2025-10-28 16:25:47,528 - INFO - ✅ Equipamento criado: REL-P143-P14352-MF-03A (Modelo: P143)
+2025-10-28 16:25:47,528 - INFO - 📄 Processando: P143_204-MF-03B_2014-08-14
+2025-10-28 16:25:47,539 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-03B (Modelo: P143)
+2025-10-28 16:25:47,539 - INFO - 📄 Processando: P143_204-MF-2A_2018-06-13
+2025-10-28 16:25:47,548 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2A (Modelo: P143)
+2025-10-28 16:25:47,548 - INFO - 📄 Processando: P143_204-MF-2B_2018-06-13
+2025-10-28 16:25:47,558 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2B (Modelo: P143)
+2025-10-28 16:25:47,558 - INFO - 📄 Processando: P143_204-MF-2C_2018-06-13
+2025-10-28 16:25:47,568 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-2C (Modelo: P143)
+2025-10-28 16:25:47,568 - INFO - 📄 Processando: P143_204-MF-3C_2014-08-09
+2025-10-28 16:25:47,577 - INFO - ✅ Equipamento criado: REL-P143-P143204-MF-3C (Modelo: P143)
+2025-10-28 16:25:47,577 - INFO - 📄 Processando: P220 223-MP-01A
+2025-10-28 16:25:47,585 - INFO - ✅ Equipamento criado: REL-P122-P220223-MP-01A (Modelo: P122)
+2025-10-28 16:25:47,585 - INFO - 📄 Processando: P220 223-MP-01B
+2025-10-28 16:25:47,593 - INFO - ✅ Equipamento criado: REL-P122-P220223-MP-01B (Modelo: P122)
+2025-10-28 16:25:47,593 - INFO - 📄 Processando: P220 52-MP-01A
+2025-10-28 16:25:47,603 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-01A (Modelo: P122)
+2025-10-28 16:25:47,603 - INFO - 📄 Processando: P220 52-MP-04A
+2025-10-28 16:25:47,611 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-04A (Modelo: P122)
+2025-10-28 16:25:47,611 - INFO - 📄 Processando: P220 52-MP-04B
+2025-10-28 16:25:47,620 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-04B (Modelo: P122)
+2025-10-28 16:25:47,620 - INFO - 📄 Processando: P220 52-MP-06A
+2025-10-28 16:25:47,629 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-06A (Modelo: P122)
+2025-10-28 16:25:47,629 - INFO - 📄 Processando: P220 52-MP-06B
+2025-10-28 16:25:47,638 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-06B (Modelo: P122)
+2025-10-28 16:25:47,638 - INFO - 📄 Processando: P220 52-MP-08A
+2025-10-28 16:25:47,647 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-08A (Modelo: P122)
+2025-10-28 16:25:47,647 - INFO - 📄 Processando: P220 52-MP-21A
+2025-10-28 16:25:47,655 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-21A (Modelo: P122)
+2025-10-28 16:25:47,655 - INFO - 📄 Processando: P220 52-MP-21B
+2025-10-28 16:25:47,663 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-21B (Modelo: P122)
+2025-10-28 16:25:47,663 - INFO - 📄 Processando: P220 52-MP-29B
+2025-10-28 16:25:47,672 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-29B (Modelo: P122)
+2025-10-28 16:25:47,672 - INFO - 📄 Processando: P220 52-MP-30
+2025-10-28 16:25:47,682 - INFO - ✅ Equipamento criado: REL-P122-P22052-MP-30 (Modelo: P122)
+2025-10-28 16:25:47,682 - INFO - 📄 Processando: P220 53-MP-01A
+2025-10-28 16:25:47,691 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-01A (Modelo: P122)
+2025-10-28 16:25:47,691 - INFO - 📄 Processando: P220 53-MP-01B
+2025-10-28 16:25:47,701 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-01B (Modelo: P122)
+2025-10-28 16:25:47,701 - INFO - 📄 Processando: P220 53-MP-08A
+2025-10-28 16:25:47,709 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-08A (Modelo: P122)
+2025-10-28 16:25:47,709 - INFO - 📄 Processando: P220 53-MP-08B
+2025-10-28 16:25:47,718 - INFO - ✅ Equipamento criado: REL-P122-P22053-MP-08B (Modelo: P122)
+2025-10-28 16:25:47,718 - INFO - 📄 Processando: P220-52-MP-08B_2016-03-11
+2025-10-28 16:25:47,726 - INFO - ✅ Equipamento criado: REL-P122-P220-52-MP-08B (Modelo: P122)
+2025-10-28 16:25:47,726 - INFO - 📄 Processando: P220_52-MK-02A_2020-07-08
+2025-10-28 16:25:47,734 - INFO - ✅ Equipamento criado: REL-P122-P22052-MK-02A (Modelo: P122)
+2025-10-28 16:25:47,734 - INFO - 📄 Processando: P220_52-MK-02B_2017-11-07
+2025-10-28 16:25:47,744 - INFO - ✅ Equipamento criado: REL-P122-P22052-MK-02B (Modelo: P122)
+2025-10-28 16:25:47,744 - INFO - 📄 Processando: P220_54-MP-1A_2018-11-13
+2025-10-28 16:25:47,754 - INFO - ✅ Equipamento criado: REL-P122-P22054-MP-1A2 (Modelo: P122)
+2025-10-28 16:25:47,754 - INFO - 📄 Processando: P241_52-MP-20_2019-08-15
+2025-10-28 16:25:47,764 - INFO - ✅ Equipamento criado: REL-P241-P24152-MP-202 (Modelo: P241)
+2025-10-28 16:25:47,764 - INFO - 📄 Processando: P241_53-MK-01_2019-08-15
+2025-10-28 16:25:47,771 - INFO - ✅ Equipamento criado: REL-P241-P24153-MK-012 (Modelo: P241)
+2025-10-28 16:25:47,771 - INFO - 📄 Processando: P922 52-MF-01BC
+2025-10-28 16:25:47,781 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-01BC (Modelo: P122)
+2025-10-28 16:25:47,781 - INFO - 📄 Processando: P922 52-MF-02AC
+2025-10-28 16:25:47,791 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-02AC (Modelo: P122)
+2025-10-28 16:25:47,791 - INFO - 📄 Processando: P922 52-MF-03AC
+2025-10-28 16:25:47,801 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-03AC (Modelo: P122)
+2025-10-28 16:25:47,801 - INFO - 📄 Processando: P922 52-MF-03BC
+2025-10-28 16:25:47,812 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-03BC (Modelo: P122)
+2025-10-28 16:25:47,812 - INFO - 📄 Processando: P922 52-MF-2BC_2021-03-06
+2025-10-28 16:25:47,832 - INFO - ✅ Equipamento criado: REL-P122-P92252-MF-2BC (Modelo: P122)
+2025-10-28 16:25:47,832 - INFO - 📄 Processando: P922S_204-MF-1AC_2014-07-28
+2025-10-28 16:25:47,844 - INFO - ✅ Equipamento criado: REL-P122-P922S204-MF-1A (Modelo: P122)
+2025-10-28 16:25:47,844 - INFO - 📄 Processando: P_122 52-MF-03B1_2021-03-17
+2025-10-28 16:25:47,852 - INFO - ✅ Equipamento criado: REL-P122-P12252-MF-03B (Modelo: P122)
+2025-10-28 16:25:47,852 - INFO - 📊 PROCESSAMENTO UNIVERSAL CONCLUÍDO:
+2025-10-28 16:25:47,852 - INFO -    📁 Arquivos CSV encontrados: 50
+2025-10-28 16:25:47,852 - INFO -    ✅ Arquivos processados: 50
+2025-10-28 16:25:47,852 - INFO -    ❌ Erros: 0
+2025-10-28 16:25:47,852 - INFO -    🔧 Equipamentos criados: 50
+2025-10-28 16:25:47,853 - INFO -    🗄️ Equipamentos no banco: 50
+2025-10-28 16:25:47,853 - INFO - 🎉 Processamento 100% bem sucedido! 50 arquivos processados

@@ -1,0 +1,74 @@
+2025-10-28 16:54:56,806 - INFO - 🎯 INICIANDO CORREÇÃO DA ARQUITETURA DATABASE
+2025-10-28 16:54:56,806 - INFO - ============================================================
+2025-10-28 16:54:56,830 - INFO - ✅ Conectado ao PostgreSQL
+2025-10-28 16:54:56,837 - INFO - 🧹 Dados problemáticos removidos
+2025-10-28 16:54:56,843 - INFO - ✅ Conectado ao PostgreSQL
+2025-10-28 16:54:56,843 - INFO - 🔧 Criando tabela equipment_protection_functions...
+2025-10-28 16:54:56,872 - INFO - 🔧 Verificando coluna is_enabled em relay_settings...
+2025-10-28 16:54:56,879 - INFO - ✅ Nova estrutura criada com sucesso
+2025-10-28 16:54:56,886 - INFO - ✅ Conectado ao PostgreSQL
+2025-10-28 16:54:56,892 - INFO - ✅ Conectado ao PostgreSQL
+2025-10-28 16:54:56,895 - INFO - 📄 Processando: REL-SEPAMS40-00-MF-122016-0 -> P122_52-MP-20_2018-08-20_params.csv
+2025-10-28 16:54:56,911 - INFO - 📄 Processando: REL-SEPAMS40-00-MF-142016-0 -> P122_52-MP-20_2018-08-20_params.csv
+2025-10-28 16:54:56,923 - INFO - 📄 Processando: REL-SEPAMS40-00-MF-242024-0 -> P122_52-MP-20_2018-08-20_params.csv
+2025-10-28 16:54:56,935 - INFO - 📄 Processando: REL-P122-P12252-MF-02A -> P122 52-MF-02A_2021-03-08_params.csv
+2025-10-28 16:54:56,948 - INFO - 📄 Processando: REL-P122-P12252-MF-03A1 -> P122 52-MF-03A1_2021-03-11_params.csv
+2025-10-28 16:54:56,967 - INFO - 📄 Processando: REL-P122-P122204-MF-2B1 -> P122_204-MF-2B1_2014-07-28_params.csv
+2025-10-28 16:54:56,981 - INFO - 📄 Processando: REL-P122-P122204-PN-04 -> P143_204-MF-2C_2018-06-13_params.csv
+2025-10-28 16:54:56,982 - INFO - 📄 Processando: REL-P122-P122204-PN-05 -> P122_205-TF-3A_2021-03-08_params.csv
+2025-10-28 16:54:56,994 - INFO - 📄 Processando: REL-P122-P122204-PN-06 -> P220 52-MP-06A_params.csv
+2025-10-28 16:54:57,005 - WARNING - ⚠️ Arquivo CSV não encontrado para: REL-P122-P122204-PN-06-f291841f
+2025-10-28 16:54:57,006 - INFO - 📄 Processando: REL-P122-P122205-TF-3A -> P143 52-MF-03A_params.csv
+2025-10-28 16:54:57,007 - INFO - 📄 Processando: REL-P122-P122205-TF-3B -> P143_204-MF-03B_2014-08-14_params.csv
+2025-10-28 16:54:57,008 - INFO - 📄 Processando: REL-P122-P12252-MP-202 -> P122 52-MF-02A_2021-03-08_params.csv
+2025-10-28 16:54:57,021 - WARNING - ⚠️ Arquivo CSV não encontrado para: REL-P122-P12252-Z-08L
+2025-10-28 16:54:57,022 - WARNING - ⚠️ Arquivo CSV não encontrado para: REL-P122-P12252-Z-08L-8cdd528c
+2025-10-28 16:54:57,022 - INFO - 📄 Processando: REL-P143-P14352-MF-03A -> P143 52-MF-03A_params.csv
+2025-10-28 16:54:57,023 - INFO - 📄 Processando: REL-P143-P143204-MF-03B -> P143_204-MF-03B_2014-08-14_params.csv
+2025-10-28 16:54:57,023 - INFO - 📄 Processando: REL-P143-P143204-MF-2A -> P122 52-MF-02A_2021-03-08_params.csv
+2025-10-28 16:54:57,037 - INFO - 📄 Processando: REL-P143-P143204-MF-2B -> P220_52-MK-02B_2017-11-07_params.csv
+2025-10-28 16:54:57,048 - INFO - 📄 Processando: REL-P143-P143204-MF-2C -> P143_204-MF-2C_2018-06-13_params.csv
+2025-10-28 16:54:57,049 - INFO - 📄 Processando: REL-P143-P143204-MF-3C -> P143_204-MF-3C_2014-08-09_params.csv
+2025-10-28 16:54:57,050 - INFO - 📄 Processando: REL-P122-P220223-MP-01A -> P220 53-MP-01A_params.csv
+2025-10-28 16:54:57,061 - INFO - 📄 Processando: REL-P122-P220223-MP-01B -> P220 53-MP-01B_params.csv
+2025-10-28 16:54:57,070 - INFO - 📄 Processando: REL-P122-P22052-MP-01A -> P220 53-MP-01A_params.csv
+2025-10-28 16:54:57,076 - INFO - 📄 Processando: REL-P122-P22052-MP-04A -> P220 52-MP-04A_params.csv
+2025-10-28 16:54:57,089 - INFO - 📄 Processando: REL-P122-P22052-MP-04B -> P220 52-MP-04B_params.csv
+2025-10-28 16:54:57,101 - INFO - 📄 Processando: REL-P122-P22052-MP-06A -> P220 52-MP-06A_params.csv
+2025-10-28 16:54:57,111 - INFO - 📄 Processando: REL-P122-P22052-MP-06B -> P220 52-MP-06B_params.csv
+2025-10-28 16:54:57,123 - INFO - 📄 Processando: REL-P122-P22052-MP-08A -> P220 53-MP-08A_params.csv
+2025-10-28 16:54:57,133 - INFO - 📄 Processando: REL-P122-P22052-MP-21A -> P220 52-MP-21A_params.csv
+2025-10-28 16:54:57,143 - INFO - 📄 Processando: REL-P122-P22052-MP-21B -> P220 52-MP-21B_params.csv
+2025-10-28 16:54:57,154 - INFO - 📄 Processando: REL-P122-P22052-MP-29B -> P220 52-MP-29B_params.csv
+2025-10-28 16:54:57,168 - INFO - 📄 Processando: REL-P122-P22052-MP-30 -> P220 52-MP-30_params.csv
+2025-10-28 16:54:57,178 - INFO - 📄 Processando: REL-P122-P22053-MP-01A -> P220 53-MP-01A_params.csv
+2025-10-28 16:54:57,187 - INFO - 📄 Processando: REL-P122-P22053-MP-01B -> P220 53-MP-01B_params.csv
+2025-10-28 16:54:57,197 - INFO - 📄 Processando: REL-P122-P22053-MP-08A -> P220 53-MP-08A_params.csv
+2025-10-28 16:54:57,208 - INFO - 📄 Processando: REL-P122-P22053-MP-08B -> P220 53-MP-08B_params.csv
+2025-10-28 16:54:57,219 - INFO - 📄 Processando: REL-P122-P220-52-MP-08B -> P220 53-MP-08B_params.csv
+2025-10-28 16:54:57,228 - INFO - 📄 Processando: REL-P122-P22052-MK-02A -> P122 52-MF-02A_2021-03-08_params.csv
+2025-10-28 16:54:57,242 - INFO - 📄 Processando: REL-P122-P22052-MK-02B -> P220_52-MK-02B_2017-11-07_params.csv
+2025-10-28 16:54:57,252 - WARNING - ⚠️ Arquivo CSV não encontrado para: REL-P122-P22054-MP-1A2
+2025-10-28 16:54:57,253 - INFO - 📄 Processando: REL-P241-P24152-MP-202 -> P122 52-MF-02A_2021-03-08_params.csv
+2025-10-28 16:54:57,267 - WARNING - ⚠️ Arquivo CSV não encontrado para: REL-P241-P24153-MK-012
+2025-10-28 16:54:57,267 - INFO - 📄 Processando: REL-P122-P92252-MF-01BC -> P922 52-MF-01BC_params.csv
+2025-10-28 16:54:57,274 - INFO - 📄 Processando: REL-P122-P92252-MF-02AC -> P922 52-MF-02AC_params.csv
+2025-10-28 16:54:57,281 - INFO - 📄 Processando: REL-P122-P92252-MF-03AC -> P922 52-MF-03AC_params.csv
+2025-10-28 16:54:57,288 - INFO - 📄 Processando: REL-P122-P92252-MF-03BC -> P922 52-MF-03BC_params.csv
+2025-10-28 16:54:57,297 - INFO - 📄 Processando: REL-P122-P92252-MF-2BC -> P922 52-MF-2BC_2021-03-06_params.csv
+2025-10-28 16:54:57,303 - INFO - 📄 Processando: REL-P122-P922S204-MF-1A -> P220 52-MP-21A_params.csv
+2025-10-28 16:54:57,312 - INFO - 📄 Processando: REL-P122-P12252-MF-03B -> P143_204-MF-03B_2014-08-14_params.csv
+2025-10-28 16:54:57,313 - INFO - ✅ Processamento concluído:
+2025-10-28 16:54:57,313 - INFO -    🔧 Funções de proteção processadas: 147
+2025-10-28 16:54:57,313 - INFO -    ⚙️ Configurações processadas: 190
+2025-10-28 16:54:57,320 - INFO - ✅ Conectado ao PostgreSQL
+2025-10-28 16:54:57,320 - INFO - ============================================================
+2025-10-28 16:54:57,320 - INFO - 📊 VALIDAÇÃO RESULTADO FINAL:
+2025-10-28 16:54:57,321 - INFO -    EQUIPMENT_PROTECTION_FUNCTIONS: 147
+2025-10-28 16:54:57,321 - INFO -    FUNCTIONS_ENABLED: 13
+2025-10-28 16:54:57,322 - INFO -    FUNCTIONS_DISABLED: 134
+2025-10-28 16:54:57,323 - INFO -    RELAY_SETTINGS: 190
+2025-10-28 16:54:57,323 - INFO -    SETTINGS_ENABLED: 190
+2025-10-28 16:54:57,323 - INFO - ============================================================
+2025-10-28 16:54:57,323 - INFO - 🎉 CORREÇÃO DA ARQUITETURA CONCLUÍDA COM SUCESSO!
+2025-10-28 16:54:57,323 - INFO - ✅ CAUSA RAIZ TRATADA: Status ENABLED/DISABLED implementado

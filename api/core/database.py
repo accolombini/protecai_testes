@@ -15,13 +15,19 @@ from api.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Configurar engine do SQLAlchemy
+# Configurar engine do SQLAlchemy com pool robusto
 engine = create_engine(
     settings.DATABASE_URL,
     connect_args={
         "options": "-c search_path=relay_configs,public"
     },
-    echo=True if settings.LOG_LEVEL == "DEBUG" else False
+    echo=True if settings.LOG_LEVEL == "DEBUG" else False,
+    # 🔧 CONFIGURAÇÃO ROBUSTA DO POOL DE CONEXÕES
+    pool_size=10,              # Número de conexões mantidas no pool
+    max_overflow=20,           # Conexões extras permitidas além do pool_size
+    pool_timeout=30,           # Timeout para obter conexão do pool (segundos)
+    pool_recycle=3600,         # Reciclar conexões a cada hora
+    pool_pre_ping=True,        # Verificar conexão antes de usar (evita "connection closed")
 )
 
 # Session maker
@@ -77,3 +83,35 @@ def check_schema():
     except Exception as e:
         logger.error(f"❌ Erro ao verificar schema: {e}")
         return False
+
+def cleanup_connections():
+    """
+    🔧 ROBUSTEZ: Limpa conexões idle e reseta pool
+    Usar durante desenvolvimento para evitar "too many clients"
+    """
+    try:
+        logger.info("🔄 Limpando pool de conexões...")
+        engine.dispose()
+        logger.info("✅ Pool de conexões resetado")
+        return True
+    except Exception as e:
+        logger.error(f"❌ Erro ao limpar conexões: {e}")
+        return False
+
+def get_connection_stats():
+    """
+    📊 Retorna estatísticas do pool de conexões
+    Útil para debugging de connection leaks
+    """
+    try:
+        pool = engine.pool
+        return {
+            "pool_size": pool.size(),
+            "checked_in": pool.checkedin(),
+            "checked_out": pool.checkedout(),
+            "overflow": pool.overflow(),
+            "total_connections": pool.size() + pool.overflow()
+        }
+    except Exception as e:
+        logger.error(f"❌ Erro ao obter stats: {e}")
+        return None

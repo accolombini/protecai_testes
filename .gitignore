@@ -214,6 +214,8 @@ docker/postgres/logs/
 
 # Project specific outputs that should not be tracked
 outputs/logs/
+# EXCEÇÃO: Manter logs organizacionais importantes (movidos da raiz)
+!outputs/logs/*.log
 outputs/logs_backup_*/
 outputs/norm_csv/
 outputs/norm_excel/
@@ -268,6 +270,8 @@ Direcionadores_PROTECAI.docx
 
 # SQL documentation files (keep only final versions)
 docs/
+# EXCEÇÃO: Manter docs de status organizacionais
+!docs/status/
 
 # ================================
 # NOVOS PATTERNS - ORGANIZAÇÃO 27/OUT/2025  

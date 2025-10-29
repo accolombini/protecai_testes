@@ -1,0 +1,103 @@
+
+# ProtecAI - Docker Compose ÚNICO E CONSOLIDADO
+# =============================================
+# Arquivo ÚNICO para todo o projeto - SEM DUPLICAÇÕES
+# 
+# USO:
+#   docker compose up -d          # Start containers
+#   docker compose down           # Stop containers  
+#   docker compose config         # Validate config
+#   docker compose logs postgres  # View logs
+
+services:
+  # PostgreSQL Database - Core do ProtecAI
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-protecai
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: protecai_db
+      POSTGRES_USER: protecai
+      POSTGRES_PASSWORD: protecai
+      POSTGRES_INITDB_ARGS: "--data-checksums --encoding=UTF8 --locale=C"
+      PGDATA: /var/lib/postgresql/data/pgdata
+      TZ: America/Sao_Paulo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docs/SCHEMA_CONFIGURACOES_RELES_CORRETO.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U protecai -d protecai_db -h localhost"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    networks:
+      - protecai_network
+
+  # Adminer - Interface Web para PostgreSQL
+  adminer:
+    image: adminer:4-standalone
+    container_name: adminer-protecai
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: pepa-linha
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - protecai_network
+
+  # ProtecAI API (desabilitado - usar dev server local)
+  # Habilitar apenas para produção usando: docker compose --profile api up -d
+  protecai-api:
+    profiles: ["api", "production"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: protecai-api
+    restart: unless-stopped
+    environment:
+      POSTGRES_SERVER: postgres
+      POSTGRES_USER: protecai
+      POSTGRES_PASSWORD: protecai
+      POSTGRES_DB: protecai_db
+      POSTGRES_PORT: 5432
+      PYTHONPATH: /app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./outputs:/app/outputs:rw
+      - ./inputs:/app/inputs:ro
+      - ./api:/app/api:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - protecai_network
+
+volumes:
+  postgres_data:
+    name: protecai_postgres_data
+    driver: local
+
+networks:
+  protecai_network:
+    name: protecai_network
+    driver: bridgeVeja 
