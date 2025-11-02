@@ -332,3 +332,19 @@ test_file.txt
 ~$*.docx
 ~$*.xlsx
 ~$*.pptx
+
+# ================================
+# ARQUIVOS DE TESTE E OUTPUTS TEMPORÁRIOS
+# Data: 02/11/2025
+# ================================
+
+# Arquivos de teste gerados automaticamente
+test_filename.csv
+test_report.pdf
+test_report.xlsx
+tests/test_filename.csv
+outputs/reports/test_report.*
+
+# Logs de processamento universal (gerados automaticamente)
+outputs/logs/universal_relay_processing.log
+outputs/logs/*_processing.log
