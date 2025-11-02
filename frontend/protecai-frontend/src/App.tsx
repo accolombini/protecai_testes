@@ -4,9 +4,10 @@ import RealFileUpload from './components/RealFileUpload'
 import SimpleAPITest from './components/SimpleAPITest'
 import MainDashboard from './components/MainDashboard'
 import Reports from './components/Reports'
+import DatabaseSchema from './components/DatabaseSchema'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'upload' | 'api' | 'test'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'upload' | 'api' | 'database' | 'test'>('dashboard')
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -65,6 +66,16 @@ function App() {
                 🔗 API Integration
               </button>
               <button
+                onClick={() => setActiveTab('database')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  activeTab === 'database'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                💾 Database Schema
+              </button>
+              <button
                 onClick={() => setActiveTab('test')}
                 className={`px-4 py-2 rounded-md font-medium transition-colors ${
                   activeTab === 'test'
@@ -85,6 +96,7 @@ function App() {
         {activeTab === 'reports' && <Reports />}
         {activeTab === 'upload' && <RealFileUpload />}
         {activeTab === 'api' && <SimpleAPITest />}
+        {activeTab === 'database' && <DatabaseSchema />}
         {activeTab === 'test' && <TestComponent />}
       </main>
 

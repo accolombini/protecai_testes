@@ -24,6 +24,8 @@ interface SystemStats {
   totalEquipments: number;
   totalImports: number;
   totalEndpoints: number;
+  totalPaths: number;        // Paths únicos (URLs)
+  totalMethods: number;       // Métodos HTTP totais
   postgresRecords: number;
   systemStatus: 'healthy' | 'warning' | 'error';
 }
@@ -35,6 +37,8 @@ const MainDashboard: React.FC = () => {
     totalEquipments: 50,
     totalImports: 0,
     totalEndpoints: 64,
+    totalPaths: 75,            // Será atualizado dinamicamente
+    totalMethods: 81,          // Será atualizado dinamicamente
     postgresRecords: 470,
     systemStatus: 'healthy'
   });
@@ -95,8 +99,19 @@ const MainDashboard: React.FC = () => {
         console.log(`✅ DESCOBERTAS ${discoveredAPIs.length} APIs: ${discoveredAPIs.map(api => api.name).join(', ')}`);
         setApiStatuses(discoveredAPIs);
         
-        // Atualizar contagem de endpoints
-        setSystemStats(prev => ({ ...prev, totalEndpoints: allPaths.length }));
+        // Calcular paths únicos e métodos HTTP totais
+        const totalPaths = allPaths.length;
+        const totalMethods = Object.values(openapi.paths).reduce((sum: number, path: any) => {
+          return sum + Object.keys(path).filter(key => ['get', 'post', 'put', 'delete', 'patch'].includes(key.toLowerCase())).length;
+        }, 0);
+        
+        // Atualizar contagens (mantém totalEndpoints para compatibilidade)
+        setSystemStats(prev => ({ 
+          ...prev, 
+          totalEndpoints: totalPaths,  // Compatibilidade
+          totalPaths: totalPaths,      // Paths únicos
+          totalMethods: totalMethods   // Métodos HTTP totais
+        }));
         
       } else {
         console.warn('⚠️ OpenAPI não disponível, usando APIs conhecidas');
@@ -295,12 +310,20 @@ const MainDashboard: React.FC = () => {
         <div className="bg-purple-900 rounded-lg p-6 border border-purple-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-200 text-sm font-medium">Endpoints</p>
-              <p className="text-3xl font-bold text-white">{systemStats.totalEndpoints}</p>
+              <p className="text-purple-200 text-sm font-medium">API Endpoints</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-2xl font-bold text-white">{systemStats.totalPaths}</p>
+                <p className="text-purple-300 text-sm">paths</p>
+                <p className="text-purple-400 text-lg">|</p>
+                <p className="text-2xl font-bold text-white">{systemStats.totalMethods}</p>
+                <p className="text-purple-300 text-sm">operations</p>
+              </div>
             </div>
             <CodeBracketIcon className="h-12 w-12 text-purple-400" />
           </div>
-          <p className="text-purple-200 text-sm mt-2">Sistema Enterprise!</p>
+          <p className="text-purple-200 text-xs mt-2">
+            {systemStats.totalPaths} endpoints únicos • {systemStats.totalMethods} operações HTTP
+          </p>
         </div>
 
         <div className="bg-orange-900 rounded-lg p-6 border border-orange-700">

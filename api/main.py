@@ -24,7 +24,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Imports dos módulos do projeto
-from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway, reports
+from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway, reports, database, system_test
 from api.core.config import settings
 from api.core.database import engine, get_db
 
@@ -85,6 +85,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Content-Disposition"],  # CRITICAL: Permitir que frontend leia o header customizado
 )
 
 # Incluir routers
@@ -149,6 +150,19 @@ app.include_router(
     prefix="/api/v1/reports",
     tags=["Reports"],
     responses={400: {"description": "Invalid report parameters"}},
+)
+
+app.include_router(
+    database.router,
+    prefix="/api/v1",
+    tags=["Database"],
+    responses={500: {"description": "Database schema error"}},
+)
+
+app.include_router(
+    system_test.router,
+    tags=["System Test"],
+    responses={500: {"description": "System test error"}},
 )
 
 # Event handlers
@@ -266,16 +280,35 @@ async def health_connections():
 @app.get("/api/v1/info", tags=["Info"])
 async def api_info():
     """Informações detalhadas da API"""
+    # Contar endpoints dinamicamente do OpenAPI
+    try:
+        from fastapi.openapi.utils import get_openapi
+        openapi_schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            routes=app.routes,
+        )
+        total_paths = len(openapi_schema.get("paths", {}))
+        total_methods = sum(len(methods) for methods in openapi_schema.get("paths", {}).values())
+    except:
+        total_paths = 0
+        total_methods = 0
+    
     return {
         "name": "ProtecAI API",
         "description": "Sistema Integrado de Proteção de Relés",
         "version": "1.0.0",
+        "endpoints_info": {
+            "total_paths": total_paths,
+            "total_http_methods": total_methods,
+            "note": "paths = unique URLs, methods = GET+POST+PUT+DELETE count"
+        },
         "architecture": {
             "database": "PostgreSQL with relay_configs + ml_gateway schemas",
             "etap_integration": "Simulator interface + etapPy™ API",
             "ml_module": "Reinforcement Learning (preparatory)",
             "ml_gateway": "Enterprise ML/RL Gateway for external teams",
-            "endpoints": "50+",
+            "endpoints": f"{total_paths} paths, {total_methods} methods",
             "models": "Equipment, Protection, ML Jobs, ML Results"
         },
         "capabilities": {
@@ -287,7 +320,8 @@ async def api_info():
             "ml_optimization": "planned",
             "ml_gateway_integration": "enterprise ready",
             "external_ml_teams": "comprehensive support",
-            "selectivity_validation": True
+            "selectivity_validation": True,
+            "reports": "✅ CSV, XLSX, PDF exports"
         },
         "contact": {
             "team": "ProtecAI Team",
