@@ -1,594 +1,546 @@
-# 🛡️ PROTECAI_TESTES
+# ProtecAI - Sistema de Proteção Elétrica Industrial
 
-Sistema completo **enterprise-grade** para **extração, normalização, armazenamento e integração ETAP** de parâmetros de proteção elétrica com arquitetura universal para **QUALQUER fabricante de relé**.
-
-## 🌟 Funcionalidades
-
-### 🏗️ **CORE SYSTEM (Fase Original)**
-✅ **Extração Universal**: Processa PDFs, CSV, Excel de MiCOM S1 Agile, Easergy Studio e outros  
-✅ **Normalização ANSI/IEEE**: Padronização automática com códigos internacionais  
-✅ **Base PostgreSQL**: Estrutura normalizada enterprise para análises complexas  
-✅ **Docker Compose**: Ambiente robusto PostgreSQL 16 + Adminer  
-✅ **Pipeline Completo**: Automatização end-to-end com validação rigorosa  
-
-### 🚀 **ETAP INTEGRATION (Fase Enterprise - TODO #8 ✅ CONCLUÍDO)**
-✅ **Arquitetura Universal**: Suporte automático para **QUALQUER fabricante** (Schneider, ABB, Siemens, GE, SEL, Genérico)  
-✅ **ETAP Models Enterprise**: 8 tabelas SQLAlchemy com relacionamentos complexos  
-✅ **REST API Completa**: 18 endpoints FastAPI para integração bidirecional  
-✅ **CSV Bridge**: Compatibilidade total com fluxo atual da Petrobras  
-✅ **Detecção Automática**: Identifica fabricante e padrões IEEE/IEC/PETROBRAS automaticamente  
-✅ **Performance Otimizada**: Processa 7,000+ dispositivos/segundo  
-✅ **Extensibilidade Total**: Adiciona novos fabricantes sem modificar código  
-
-### 📊 **DADOS REAIS VALIDADOS**
-🎯 **MiCOM P143**: 338 parâmetros reais processados com 100% precisão  
-🎯 **Easergy P3**: 151 parâmetros reais validados completamente  
-🎯 **Padrões Suportados**: IEEE C37.2, IEC 61850, PETROBRAS N-2182  
-🎯 **Coordenação & Seletividade**: Análise automática com curvas de proteção  
+**Sistema enterprise-grade para extração, normalização e análise de parâmetros de proteção elétrica de subestações industriais.**
 
 ---
 
-## 📂 Estrutura de diretórios
+## 📋 Sumário
 
-```
-protecai_testes/
-├─ inputs/                  # 📁 Entradas (PDFs, Excel, CSV, TXT)
-│  ├─ pdf/                 # PDFs dos relés (MiCOM, Easergy, etc.)
-│  ├─ csv/                 # CSVs de outras fontes  
-│  ├─ txt/                 # Arquivos texto estruturados
-│  ├─ xlsx/                # Planilhas Excel/LibreOffice
-│  └─ registry/            # Controle de arquivos processados
-├─ outputs/
-│  ├─ csv/                 # 🎯 CSV padronizado (Code, Description, Value)
-│  ├─ excel/               # Arquivos .xlsx extraídos
-│  ├─ norm_csv/            # CSVs normalizados para importação
-│  ├─ norm_excel/          # Versões Excel dos dados normalizados
-│  ├─ atrib_limpos/        # Arquivos com valores/unidades separados
-│  ├─ doc/                 # Documentação e códigos normalizados
-│  └─ logs/                # Logs de execução e importação
-├─ api/                     # 🚀 **NOVA ARQUITETURA ETAP ENTERPRISE**
-│  ├─ main.py              # FastAPI application principal
-│  ├─ schemas.py           # Pydantic schemas para validação
-│  ├─ core/                # Configurações e database engine
-│  ├─ models/              # 🏗️ SQLAlchemy Models (8 tabelas ETAP)
-│  │  ├─ etap_models.py    # Models específicos para integração ETAP
-│  │  └─ equipment_models.py # Models de equipamentos
-│  ├─ routers/             # 🌐 REST API Endpoints (18 endpoints)
-│  │  ├─ etap.py           # Endpoints ETAP integration
-│  │  ├─ equipments.py     # Gestão de equipamentos
-│  │  ├─ compare.py        # Comparação de configurações
-│  │  └─ validation.py     # Validação de dados
-│  └─ services/            # 🧠 Business Logic Layer
-│     ├─ etap_service.py           # Core ETAP operations
-│     ├─ etap_integration_service.py # Integration orchestration
-│     ├─ csv_bridge.py             # CSV compatibility bridge
-│     ├─ universal_relay_processor.py # 🌍 Universal manufacturer support
-│     └─ validation_service.py     # Validação enterprise
-├─ docker/
-│  └─ postgres/            # Configuração Docker PostgreSQL + Adminer
-├─ docs/                   # 📚 Documentação SQL e modelagem
-├─ src/                    # 🔧 Core processing engines
-│  ├─ app.py               # CLI principal: extração de PDFs
-│  ├─ normalizador.py      # Normalização com códigos ANSI
-│  ├─ pipeline_completo.py # Pipeline end-to-end
-│  ├─ universal_format_converter.py # Conversor universal
-│  ├─ parsers/             # Funções de parsing PDF
-│  └─ utils/               # Utilitários diversos
-├─ tests/                  # 🧪 Testes automatizados + ETAP integration tests
-└─ test_etap_*.py          # 🎯 Testes específicos ETAP (100% success rate)
-```
+- [Visão Geral](#visão-geral)
+- [Arquitetura do Sistema](#arquitetura-do-sistema)
+- [Funcionalidades](#funcionalidades)
+- [Requisitos](#requisitos)
+- [Instalação](#instalação)
+- [Uso](#uso)
+- [API REST](#api-rest)
+- [Estrutura de Diretórios](#estrutura-de-diretórios)
+- [Banco de Dados](#banco-de-dados)
+- [Desenvolvimento](#desenvolvimento)
+- [Padrões de Qualidade](#padrões-de-qualidade)
+- [Licença](#licença)
 
 ---
 
-## 🚀 ETAP INTEGRATION ENTERPRISE (TODO #8 ✅ CONCLUÍDO)
+## 🎯 Visão Geral
 
-### 🎯 **ARQUITETURA UNIVERSAL IMPLEMENTADA**
+ProtecAI é um sistema robusto desenvolvido para o setor de engenharia de proteção elétrica da Petrobras, capaz de processar automaticamente configurações de relés de proteção de **qualquer fabricante** (Schneider Electric, General Electric, ABB, Siemens, SEL, etc.) e gerar relatórios consolidados para análise técnica.
 
-O sistema agora suporta **QUALQUER fabricante de relé** através de detecção automática e processamento padronizado:
+### Princípios Fundamentais
 
-#### 🌍 **Fabricantes Suportados**
-- ✅ **Schneider Electric** (MiCOM P143, P14x series)
-- ✅ **ABB** (REF/REM series, 615 series)  
-- ✅ **Siemens** (7SJ/7SA/7UT series)
-- ✅ **General Electric** (D/G series, Multilin)
-- ✅ **SEL** (SEL-387, SEL-421, etc.)
-- ✅ **Generic IEC/IEEE** (padrões internacionais)
-
-#### 🏗️ **Componentes Enterprise**
-
-**1. ETAP Models (8 Tabelas SQLAlchemy)**
-```bash
-# Modelos enterprise com relacionamentos complexos
-api/models/etap_models.py
-- EtapStudy (estudos de coordenação)
-- EtapEquipmentConfig (configurações de equipamentos)
-- ProtectionCurve (curvas de proteção)
-- CoordinationResult (resultados de coordenação)
-- SimulationResult (resultados de simulação)
-- EtapSyncLog (logs de sincronização)
-- EtapFieldMapping (mapeamento de campos)
-- EtapImportHistory (histórico de importações)
-```
-
-**2. REST API FastAPI (18 Endpoints)**
-```bash
-# API completa para integração bidirecional
-api/routers/etap.py
-- POST /etap/studies/ (criar estudos)
-- GET /etap/studies/{study_id} (consultar estudos)
-- POST /etap/equipment-config/ (configurar equipamentos)
-- GET /etap/coordination-analysis/{study_id} (análise coordenação)
-- GET /etap/protection-curves/ (curvas de proteção)
-# + 13 endpoints adicionais
-```
-
-**3. Universal Relay Processor**
-```bash
-# Detecção automática e processamento universal
-api/services/universal_relay_processor.py
-- UniversalRelayDetector (identifica fabricante)
-- UniversalRelayProcessor (processa qualquer relé)
-- ManufacturerStandard (enum de fabricantes)
-- ParameterCategory (classificação IEEE/IEC/PETROBRAS)
-```
-
-**4. CSV Bridge & Integration**
-```bash
-# Compatibilidade total com fluxo atual
-api/services/csv_bridge.py (400+ linhas)
-api/services/etap_integration_service.py
-- import_csv_to_study() (importação CSV → ETAP)
-- export_study_to_csv() (exportação ETAP → CSV)
-- batch_processing() (processamento em lote)
-```
-
-### 📊 **DADOS REAIS VALIDADOS (100% SUCCESS)**
-
-**🎯 Performance Benchmarks:**
-- **MiCOM P143**: 338 parâmetros processados em 0.047s
-- **Easergy P3**: 151 parâmetros processados em 0.021s  
-- **Throughput**: 7,251 dispositivos/segundo
-- **Detecção**: 100% precisão de fabricante
-- **Padrões**: IEEE C37.2, IEC 61850, PETROBRAS N-2182
-
-**🏆 Quality Metrics:**
-- ✅ **Tests Passed**: 6/6 (100.0%)
-- ✅ **Quality Grade**: A+
-- ✅ **Status**: PRODUCTION READY
-- ✅ **Coverage**: Universal manufacturer support
-- ✅ **Extensibilidade**: Zero-code new manufacturer addition
-
-### 🔧 **Como usar ETAP Integration**
-
-#### 1. Iniciar API Enterprise
-```bash
-# Navegar para o diretório da API
-cd api/
-
-# Iniciar FastAPI server
-uvicorn main:app --reload --port 8000
-
-# API disponível em: http://localhost:8000
-# Documentação automática: http://localhost:8000/docs
-```
-
-#### 2. Processamento Universal
-```bash
-# Teste completo da arquitetura universal
-python test_etap_universal.py
-
-# Resultados esperados:
-# ✅ Database Universal Setup PASSED
-# ✅ Universal Device Detection PASSED (6 devices, 4 manufacturers)
-# ✅ Real Data Universal Processing PASSED (489 parameters)
-# ✅ ETAP Integration Universal PASSED
-# ✅ System Extensibility PASSED
-# ✅ Performance & Scalability PASSED (7000+ devices/sec)
-```
-
-#### 3. Integração CSV → ETAP
-```bash
-# Exemplo de uso via API
-curl -X POST "http://localhost:8000/etap/import-csv-study/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "study_name": "Coordenação Petrobras 2025",
-    "csv_file_path": "outputs/csv/tela1_params.csv",
-    "auto_detect_manufacturer": true
-  }'
-```
-
-### 🌟 **Vantagens da Arquitetura Universal**
-
-🎯 **Extensibilidade**: Adicione novos fabricantes sem modificar código  
-🔧 **Manutenção**: Lógica única para todos os fabricantes  
-📊 **Consistência**: Padronização automática IEEE/IEC/PETROBRAS  
-🚀 **Performance**: Processamento otimizado 7000+ dispositivos/segundo  
-🛡️ **Confiabilidade**: Detecção automática reduz erros humanos  
-🌍 **Universalidade**: Suporte para QUALQUER relé futuro  
+- **ROBUSTEZ**: Sistema crítico para operação de subestações elétricas
+- **FLEXIBILIDADE**: Adapta-se automaticamente a novos fabricantes/modelos
+- **DADOS REAIS**: Zero tolerância a dados fictícios (mock/fake)
+- **CAUSA RAIZ**: Problemas sempre corrigidos na origem, não sintomas
+- **SEGURANÇA**: Vidas dependem da precisão dos dados de proteção
 
 ---
 
-## 🐳 Docker + PostgreSQL (Recomendado)
+## �️ Arquitetura do Sistema
 
-### 0. Configuração inicial (apenas primeira vez)
-
-Certifique-se de que o arquivo `.env` existe em `docker/postgres/`:
-
-```bash
-# Verificar se o arquivo .env existe
-ls docker/postgres/.env
-
-# Se não existir, criar com as configurações padrão:
-cat > docker/postgres/.env << 'EOF'
-POSTGRES_USER=protecai
-POSTGRES_PASSWORD=protecai
-POSTGRES_DB=protecai_db
-POSTGRES_PORT=5432
-TZ=America/Sao_Paulo
-EOF
+```
+┌─────────────────┐
+│   Arquivos      │  PDF, TXT, S40, XLSX, CSV
+│   de Entrada    │  (Múltiplos fabricantes)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Conversor      │  Universal Format Converter
+│  Universal      │  Detecção automática de formato
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  CSV            │  Formato padronizado:
+│  Padronizado    │  Code | Description | Value
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  PostgreSQL     │  Banco normalizado (3NF)
+│  Database       │  protec_ai schema
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  REST API       │  FastAPI + SQLAlchemy
+│  (FastAPI)      │  18+ endpoints
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Frontend       │  React + TypeScript
+│  (React)        │  Dashboards e relatórios
+└─────────────────┘
 ```
 
-### 1. Subir o ambiente Docker
+### Componentes Principais
 
-```bash
-# Navegar para o diretório do Docker
-cd docker/postgres
-
-# Subir PostgreSQL + Adminer
-docker compose up -d
-
-# Verificar se os containers estão rodando
-docker compose ps
-```
-
-**Serviços disponíveis:**
-- **PostgreSQL 16**: `localhost:5432`
-- **Adminer** (interface web): http://localhost:8080
-
-**Credenciais padrão:**
-- **Usuário**: protecai
-- **Senha**: protecai
-- **Database**: protecai_db
-
-### 2. Acessar o banco PostgreSQL
-
-**Via psql (linha de comando):**
-```bash
-# Entrar no container PostgreSQL
-docker exec -it postgres-protecai psql -U protecai -d protecai_db
-
-# Ou diretamente do host (se tiver psql instalado)
-# Será solicitada a senha: protecai
-psql -h localhost -p 5432 -U protecai -d protecai_db
-```
-
-**Via Adminer (interface web):**
-1. Acesse: http://localhost:8080
-2. **⚠️ IMPORTANTE**: Mude "Sistema" de "MySQL" para "PostgreSQL"
-3. **Sistema**: PostgreSQL (NÃO deixe MySQL!)
-4. **Servidor**: postgres-protecai
-5. **Usuário**: protecai
-6. **Senha**: protecai
-7. **Base de dados**: protecai_db
-
-### 3. Gerenciar o ambiente Docker
-#### Atenção lembrar de entrar no repositório onde se encontra o docker-compose.yaml
-```bash
-# 🟢 PARAR containers (mantém dados) - RECOMENDADO para pausa temporária
-docker compose stop
-
-# 🟡 Reiniciar containers parados
-docker compose start
-
-# 🟠 PARAR e REMOVER containers (mantém dados persistentes, mas remove containers)
-docker compose down
-
-# 🔴 PARAR e REMOVER TUDO incluindo dados - ⚠️ MUITO CUIDADO!
-docker compose down -v
-```
-
-**💡 Dica**: Para pausar o trabalho, use sempre `docker compose stop`!
+1. **Universal Format Converter**: Converte qualquer formato para CSV padronizado
+2. **Relay Processor**: Detecta fabricante, extrai metadados, importa para DB
+3. **PostgreSQL Database**: Armazena dados normalizados (3NF)
+4. **REST API**: Expõe dados via FastAPI (JSON, CSV, XLSX, PDF)
+5. **Frontend**: Interface React para visualização e geração de relatórios
 
 ---
 
-## ⚙️ Preparando o ambiente Python
+## ✨ Funcionalidades
 
-### 1. Criar ambiente virtual
-```bash
-# Com virtualenvwrapper (macOS/Linux)
-mkvirtualenv -p python3 protecai_testes
-workon protecai_testes
+### Processamento de Dados
 
-# Ou com venv padrão
-python3 -m venv venv
+- ✅ **Extração Universal**: PDF (PyPDF2), TXT, S40/S41/S80 (Schneider), XLSX, CSV
+- ✅ **Detecção Automática**: Identifica fabricante através de regex patterns
+- ✅ **Normalização ANSI/IEEE**: Padronização com códigos internacionais
+- ✅ **Consolidação**: Elimina duplicatas e variações de nomes
+- ✅ **Rastreabilidade**: Logs detalhados de todas as operações
 
-# Ativar ambiente virtual:
-source venv/bin/activate     # macOS/Linux
-# ou
-venv\Scripts\activate        # Windows
+### Relatórios e Análises
+
+- ✅ **Metadados Dinâmicos**: Fabricantes, modelos, bays, status extraídos do DB
+- ✅ **Filtros Avançados**: Combinação de múltiplos critérios
+- ✅ **Exportação Multi-formato**: CSV, XLSX, PDF com headers descritivos
+- ✅ **Nomes Inteligentes**: `REL_SCHN-P220_20251102_150530.csv`
+- ✅ **Performance Otimizada**: Queries com indexes, ~18ms para 50 equipamentos
+
+### Integração e Extensibilidade
+
+- ✅ **REST API Completa**: 18+ endpoints documentados (OpenAPI/Swagger)
+- ✅ **Banco Normalizado**: Schema 3NF com relacionamentos corretos
+- ✅ **Docker Compose**: PostgreSQL 16 + Adminer containerizados
+- ✅ **Extensível**: Novos fabricantes sem modificação de código  
+
+---
+
+## � Requisitos
+
+### Software
+
+- **Python**: 3.12+
+- **PostgreSQL**: 16+ (via Docker)
+- **Docker**: 20+ e Docker Compose
+- **Node.js**: 18+ (para frontend)
+
+### Bibliotecas Python
+
+```txt
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.10
+pydantic==2.5.1
+pandas==2.3.2
+openpyxl==3.1.5
+reportlab==4.0.7
+PyPDF2==3.0.1
+python-docx==1.2.0
 ```
 
-### 2. Instalar dependências
+Ver `requirements.txt` para lista completa.
+
+---
+
+## 🚀 Instalação
+
+### 1. Clone o Repositório
+
 ```bash
+git clone https://github.com/accolombini/protecai_testes.git
+cd protecai_testes
+```
+
+### 2. Configure Ambiente Virtual Python
+
+```bash
+# Criar ambiente virtual
+python3 -m venv protecai_testes
+
+# Ativar (Linux/macOS)
+source protecai_testes/bin/activate
+
+# Ativar (Windows)
+protecai_testes\Scripts\activate
+
+# Instalar dependências
 pip install -r requirements.txt
 ```
 
+### 3. Configurar PostgreSQL (Docker)
+
+```bash
+# Navegar para diretório Docker
+cd docker/postgres
+
+# Verificar arquivo .env (criado automaticamente)
+cat .env
+
+# Subir containers
+docker compose up -d
+
+# Verificar status
+docker compose ps
+```
+
+**Serviços Disponíveis:**
+- PostgreSQL: `localhost:5432`
+- Adminer (UI): http://localhost:8080
+
+**Credenciais Padrão:**
+- Usuário: `protecai`
+- Senha: `protecai`
+- Database: `protecai_db`
+
+### 4. Inicializar Banco de Dados
+
+```bash
+# Voltar para raiz do projeto
+cd ../..
+
+# Criar schema protec_ai e tabelas (automático no primeiro uso)
+# ou execute manualmente:
+PGPASSWORD=protecai psql -h localhost -U protecai -d protecai_db -f docs/SCHEMA_CONFIGURACOES_RELES_CORRETO.sql
+```
+
 ---
 
-## 🚀 Fluxo de trabalho completo
+## � Uso
 
-### NOVA ARQUITETURA UNIFICADA (2025-10-18)
+### Processamento de Arquivos
 
-🔥 **IMPORTANTE**: O sistema agora usa arquitetura unificada onde **TODOS** os formatos são convertidos para CSV padronizado antes do processamento.
-
-```
-inputs/{pdf,txt,xlsx,csv} → [CONVERSOR UNIVERSAL] → outputs/csv/ → [PIPELINE ÚNICO]
-```
-
-### 1. Conversão Universal → CSV Padronizado
+#### Fluxo Completo (Recomendado)
 
 ```bash
-# Converter TODOS os formatos para CSV padronizado
+# 1. Converter todos os formatos para CSV padronizado
 python src/universal_format_converter.py
 
-# Resultado: Todos os arquivos em formato (Code, Description, Value) em outputs/csv/
-```
-
-### 2. Pipeline Completo Unificado
-
-```bash
-# Pipeline completo: conversão + normalização + importação
+# 2. Pipeline completo: conversão + normalização + importação
 python src/pipeline_completo.py
 
-# Apenas conversão (para testar)
-python src/pipeline_completo.py --only-extract
-
-# Pular normalização
-python src/pipeline_completo.py --skip-normalization
-```
-
-### 3. Normalização ANSI (Automática no Pipeline)
-
-```bash
-# Já incluída no pipeline completo, mas pode ser executada separadamente:
-python src/normalizador.py
-
-# Gera arquivos em outputs/norm_csv/ e outputs/norm_excel/
-```
-
-### 4. Importação para PostgreSQL (Automática no Pipeline)
-
-**Importante**: Certifique-se que o Docker está rodando primeiro!
-
-```bash
-# Já incluída no pipeline completo, mas pode ser executada separadamente:
-python src/importar_dados_normalizado.py
-
-# Verifica log de importação
+# 3. Verificar logs
 cat outputs/logs/relatorio_importacao.json
 ```
 
-### ✨ Vantagens da Arquitetura Unificada
-
-🎯 **Consistência**: Todos os formatos seguem o mesmo pipeline após conversão
-🔧 **Manutenção**: Apenas um fluxo de processamento para manter
-📊 **Comparabilidade**: Dados padronizados facilitam análise comparativa
-🚀 **Performance**: Menos duplicação de código e lógica
-🛡️ **Confiabilidade**: Reduz pontos de falha no sistema
-
-### 📁 Estrutura de Diretórios Atualizada
-
-```
-inputs/
-├── pdf/          # PDFs dos relés (MiCOM, Easergy, etc.)
-├── txt/          # Arquivos texto estruturados
-├── xlsx/         # Planilhas Excel/LibreOffice
-├── csv/          # CSVs de outras fontes
-└── registry/     # Controle de arquivos processados
-
-outputs/
-├── csv/          # 🎯 CSV padronizado (Code, Description, Value)
-├── atrib_limpos/ # Dados limpos para normalização
-├── norm_csv/     # Dados normalizados (CSV)
-├── norm_excel/   # Dados normalizados (Excel)
-└── logs/         # Relatórios de processamento
-```
-
-### 5. Validar importação
+#### Processamento Específico
 
 ```bash
-# Executar validações pós-importação
-python src/validar_dados_importacao.py
+# Apenas extração de PDFs
+python src/app.py
+
+# Apenas normalização ANSI
+python src/normalizador.py
+
+# Apenas importação para PostgreSQL
+python src/importar_dados_normalizado.py
 ```
+
+### API REST
+
+#### Iniciar Servidor
+
+```bash
+cd api/
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Acessos:**
+- API: http://localhost:8000
+- Documentação: http://localhost:8000/docs
+- Health Check: http://localhost:8000/health
+
+#### Endpoints Principais
+
+```bash
+# Metadados para filtros
+curl http://localhost:8000/api/v1/reports/metadata
+
+# Exportar relatório CSV
+curl "http://localhost:8000/api/v1/reports/export/csv?status=ACTIVE" \
+  -o relatorio.csv
+
+# Exportar relatório PDF
+curl "http://localhost:8000/api/v1/reports/export/pdf?manufacturer=Schneider" \
+  -o relatorio.pdf
+```
+
+### Frontend
+
+```bash
+cd frontend/protecai-frontend
+npm install
+npm run dev
+```
+
+Acesse: http://localhost:5173
 
 ---
 
-## 📊 Explorando os dados no PostgreSQL
+## 🌐 API REST
 
-### Estrutura das tabelas
+### Endpoints de Relatórios
 
-```sql
--- Verificar estrutura do schema
-\dt protec_ai.*
+| Método | Endpoint | Descrição | Performance |
+|--------|----------|-----------|-------------|
+| GET | `/api/v1/reports/metadata` | Metadados dinâmicos | ~18ms |
+| POST | `/api/v1/reports/preview` | Preview com paginação | ~18ms |
+| GET | `/api/v1/reports/export/csv` | Exportar CSV | ~16ms |
+| GET | `/api/v1/reports/export/xlsx` | Exportar Excel | ~564ms |
+| GET | `/api/v1/reports/export/pdf` | Exportar PDF | ~27ms |
 
--- Tabelas principais:
--- • fabricantes (6 registros: Schneider, ABB, GE, etc.)
--- • tipos_token (11 tipos: ANSI, IEEE, IEC, etc.)  
--- • arquivos (arquivos CSV processados)
--- • campos_originais (códigos e descrições originais)
--- • valores_originais (valores extraídos dos PDFs)
--- • tokens_valores (tokens normalizados com confiança)
-```
+### Exemplo de Resposta - Metadata
 
-### Consultas úteis
-
-```sql
--- Ver todos os fabricantes
-SELECT * FROM protec_ai.fabricantes;
-
--- Dados completos (via view)
-SELECT * FROM protec_ai.vw_dados_completos LIMIT 10;
-
--- Códigos ANSI encontrados
-SELECT * FROM protec_ai.vw_codigos_ansi;
-
--- Campos por fabricante
-SELECT * FROM protec_ai.vw_campos_por_fabricante;
-
--- Estatísticas de importação
-SELECT 
-    COUNT(*) as total_campos,
-    COUNT(DISTINCT arquivo_id) as arquivos_processados
-FROM protec_ai.campos_originais;
-```
-
-### Views disponíveis
-
-1. **`vw_dados_completos`**: Visão consolidada de todos os dados
-2. **`vw_codigos_ansi`**: Apenas registros com códigos ANSI válidos  
-3. **`vw_campos_por_fabricante`**: Agrupamento por fabricante
-
----
-
-## 🔧 Scripts utilitários
-
-### Limpeza de valores/unidades
-```bash
-# Separar valores numéricos das unidades
-python -m src.utils.split_units
-
-# Saída em outputs/atrib_limpos/ com sufixo _clean.xlsx
-```
-
-### Geração de documentação
-```bash
-# Gerar documentação dos códigos normalizados  
-python -m src.utils.generate_docx_documentation
-
-# Saída em outputs/doc/
-```
-
----
-
-## 🧪 Testes e validação
-
-```bash
-# Executar testes automatizados
-pytest tests/
-
-# Verificar logs de importação
-ls -la outputs/logs/
-
-# Validar dados no PostgreSQL
-python src/validar_dados_importacao.py
-```
-
----
-
-## 📝 Logs e relatórios
-
-### Locais importantes:
-- **`outputs/logs/relatorio_importacao.json`**: Status da última importação
-- **`outputs/logs/importacao_normalizada.log`**: Log detalhado do processo
-- **`outputs/doc/`**: Documentação gerada automaticamente
-
-### Exemplo de relatório de importação:
 ```json
 {
-  "arquivos_processados": 2,
-  "fabricantes_inseridos": 6,
-  "tipos_token_inseridos": 11,
-  "campos_inseridos": 486,
-  "valores_inseridos": 332,
-  "tokens_inseridos": 332,
-  "erros": [],
-  "duracao_segundos": 1.1
+  "manufacturers": [
+    {
+      "code": "GE",
+      "name": "General Electric",
+      "count": 8
+    },
+    {
+      "code": "SE",
+      "name": "Schneider Electric",
+      "count": 42
+    }
+  ],
+  "models": [
+    {
+      "code": "P220",
+      "name": "P220",
+      "manufacturer_code": "SE",
+      "count": 20
+    }
+  ],
+  "bays": [
+    {
+      "name": "52-MP-08B",
+      "count": 1
+    }
+  ],
+  "statuses": [
+    {
+      "code": "ACTIVE",
+      "label": "Ativo",
+      "count": 50
+    }
+  ]
 }
 ```
 
 ---
 
-## 🔍 Troubleshooting
+## � Estrutura de Diretórios
 
-### Docker não sobe
-```bash
-# Verificar se as portas estão livres
-lsof -i :5432  # PostgreSQL
-lsof -i :8080  # Adminer
-
-# Recriar containers
-docker compose down
-docker compose up -d --force-recreate
-
-# Ou reiniciar serviços
-docker compose restart
+```
+protecai_testes/
+├── api/                      # REST API (FastAPI)
+│   ├── main.py              # Application principal
+│   ├── core/                # Configurações
+│   ├── models/              # SQLAlchemy models
+│   ├── routers/             # Endpoints REST
+│   ├── schemas/             # Pydantic schemas
+│   └── services/            # Business logic
+│
+├── inputs/                   # Arquivos de entrada
+│   ├── pdf/                 # PDFs de relés
+│   ├── txt/                 # Arquivos texto
+│   ├── xlsx/                # Planilhas Excel
+│   └── csv/                 # CSVs externos
+│
+├── outputs/                  # Arquivos gerados
+│   ├── csv/                 # CSVs convertidos
+│   ├── norm_csv/            # CSVs normalizados
+│   ├── excel/               # Excel exportados
+│   ├── reports/             # Relatórios gerados
+│   └── logs/                # Logs de processamento
+│
+├── scripts/                  # Scripts de processamento
+│   ├── universal_robust_relay_processor.py
+│   ├── test_sepam_voltage_fix.py
+│   └── ...
+│
+├── src/                      # Core processing engines
+│   ├── app.py               # Extração de PDFs
+│   ├── universal_format_converter.py
+│   ├── normalizador.py      # Normalização ANSI
+│   └── pipeline_completo.py # Pipeline unificado
+│
+├── tests/                    # Testes automatizados
+├── docker/                   # Docker configs
+│   └── postgres/            # PostgreSQL setup
+│
+├── frontend/                 # Interface React
+│   └── protecai-frontend/
+│
+├── requirements.txt          # Dependências Python
+├── docker-compose.yml        # Orquestração Docker
+└── README.md                 # Esta documentação
 ```
 
-### Erro de conexão PostgreSQL
+---
+
+## �️ Banco de Dados
+
+### Schema `protec_ai`
+
+**Tabelas Principais:**
+
+```sql
+-- Fabricantes de relés
+fabricantes (
+    id SERIAL PRIMARY KEY,
+    codigo_fabricante VARCHAR(50),
+    nome_completo VARCHAR(200),
+    pais_origem VARCHAR(100)
+)
+
+-- Modelos de relés
+relay_models (
+    id SERIAL PRIMARY KEY,
+    model_code VARCHAR(100),
+    manufacturer_id INTEGER REFERENCES fabricantes(id),
+    model_name VARCHAR(200),
+    voltage_class VARCHAR(50),
+    technology VARCHAR(50)
+)
+
+-- Equipamentos instalados
+relay_equipment (
+    id SERIAL PRIMARY KEY,
+    equipment_tag VARCHAR(100) UNIQUE,
+    relay_model_id INTEGER REFERENCES relay_models(id),
+    serial_number VARCHAR(100),
+    bay_name VARCHAR(100),
+    status VARCHAR(20),
+    installation_date DATE
+)
+
+-- Barramentos (bays)
+bays (
+    id SERIAL PRIMARY KEY,
+    bay_code VARCHAR(50) UNIQUE,
+    voltage_level VARCHAR(20),
+    bay_type VARCHAR(50)
+)
+```
+
+### Consultas Úteis
+
+```sql
+-- Ver todos equipamentos
+SELECT * FROM protec_ai.relay_equipment;
+
+-- Equipamentos por fabricante
+SELECT f.nome_completo, COUNT(*) as total
+FROM protec_ai.relay_equipment re
+JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+GROUP BY f.nome_completo;
+
+-- Modelos mais utilizados
+SELECT rm.model_name, COUNT(*) as total
+FROM protec_ai.relay_equipment re
+JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+GROUP BY rm.model_name
+ORDER BY total DESC;
+```
+
+---
+
+## �️ Desenvolvimento
+
+### Executar Testes
+
 ```bash
-# Verificar se o container está rodando
+# Todos os testes
+pytest tests/
+
+# Teste específico
+pytest tests/test_ml_gateway_api_complete.py -v
+
+# Com cobertura
+pytest --cov=api tests/
+```
+
+### Formatação de Código
+
+```bash
+# Black (formatter)
+black api/ src/ scripts/
+
+# isort (imports)
+isort api/ src/ scripts/
+
+# flake8 (linting)
+flake8 api/ src/ scripts/
+```
+
+### Debug
+
+```bash
+# Logs detalhados
+tail -f outputs/logs/universal_relay_processing.log
+
+# Verificar conexão PostgreSQL
+docker exec -it postgres-protecai psql -U protecai -d protecai_db
+
+# Ver containers
 docker compose ps
-
-# Ver logs do PostgreSQL
 docker compose logs postgres-protecai
-
-# Testar conexão
-docker exec -it postgres-protecai psql -U protecai -d protecai_db -c "SELECT version();"
-```
-
-### Erro na importação
-```bash
-# Verificar log detalhado
-cat outputs/logs/relatorio_importacao.json
-
-# Verificar estrutura do banco
-docker exec -it postgres-protecai psql -U protecai -d protecai_db -c "\dt protec_ai.*"
 ```
 
 ---
 
-## 🚀 Próximos passos
+## ✅ Padrões de Qualidade
 
-### 🎯 **ROADMAP PÓS TODO #8**
+### Princípios de Código
 
-#### **🔥 TODO #6: etapPy™ API Preparation (PRÓXIMO)**
-- **Objetivo**: Migração do CSV Bridge para API nativa Python
-- **Benefícios**: Integração direta sem dependência de arquivos
-- **Arquitetura**: Utilizar a base universal já implementada
+- **Docstrings**: Google Style em todas as funções públicas
+- **Type Hints**: Python 3.12+ type annotations
+- **Error Handling**: Try/except com logging detalhado
+- **Logging**: Estruturado (timestamp, level, message)
+- **Commits**: Conventional Commits (feat:, fix:, docs:, etc.)
 
-#### **🧠 TODO #7: ML Reinforcement Learning**
-- **Objetivo**: Machine Learning para análise de coordenação/seletividade
-- **Base**: Dados estruturados do sistema universal
-- **Algoritmos**: Análise de padrões nos 7000+ dispositivos processados
+### Dados Reais Validados
 
-#### **🌟 Funcionalidades Futuras**
-- **Dashboard Analítico**: Interface web para visualização dos dados ETAP
-- **Relatórios Avançados**: Geração automática de relatórios de coordenação  
-- **Integração Cloud**: Deploy para ambiente de produção Petrobras
-- **API Gateway**: Gerenciamento de acesso e autenticação enterprise
-- **Real-time Monitoring**: Monitoramento em tempo real das análises
+- **50 equipamentos** catalogados
+- **2 fabricantes**: General Electric (8), Schneider Electric (42)
+- **6 modelos** reais: P143, P241, P122, P220, P922, SEPAM S40
+- **43 barramentos** (bays) distintos
+- **Zero mock/fake data**: 100% dados reais da Petrobras
 
----
+### Performance
 
-## 🏆 **CONQUISTAS TÉCNICAS**
-
-### ✅ **TODO #8 ETAP Integration - COMPLETADO COM EXCELÊNCIA**
-- **📊 Dados Reais**: 489 parâmetros Petrobras processados
-- **🌍 Universalidade**: 6 fabricantes suportados automaticamente  
-- **⚡ Performance**: 7,251 dispositivos/segundo comprovados
-- **🏗️ Arquitetura**: 8 tabelas + 18 endpoints + Universal Processor
-- **🎯 Qualidade**: 100% testes aprovados, Grade A+, Production Ready
-
-### 🔧 **Legado Técnico Original**
-- **API REST**: Desenvolver API para consultar dados normalizados ✅ **CONCLUÍDO**
-- **Dashboard**: Interface web para visualização dos dados 🚧 **PLANEJADO**
-- **ML Pipeline**: Algoritmos de análise de padrões nos parâmetros 🚧 **TODO #7**
-- **Exportação avançada**: Relatórios customizados em múltiplos formatos ✅ **CONCLUÍDO**
-- **Integração CI/CD**: Automatizar testes e deployments 🚧 **FUTURO**
+- Metadata endpoint: ~18ms
+- Export CSV: ~16ms
+- Export XLSX: ~564ms
+- Export PDF: ~27ms
+- Processamento: 7,000+ dispositivos/segundo
 
 ---
 
 ## 📄 Licença
 
-Este projeto é destinado para uso interno da Petrobras no contexto de proteção elétrica.
+Projeto proprietário desenvolvido para Petrobras.  
+**Uso restrito:** Engenharia de Proteção Elétrica.
+
+---
+
+## � Equipe
+
+**Desenvolvimento:** ProtecAI Engineering Team  
+**Cliente:** Petrobras - Engenharia de Proteção  
+**Data:** Outubro/Novembro 2025  
+**Versão:** 1.0.0
+
+---
+
+## 🆘 Suporte
+
+Para questões técnicas ou reportar problemas:
+
+1. Verifique logs em `outputs/logs/`
+2. Consulte documentação da API: http://localhost:8000/docs
+3. Revise STATUS.md para estado atual do projeto
+
+---
+
+**⚡ Sistema Crítico - Vidas Dependem da Precisão dos Dados ⚡**
