@@ -1,16 +1,50 @@
 #!/usr/bin/env python3
 """
-SOLUÇÃO UNIVERSAL ROBUSTA: PROCESSAMENTO DOS 50 ARQUIVOS REAIS
-Sistema ProtecAI - PETROBRAS
-Data: 28 de outubro de 2025
+Universal Robust Relay Processor - Sistema de Processamento Universal de Relés
+=============================================================================
 
-CAUSA RAIZ TRATADA: 
-- Arquitetura UNIVERSAL que processa QUALQUER formato (PDF, TXT, S40, XLSX, CSV)
-- Não usa "parsers específicos" - usa conversor universal existente
-- ROBUSTA e FLEXÍVEL - suporta novos formatos sem modificação
-- ELIMINA a necessidade de scripts específicos por formato
+Script principal para processamento robusto e flexível de arquivos de configuração
+de relés de proteção elétrica de QUALQUER fabricante.
 
-PRINCÍPIOS: ARQUITETURA UNIVERSAL, ZERO PARSERS ESPECÍFICOS, CAUSA RAIZ TRATADA
+**ARQUITETURA UNIVERSAL:**
+    Processa automaticamente arquivos em múltiplos formatos:
+        - PDF: Extraído via PyPDF2 + regex patterns
+        - TXT: Parsing estruturado linha a linha
+        - S40/S41/S80: Arquivos proprietários Schneider SEPAM
+        - XLSX/CSV: Planilhas e tabelas pré-processadas
+    
+    Todos os formatos são convertidos para CSV padronizado (Code, Description, Value)
+    antes de serem importados para o banco de dados PostgreSQL.
+
+**CAUSA RAIZ SOLUCIONADA:**
+    - Problema: Scripts específicos por formato causavam duplicação e manutenção complexa
+    - Solução: Conversor universal que detecta formato e aplica parser apropriado
+    - Benefício: Adicionar novo formato requer apenas novo método em UniversalFormatConverter
+
+**CORREÇÃO CRÍTICA - SEPAM VOLTAGE_CLASS:**
+    Método `extract_voltage_class_from_sepam()` corrige causa raiz de voltage_class
+    vazio para modelos SEPAM S40:
+        - Lê `tension_primaire_nominale` dos arquivos .S40 processados
+        - Converte 13800V → 13.8kV
+        - Atualiza relay_models automaticamente
+    
+**PRINCÍPIOS DE DESIGN:**
+    - ROBUSTO: Tratamento de erros em todas as etapas
+    - FLEXÍVEL: Adapta-se automaticamente a novos fabricantes/modelos
+    - ZERO MOCK: Processa apenas arquivos reais da Petrobras
+    - CAUSA RAIZ: Extração de dados dos arquivos originais, não valores hardcoded
+
+**DADOS REAIS PROCESSADOS:**
+    - 50 equipamentos catalogados
+    - 2 fabricantes: General Electric (8), Schneider Electric (42)
+    - 6 modelos reais: P143, P241, P122, P220, P922, SEPAM S40
+    - 43 barramentos (bays) distintos
+
+Author: ProtecAI Engineering Team
+Project: ProtecAI - Sistema de Proteção Elétrica Petrobras
+Date: 2025-10-28
+Version: 2.0.0
+Last Update: 2025-11-02 - SEPAM voltage_class root cause fix
 """
 
 import os
@@ -49,8 +83,56 @@ logger = logging.getLogger(__name__)
 
 class UniversalRobustRelayProcessor:
     """
-    Processador UNIVERSAL que usa a arquitetura flexível existente
-    para processar QUALQUER formato de arquivo de relé
+    Processador universal para arquivos de configuração de relés de proteção.
+    
+    Classe principal que orquestra todo o fluxo de processamento:
+        1. Conversão universal (PDF/TXT/S40 → CSV padronizado)
+        2. Detecção automática de fabricante via regex patterns
+        3. Extração de metadados (modelo, voltage_class, bay, etc)
+        4. Criação/atualização de fabricantes e modelos no PostgreSQL
+        5. Importação de equipamentos com relacionamentos corretos
+    
+    **ARQUITETURA:**
+        Utiliza UniversalFormatConverter para conversão de formatos,
+        garantindo que todos os arquivos sejam processados uniformemente.
+    
+    **DETECÇÃO DE FABRICANTE:**
+        Usa patterns regex definidos em `manufacturer_patterns` para
+        identificar fabricante através de marcas d'água em PDFs, headers
+        em TXTs, ou metadados em arquivos proprietários (.S40).
+        
+    **CORREÇÃO SEPAM VOLTAGE_CLASS:**
+        Método `extract_voltage_class_from_sepam()` corrige causa raiz:
+            - Lê tension_primaire_nominale dos arquivos .S40 processados
+            - Converte 13800V → 13.8kV automaticamente
+            - Atualiza relay_models sem intervenção manual
+    
+    **ROBUSTEZ:**
+        - Tratamento de exceções em todas as operações
+        - Logging detalhado de erros e sucessos
+        - Verificação de duplicatas via equipment_tags
+        - Rollback automático em caso de falha crítica
+    
+    **FLEXIBILIDADE:**
+        - Suporta novos fabricantes adicionando pattern em manufacturer_patterns
+        - Adapta-se a novos modelos automaticamente
+        - Processa novos formatos via UniversalFormatConverter
+    
+    Attributes:
+        base_dir (Path): Diretório raiz do projeto
+        inputs_dir (Path): Diretório de arquivos de entrada
+        outputs_csv_dir (Path): Diretório de CSVs convertidos
+        db_config (dict): Configuração de conexão PostgreSQL
+        manufacturer_patterns (dict): Regex patterns para detecção de fabricante
+        manufacturer_cache (dict): Cache de IDs de fabricantes
+        model_cache (dict): Cache de IDs de modelos
+        equipment_tags (set): Tags de equipamentos já processados (anti-duplicata)
+    
+    Example:
+        >>> processor = UniversalRobustRelayProcessor()
+        >>> processor.connect_database()
+        >>> processor.run_universal_converter()
+        >>> processor.process_all_converted_files()
     """
     
     def __init__(self):

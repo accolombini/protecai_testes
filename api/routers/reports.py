@@ -1,11 +1,31 @@
 """
-Reports Router - Endpoints para Geração de Relatórios
-====================================================
+Reports Router - API REST para Geração de Relatórios
+===================================================
 
-Endpoints robustos para:
-- Metadados (fabricantes, modelos, status, etc)
-- Exportação multi-formato (CSV, XLSX, PDF)
-- Filtros avançados (família, barramento, sistema)
+Módulo responsável pelos endpoints REST para geração e exportação de
+relatórios de equipamentos de proteção elétrica.
+
+**ENDPOINTS DISPONÍVEIS:**
+    - GET /metadata: Metadados dinâmicos para filtros (fabricantes, modelos, bays)
+    - POST /preview: Visualização prévia com paginação
+    - GET /export/csv: Exportação em formato CSV
+    - GET /export/xlsx: Exportação em formato Excel
+    - GET /export/pdf: Exportação em formato PDF
+
+**PRINCÍPIOS DE DESIGN:**
+    - ROBUSTO: Validação de entrada, tratamento de erros, logging detalhado
+    - FLEXÍVEL: Filtros opcionais combinados, adapta-se a novos dados
+    - ZERO MOCK: Todos os dados do PostgreSQL real
+    - CAUSA RAIZ: Queries dinâmicas, não listas hardcoded
+
+**SEGURANÇA:**
+    Sistema crítico para operação de subestações elétricas.
+    Dados precisos são essenciais para tomada de decisão.
+
+Author: ProtecAI Engineering Team
+Project: ProtecAI - Sistema de Proteção Elétrica Petrobras
+Date: 2025-11-02
+Version: 1.0.0
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -26,15 +46,52 @@ logger = logging.getLogger(__name__)
 @router.get("/metadata", response_model=MetadataResponse)
 async def get_report_metadata(db: Session = Depends(get_db)):
     """
-    📊 **Metadados para Relatórios**
+    Retorna metadados dinâmicos para popular filtros de relatórios.
     
-    Retorna todas as opções disponíveis para filtros de relatórios:
-    - **Fabricantes** com contagem de equipamentos
-    - **Modelos** com código do fabricante e contagem
-    - **Barramentos** com contagem
-    - **Status** com labels em português e contagem
+    Endpoint principal para obter todas as opções disponíveis de filtros,
+    com contadores de equipamentos por categoria.
     
-    Usado para popular dropdowns no frontend.
+    **DADOS RETORNADOS:**
+        - Fabricantes: código, nome completo, quantidade de equipamentos
+        - Modelos: código, nome, fabricante associado, quantidade
+        - Barramentos (bays): código único, quantidade de equipamentos
+        - Status: código, label em português, quantidade
+    
+    **CONSOLIDAÇÃO AUTOMÁTICA:**
+        Modelos com variações de nome (SEPAM S40, SEPAM_S40) são
+        consolidados em uma única entrada com contagem somada.
+    
+    **PERFORMANCE:**
+        - Típico: ~18ms para 50 equipamentos
+        - Queries otimizadas com JOINs e agregações SQL
+        - Cache possível em produção (Redis)
+    
+    Returns:
+        MetadataResponse: Estrutura com manufacturers, models, bays, statuses
+        
+    Raises:
+        HTTPException: 500 se houver erro na conexão com banco de dados
+        
+    Example Response:
+        ```json
+        {
+            "manufacturers": [
+                {"code": "GE", "name": "General Electric", "count": 8},
+                {"code": "SE", "name": "Schneider Electric", "count": 42}
+            ],
+            "models": [
+                {"code": "P220", "name": "P220", "manufacturer_code": "SE", "count": 20},
+                {"code": "P122", "name": "P122", "manufacturer_code": "SE", "count": 13}
+            ],
+            "bays": [
+                {"name": "52-MP-08B", "count": 1},
+                {"name": "52-MF-02A", "count": 2}
+            ],
+            "statuses": [
+                {"code": "ACTIVE", "label": "Ativo", "count": 50}
+            ]
+        }
+        ```
     """
     try:
         service = ReportService(db)
@@ -49,7 +106,18 @@ async def get_report_metadata(db: Session = Depends(get_db)):
 
 @router.get("/manufacturers")
 async def get_manufacturers(db: Session = Depends(get_db)):
-    """🏭 Lista de fabricantes únicos do banco"""
+    """
+    Retorna lista de fabricantes com contagem de equipamentos.
+    
+    Endpoint auxiliar para obter apenas informações de fabricantes,
+    útil para dropdowns simplificados ou análises específicas.
+    
+    Returns:
+        dict: {"manufacturers": [...], "total": int}
+        
+    Raises:
+        HTTPException: 500 em caso de erro no banco de dados
+    """
     try:
         service = ReportService(db)
         metadata = await service.get_metadata()
@@ -66,7 +134,22 @@ async def get_models(
     manufacturer: Optional[str] = Query(None, description="Filtrar por fabricante"),
     db: Session = Depends(get_db)
 ):
-    """📱 Lista de modelos únicos"""
+    """
+    Retorna lista de modelos, opcionalmente filtrados por fabricante.
+    
+    Endpoint auxiliar para obter modelos disponíveis, com filtro opcional
+    por fabricante para facilitar seleção hierárquica no frontend.
+    
+    Args:
+        manufacturer: Nome do fabricante para filtrar (case-insensitive)
+    
+    Returns:
+        dict: {"models": [...], "total": int, "manufacturer_filter": str|None}
+        
+    Example:
+        GET /models?manufacturer=Schneider
+        Retorna apenas modelos Schneider Electric
+    """
     try:
         service = ReportService(db)
         metadata = await service.get_metadata()
