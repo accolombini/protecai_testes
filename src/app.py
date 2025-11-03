@@ -1,32 +1,53 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-app.py — Extrator de parâmetros de proteção MULTI-FORMATO com controle de processamento
+Extrator de parâmetros de proteção MULTI-FORMATO com controle de processamento.
 
-VERSÃO 2.0 - MULTI-FORMATO:
-- Suporta: PDF, TXT, XLSX, CSV
-- Nova estrutura: inputs/{pdf,txt,xlsx,csv}/
-- Controle de arquivos processados (evita reprocessamento)
-- Detecção automática de formato (MiCOM S1 Agile, Easergy Studio, etc.)
-- FileRegistryManager integrado
+Este módulo é responsável pela extração de dados de configuração de relés de
+proteção a partir de múltiplos formatos de arquivo (PDF, TXT, XLSX, CSV).
 
-FORMATOS SUPORTADOS:
-  • PDF: Relatórios MiCOM S1 Agile e Easergy Studio
-  • TXT: Arquivos de texto estruturados com parâmetros
-  • XLSX: Planilhas Excel com dados de configuração
-  • CSV: Arquivos CSV com estrutura Code,Description,Value
+**Author:** ProtecAI Engineering Team  
+**Project:** PETRO_ProtecAI  
+**Date:** 2025-10-18  
+**Version:** 2.0
 
-Estrutura de diretórios aceita:
-  inputs/pdf/      - Relatórios PDF
-  inputs/txt/      - Configurações TXT
-  inputs/xlsx/     - Planilhas Excel
-  inputs/csv/      - Dados CSV
+Formatos Suportados:
+    • PDF: Relatórios MiCOM S1 Agile e Easergy Studio (PyPDF2)
+    • TXT: Arquivos de texto estruturados com parâmetros
+    • XLSX: Planilhas Excel com dados de configuração (openpyxl)
+    • CSV: Arquivos CSV com estrutura Code,Description,Value
 
-Execução com exemplos:
-  python app.py --inputs arquivo1.pdf arquivo2.xlsx --config config.txt
-  python app.py --help
+Estrutura de Diretórios:
+    inputs/pdf/      - Relatórios PDF de relés
+    inputs/txt/      - Configurações em formato texto
+    inputs/xlsx/     - Planilhas Excel
+    inputs/csv/      - Dados em formato CSV
+    outputs/csv/     - CSVs extraídos padronizados
+    outputs/excel/   - Arquivos XLSX gerados
 
-Opções específicas:
+Características:
+    - Detecção automática de formato (MiCOM S1 Agile, Easergy Studio)
+    - FileRegistryManager integrado (evita reprocessamento)
+    - Validação de encoding (UTF-8, Latin-1, CP1252)
+    - Logging detalhado de todas operações
+
+Princípios:
+    - CAUSA RAIZ: Detecta formato através de padrões, não extensão de arquivo
+    - ROBUSTEZ: Tenta múltiplos encodings antes de falhar
+    - ZERO MOCK: Processa apenas dados reais de arquivos existentes
+
+Examples:
+    Extração básica de PDF:
+        $ python app.py --inputs relatorio.pdf
+    
+    Processamento de múltiplos formatos:
+        $ python app.py --inputs arquivo1.pdf arquivo2.xlsx --config config.txt
+    
+    Com opções avançadas:
+        $ python app.py --inputs data.pdf --output outputs/custom/ --format xlsx
+
+Usage:
+    python app.py [--inputs FILES] [--output DIR] [--format FORMAT] [--help]
 """
 
 from __future__ import annotations

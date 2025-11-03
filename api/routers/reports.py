@@ -173,7 +173,28 @@ async def get_models(
 
 @router.get("/bays")
 async def get_bays(db: Session = Depends(get_db)):
-    """🔌 Lista de barramentos únicos"""
+    """
+    Lista todos os barramentos (bays) cadastrados no sistema com contagem de equipamentos.
+    
+    Returns:
+        Dict com:
+            - bays: Lista de dicionários {"name": str, "count": int}
+            - total: Número total de barramentos distintos
+    
+    Raises:
+        HTTPException: 500 se houver erro na consulta ao banco
+    
+    Examples:
+        GET /api/v1/reports/bays
+        Response:
+        {
+            "bays": [
+                {"name": "52-MP-08B", "count": 1},
+                {"name": "BAY-01", "count": 3}
+            ],
+            "total": 2
+        }
+    """
     try:
         service = ReportService(db)
         metadata = await service.get_metadata()
@@ -196,9 +217,38 @@ async def export_report(
     db: Session = Depends(get_db)
 ):
     """
-    📥 **Exportar Relatório Multi-Formato**
+    Exporta relatório de equipamentos em formato CSV, XLSX ou PDF.
     
-    Exporta relatório filtrado em CSV, XLSX ou PDF.
+    Gera arquivo com dados filtrados e nome de arquivo descritivo baseado
+    nos critérios de seleção. Usa StreamingResponse para download eficiente.
+    
+    Args:
+        format: Formato desejado ("csv", "xlsx" ou "pdf")
+        manufacturer: Nome do fabricante (filtro opcional)
+        model: Código do modelo (filtro opcional)
+        status: Status do equipamento (filtro opcional)
+        bay: Nome do barramento (filtro opcional)
+        substation: Nome da subestação (filtro opcional)
+        db: Sessão do banco de dados (injetada)
+    
+    Returns:
+        StreamingResponse com arquivo para download e headers apropriados:
+            - Content-Disposition: attachment; filename="..."
+            - Content-Type: text/csv | application/vnd.openxmlformats... | application/pdf
+    
+    Raises:
+        HTTPException: 400 se formato inválido, 500 se erro na geração
+    
+    Examples:
+        GET /api/v1/reports/export/csv?manufacturer=Schneider&status=ACTIVE
+        
+        Response Headers:
+            Content-Disposition: attachment; filename="REL_SCHN_ACTIVE_20251103_143052.csv"
+            Content-Type: text/csv
+    
+    Note:
+        Formatos suportados: csv (~16ms), xlsx (~564ms), pdf (~27ms)
+        Filename gerado automaticamente: REL_[FABRICANTE]_[MODELO]_[TIMESTAMP].[ext]
     """
     try:
         service = ReportService(db)
@@ -276,24 +326,51 @@ async def preview_report(
     db: Session = Depends(get_db)
 ):
     """
-    👁️ **Preview de Relatório**
+    Preview de relatório com paginação para validar dados antes da exportação.
     
-    Visualiza dados que serão exportados antes do download.
+    Permite visualizar os equipamentos que serão incluídos no relatório
+    final antes de gerar o arquivo para download. Suporta paginação para
+    facilitar navegação em grandes conjuntos de dados.
     
-    **Parâmetros:**
-    - **manufacturer**: Filtro por fabricante (busca parcial)
-    - **model**: Filtro por modelo (busca parcial)
-    - **status**: Filtro por status (ACTIVE, BLOQUEIO, etc.)
-    - **bay**: Filtro por barramento
-    - **substation**: Filtro por subestação
-    - **page**: Número da página (default: 1)
-    - **size**: Itens por página (default: 50, max: 1000)
+    Args:
+        manufacturer: Filtro por fabricante (busca parcial, case-insensitive)
+        model: Filtro por modelo (busca parcial, case-insensitive)
+        status: Filtro por status (ACTIVE, BLOQUEIO, EM_CORTE, etc)
+        bay: Filtro por barramento (busca parcial)
+        substation: Filtro por subestação (busca parcial)
+        page: Número da página (mínimo: 1)
+        size: Itens por página (mínimo: 1, máximo: 1000)
+        db: Sessão do banco de dados (injetada)
     
-    **Retorna:**
-    - Lista de equipamentos filtrados
-    - Informações de paginação
-    - Filtros aplicados
-    - Timestamp da consulta
+    Returns:
+        PreviewResponse com:
+            - data: Lista de equipamentos da página atual
+            - pagination: {"page": int, "size": int, "total": int, "pages": int}
+            - filters: Filtros aplicados
+    
+    Raises:
+        HTTPException: 500 se houver erro na consulta
+    
+    Examples:
+        POST /api/v1/reports/preview?manufacturer=Schneider&page=1&size=10
+        
+        Response:
+        {
+            "data": [...],
+            "pagination": {
+                "page": 1,
+                "size": 10,
+                "total": 42,
+                "pages": 5
+            },
+            "filters": {
+                "manufacturer": "Schneider"
+            }
+        }
+    
+    Note:
+        Use este endpoint para validar resultados antes de exportar arquivos grandes.
+        Performance: ~18ms para query + paginação de 50 equipamentos.
     """
     try:
         service = ReportService(db)
