@@ -1,27 +1,49 @@
 #!/usr/bin/env python3
 """
-Pipeline Completo ProtecAI - Orquestrador de Processo UNIFICADO
-==============================================================
+Pipeline Completo ProtecAI - Orquestrador de Processo End-to-End UNIFICADO.
 
-NOVA ARQUITETURA UNIFICADA:
-1. Conversão Universal (inputs/{pdf,txt,xlsx,csv} → outputs/csv/ padronizado)
-2. Limpeza de dados (outputs/csv/ → outputs/atrib_limpos/)
-3. Normalização (outputs/atrib_limpos/ → outputs/norm_*)
-4. Importação para PostgreSQL (outputs/norm_csv/ → DB)
+Este módulo coordena todo o fluxo de processamento de dados de relés de proteção,
+desde a extração de arquivos até a importação final no banco PostgreSQL.
 
-BENEFÍCIOS DA UNIFICAÇÃO:
-- Pipeline único e consistente para todos os formatos
-- Facilita manutenção e debugging
-- Padronização de dados desde o início
-- Análise comparativa simplificada
+**Author:** ProtecAI Engineering Team  
+**Project:** PETRO_ProtecAI  
+**Date:** 2025-10-18  
+**Version:** 2.0 - Arquitetura Unificada
 
-Uso:
-    python src/pipeline_completo.py
-    python src/pipeline_completo.py --skip-normalization
-    python src/pipeline_completo.py --only-extract
+Arquitetura do Pipeline:
+    1. Conversão Universal: inputs/{pdf,txt,xlsx,csv} → outputs/csv/ padronizado
+    2. Limpeza de Dados: outputs/csv/ → outputs/atrib_limpos/ (separação valor/unidade)
+    3. Normalização ANSI: outputs/atrib_limpos/ → outputs/norm_csv/ + norm_excel/
+    4. Importação PostgreSQL: outputs/norm_csv/ → protec_ai schema (3NF)
 
-Autor: Sistema ProtecAI
-Data: 2025-10-18
+Benefícios da Unificação:
+    - Pipeline único e consistente para todos os formatos
+    - Facilita manutenção e debugging
+    - Padronização de dados desde o início (Code, Description, Value)
+    - Análise comparativa simplificada entre fabricantes
+    - Rastreabilidade completa via logs JSON
+
+Princípios:
+    - CAUSA RAIZ: Conversão universal evita lógica duplicada por formato
+    - ROBUSTEZ: Cada etapa valida entrada antes de processar
+    - FLEXIBILIDADE: Flags permitem execução parcial (--only-extract, --skip-normalization)
+    - ZERO MOCK: Processa apenas dados reais de arquivos existentes
+
+Examples:
+    Pipeline completo (padrão):
+        $ python src/pipeline_completo.py
+    
+    Apenas extração e conversão:
+        $ python src/pipeline_completo.py --only-extract
+    
+    Pular normalização ANSI:
+        $ python src/pipeline_completo.py --skip-normalization
+    
+    Modo verboso:
+        $ python src/pipeline_completo.py --verbose
+
+Usage:
+    python src/pipeline_completo.py [--skip-normalization] [--only-extract] [--verbose]
 """
 
 from __future__ import annotations

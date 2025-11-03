@@ -1,21 +1,50 @@
 # -*- coding: utf-8 -*-
 """
-Script principal para normalização de códigos multivalorados de proteção.
+Normalizador de Códigos de Proteção ANSI/IEEE/IEC para Sistema ProtecAI.
 
-Este script executa todo o pipeline de normalização:
-1. Lê arquivos de outputs/atrib_limpos/
-2. Detecta e normaliza códigos multivalorados 
-3. Gera Excel consolidado normalizado
-4. Gera documentação DOCX explicativa
-5. Salva ambos em outputs/doc/
+Este módulo executa todo o pipeline de normalização de códigos de funções
+de proteção, convertendo códigos proprietários de fabricantes para padrões
+internacionais (ANSI C37.2, IEEE, IEC 61850).
 
-Uso:
-    python -m src.normalizador
-    python src/normalizador.py
-    python src/normalizador.py --input-dir custom_dir --output-dir custom_out
+**Author:** ProtecAI Engineering Team  
+**Project:** PETRO_ProtecAI  
+**Date:** 2025-10-03  
+**Version:** 1.5
 
-Autor: Sistema ProtecAI
-Data: 2025-10-03
+Pipeline de Normalização:
+    1. Leitura: outputs/atrib_limpos/ (CSVs com valores/unidades separados)
+    2. Detecção: Identifica códigos multivalorados (ex: "50/51", "87T/87R")
+    3. Normalização: Mapeia códigos proprietários para ANSI/IEEE/IEC
+    4. Exportação Excel: outputs/norm_excel/ com códigos normalizados
+    5. Exportação CSV: outputs/norm_csv/ para importação PostgreSQL
+    6. Documentação: outputs/doc/ com explicação de cada código
+
+Padrões Suportados:
+    - ANSI C37.2: Códigos numéricos de funções de proteção (21, 50, 51, 87, etc)
+    - IEEE: Standards complementares de proteção
+    - IEC 61850: Nomenclatura internacional de automação
+    - PETROBRAS N-2182: Normas específicas Petrobras
+
+Princípios:
+    - CAUSA RAIZ: Normalização evita inconsistências em análises futuras
+    - ROBUSTEZ: Parser lida com formatos variados (50/51, 50-51, 50 & 51)
+    - FLEXIBILIDADE: Adicionar novos códigos sem modificar código principal
+    - RASTREABILIDADE: Documentação DOCX explica cada normalização
+
+Examples:
+    Normalização padrão:
+        $ python src/normalizador.py
+    
+    Com diretórios customizados:
+        $ python src/normalizador.py --input-dir custom_input --output-dir custom_output
+    
+    Como módulo:
+        $ python -m src.normalizador
+
+Outputs:
+    - outputs/norm_excel/: Planilhas com códigos normalizados
+    - outputs/norm_csv/: CSVs para importação PostgreSQL
+    - outputs/doc/: Documentação DOCX de códigos identificados
 """
 
 from __future__ import annotations
