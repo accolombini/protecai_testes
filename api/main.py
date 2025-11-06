@@ -24,7 +24,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Imports dos módulos do projeto
-from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway, reports, database, system_test
+from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway, reports, database, system_test, relay_config_reports
 from api.core.config import settings
 from api.core.database import engine, get_db
 
@@ -163,6 +163,12 @@ app.include_router(
     system_test.router,
     tags=["System Test"],
     responses={500: {"description": "System test error"}},
+)
+
+app.include_router(
+    relay_config_reports.router,
+    tags=["Relay Configuration Reports"],
+    responses={404: {"description": "Equipment not found"}},
 )
 
 # Event handlers

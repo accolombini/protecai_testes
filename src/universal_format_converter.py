@@ -109,14 +109,23 @@ class UniversalFormatConverter:
         print(f"❌ {msg}")
     
     def extract_text_from_pdf(self, pdf_path: Path) -> str:
-        """Extrai texto completo do PDF"""
+        """
+        Extrai texto de TODAS as páginas do PDF
+        
+        ESTRATÉGIA CORRETA: Parâmetros estão distribuídos em TODAS as páginas.
+        Checkboxes e valores textuais aparecem ao longo de todo o documento.
+        Extração híbrida: PyPDF2 (texto) + OCR (checkboxes) posteriormente.
+        """
         try:
             reader = PdfReader(str(pdf_path))
             parts = []
+            
+            # CORRIGIDO: Processar TODAS as páginas (parâmetros em todo o documento)
             for page in reader.pages:
                 text = page.extract_text()
                 if text:
                     parts.append(text)
+            
             return "\n".join(parts)
         except Exception as e:
             self.log_error(f"Erro ao extrair PDF {pdf_path.name}: {e}")
@@ -157,7 +166,8 @@ class UniversalFormatConverter:
                 continue
             elif '=' in line and detected_format == "sepam_s40":
                 key, value = line.split('=', 1)
-                code = f"{current_section}.{key.strip()}"
+                # ✅ CORREÇÃO: Usar apenas o key sem prefixo de seção
+                code = key.strip()
                 rows.append({
                     "Code": code,
                     "Description": key.strip(),
@@ -241,9 +251,13 @@ class UniversalFormatConverter:
             self.log_warning(f"Nenhum dado estruturado encontrado em {pdf_path.name}")
             return None
         
+        # CORREÇÃO CRÍTICA: Limpar valores 'None', 'nan' antes de salvar
+        df = df.replace(['None', 'nan', 'NaN', 'NAN'], '')
+        df = df.fillna('')
+        
         # Salvar CSV
         output_path = OUTPUT_CSV_DIR / f"{pdf_path.stem}_params.csv"
-        df.to_csv(output_path, index=False, encoding='utf-8')
+        df.to_csv(output_path, index=False, encoding='utf-8', na_rep="")  # ✅ CORREÇÃO: Evitar conversão None→"nan"
         
         self.log_success(f"PDF convertido: {pdf_path.name} → {output_path.name} ({len(df)} linhas, {detected_format})")
         return output_path
@@ -274,9 +288,13 @@ class UniversalFormatConverter:
                 self.log_warning(f"Nenhum dado estruturado em {txt_path.name}")
                 return None
             
+            # CORREÇÃO CRÍTICA: Limpar valores 'None', 'nan' antes de salvar
+            df = df.replace(['None', 'nan', 'NaN', 'NAN'], '')
+            df = df.fillna('')
+            
             # Salvar CSV
             output_path = OUTPUT_CSV_DIR / f"{txt_path.stem}_params.csv"
-            df.to_csv(output_path, index=False, encoding='utf-8')
+            df.to_csv(output_path, index=False, encoding='utf-8', na_rep="")  # ✅ CORREÇÃO: Evitar conversão None→"nan"
             
             self.log_success(f"TXT convertido: {txt_path.name} → {output_path.name} ({len(df)} linhas, {detected_format})")
             return output_path
@@ -325,6 +343,10 @@ class UniversalFormatConverter:
             
             # Limpar dados
             df = df[["Code", "Description", "Value"]].fillna("")
+            
+            # CORREÇÃO CRÍTICA: Substituir valores 'None' e 'nan' (string) por vazios
+            df = df.replace(['None', 'nan', 'NaN', 'NAN'], '')
+            
             df = df[df["Code"].astype(str).str.strip() != ""]  # Remover linhas sem código
             
             if df.empty:
@@ -333,7 +355,7 @@ class UniversalFormatConverter:
             
             # Salvar CSV
             output_path = OUTPUT_CSV_DIR / f"{xlsx_path.stem}_params.csv"
-            df.to_csv(output_path, index=False, encoding='utf-8')
+            df.to_csv(output_path, index=False, encoding='utf-8', na_rep="")  # ✅ CORREÇÃO: Evitar conversão None→"nan"
             
             self.log_success(f"XLSX convertido: {xlsx_path.name} → {output_path.name} ({len(df)} linhas)")
             return output_path
@@ -377,6 +399,8 @@ class UniversalFormatConverter:
             
             # Limpar dados
             df = df[["Code", "Description", "Value"]].fillna("")
+            # CORREÇÃO CRÍTICA: Limpar valores 'None', 'nan' antes de salvar
+            df = df.replace(['None', 'nan', 'NaN', 'NAN'], '')
             df = df[df["Code"].astype(str).str.strip() != ""]
             
             if df.empty:
@@ -385,7 +409,7 @@ class UniversalFormatConverter:
             
             # Salvar CSV padronizado
             output_path = OUTPUT_CSV_DIR / f"{csv_path.stem}_params.csv"
-            df.to_csv(output_path, index=False, encoding='utf-8')
+            df.to_csv(output_path, index=False, encoding='utf-8', na_rep="")  # ✅ CORREÇÃO: Evitar conversão None→"nan"
             
             self.log_success(f"CSV padronizado: {csv_path.name} → {output_path.name} ({len(df)} linhas)")
             return output_path

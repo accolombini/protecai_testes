@@ -272,6 +272,43 @@ const Reports: React.FC = () => {
         </div>
       </div>
 
+      {/* 📄 NOVO: Relatório de Setup do Relé */}
+      <div className="rounded-lg p-6 border border-blue-600 shadow-lg bg-blue-900">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-600 rounded-lg">
+            <DocumentTextIcon className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">📄 Relatório de Setup do Relé</h2>
+            <p className="text-blue-200 text-sm">Gere relatórios profissionais de configuração de relés específicos</p>
+          </div>
+        </div>
+        
+        <div className="bg-blue-950/50 rounded-lg p-4 border border-blue-700">
+          <p className="text-blue-100 mb-4">
+            ⚙️ Para gerar relatórios de setup de um relé específico, acesse a aba <strong>"⚙️ Setup de Relés"</strong> no menu principal.
+          </p>
+          <div className="text-sm text-blue-200 space-y-2">
+            <div className="flex items-start gap-2">
+              <span>✓</span>
+              <span>Selecione o relé desejado por TAG ou busca</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span>✓</span>
+              <span>Visualize todas as configurações e parâmetros</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span>✓</span>
+              <span>Gere relatórios em PDF, Excel ou CSV</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span>✓</span>
+              <span>Inclui dados completos: fabricante, modelo, bay, subestação</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Seletor de Tipo de Relatório */}
       <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
         <h2 className="text-lg font-semibold text-white mb-4">Selecione o Tipo de Relatório</h2>

@@ -135,6 +135,7 @@ class RobustRelayProcessor:
                     ('P241', 'MiCOM P241 Line Protection', 'SE'),
                     ('P922', 'MiCOM P922 Busbar Protection', 'SE'),
                     ('P922S', 'MiCOM P922S Busbar Protection', 'SE'),
+                    ('SEPAM', 'SEPAM Series Protection', 'SE'),
                     ('REF615', 'ABB REF615 Feeder Protection', 'ABB'),
                     ('RET650', 'ABB RET650 Transformer Protection', 'ABB')
                 ]
@@ -167,31 +168,33 @@ class RobustRelayProcessor:
             return False
     
     def detect_model_from_filename(self, filename):
-        """Detectar modelo do relé pelo nome do arquivo de forma FLEXÍVEL"""
-        # Normalizar nome do arquivo
-        filename_clean = filename.upper().replace('_', ' ').replace('-', ' ')
+        """Detectar modelo do relé baseado no nome do arquivo"""
+        filename_upper = filename.upper()
         
-        # Padrões flexíveis para detectar modelos
+        # 1. Detectar SEPAM: SOMENTE arquivos .S40 ou que começam com 00-MF-
+        if filename_upper.endswith('.S40') or filename.startswith('00-MF-'):
+            return 'SEPAM'
+        
+        # 2. Detectar P922S (antes de P922 para evitar falso positivo)
+        if 'P922S' in filename_upper:
+            return 'P922S'
+        
+        # 3. Detectar modelos P-series (P122, P143, P220, P241, P922)
+        # Aceita variações: P122, P_122, P 122
+        import re
+        
+        # Padrões para cada modelo (aceita P122, P_122, P 122)
         patterns = {
-            'P122': [r'P\s*122', r'P_122', r'P-122'],
-            'P143': [r'P\s*143', r'P_143', r'P-143'],
-            'P220': [r'P\s*220', r'P_220', r'P-220'],
-            'P241': [r'P\s*241', r'P_241', r'P-241'],
-            'P922': [r'P\s*922', r'P_922', r'P-922'],
-            'P922S': [r'P\s*922S', r'P_922S', r'P-922S'],
-            'REF615': [r'REF\s*615', r'REF_615', r'REF-615'],
-            'RET650': [r'RET\s*650', r'RET_650', r'RET-650']
+            'P122': r'P[\s_]?122',
+            'P143': r'P[\s_]?143', 
+            'P220': r'P[\s_]?220',
+            'P241': r'P[\s_]?241',
+            'P922': r'P[\s_]?922(?!S)'  # P922 mas não P922S
         }
         
-        for model, pattern_list in patterns.items():
-            for pattern in pattern_list:
-                if re.search(pattern, filename_clean):
-                    return model
-        
-        # Fallback: tentar extrair Pxxx do início do nome
-        match = re.match(r'^P[_\-\s]*(\d+)', filename_clean)
-        if match:
-            return f"P{match.group(1)}"
+        for model, pattern in patterns.items():
+            if re.search(pattern, filename_upper):
+                return model
         
         return None
     
@@ -221,22 +224,67 @@ class RobustRelayProcessor:
             logger.error(f"❌ Impossível ler arquivo {file_path}: {e}")
             return None
     
+    def extract_equipment_tag_from_filename(self, filename, model):
+        """Extrair equipment_tag do nome do arquivo de forma inteligente"""
+        # Remover extensão e data
+        clean_name = re.sub(r'\.(pdf|txt|S40)$', '', filename, flags=re.IGNORECASE)
+        clean_name = re.sub(r'_\d{4}-\d{2}-\d{2}', '', clean_name)
+        clean_name = re.sub(r'_params$', '', clean_name)
+        
+        # SEPAM: extrair padrão 00-MF-XX
+        if model == 'SEPAM':
+            match = re.search(r'(00-MF-\d{2})', clean_name)
+            if match:
+                tag = match.group(1)
+                return f"REL-SEPAM-{tag}"
+            # Fallback: pegar primeiros caracteres
+            return f"REL-SEPAM-{clean_name[:10]}"
+        
+        # P922S: extrair padrão XXX-YY-ZZZ
+        if model == 'P922S':
+            # Padrão: P922S_204-MF-1AC ou P922S 204-MF-1AC
+            match = re.search(r'(\d{3}-[A-Z]{2}-\d[A-Z]{1,2})', clean_name, re.IGNORECASE)
+            if match:
+                tag = match.group(1).upper()
+                return f"REL-P922S-{tag}"
+            # Fallback
+            return f"REL-P922S-{clean_name.replace('P922S', '').strip()[:15]}"
+        
+        # Outros modelos (P122, P143, P220, P241, P922)
+        # Padrões comuns: 52-MF-02A, 204-MF-03B, P122 52-MF-02A, etc.
+        
+        # Remover prefixo do modelo se presente
+        clean_name = re.sub(f'{model}[_\\s]*', '', clean_name, flags=re.IGNORECASE)
+        
+        # Extrair padrão XXX-YY-ZZZ (ex: 52-MF-02A, 204-MF-03B)
+        match = re.search(r'(\d{2,3}-[A-Z]{2}-\d{1,2}[A-Z]{0,2}\d?)', clean_name, re.IGNORECASE)
+        if match:
+            tag = match.group(1).upper()
+            # Tratar sufixos especiais (LADO_A, LADO_B, L_PATIO, L_REATOR)
+            suffix_match = re.search(r'(LADO[_\s]*[AB]|L[_\s]*(PATIO|REATOR))', clean_name, re.IGNORECASE)
+            if suffix_match:
+                suffix = suffix_match.group(1).replace('_', ' ').replace('  ', ' ').upper()
+                return f"REL-{model}-{tag}_{suffix}"
+            return f"REL-{model}-{tag}"
+        
+        # Fallback: usar nome limpo (até 30 caracteres)
+        fallback = re.sub(r'[^A-Z0-9\-]', '', clean_name.upper())[:30]
+        return f"REL-{model}-{fallback}"
+    
     def generate_unique_equipment_tag(self, filename, model):
-        """Gerar tag única para equipamento usando hash"""
-        # Criar base do tag
-        base_tag = f"REL-{model}-{filename[:15]}"
+        """Gerar tag única para equipamento"""
+        base_tag = self.extract_equipment_tag_from_filename(filename, model)
         
-        # Limpar caracteres especiais
-        base_tag = re.sub(r'[^A-Z0-9\-]', '', base_tag.upper())
-        
-        # Se já existe, adicionar hash
+        # Se já existe, adicionar sufixo numérico
         if base_tag in self.equipment_tags:
-            hash_suffix = hashlib.md5(filename.encode()).hexdigest()[:8]
-            base_tag = f"{base_tag}-{hash_suffix}"
+            counter = 1
+            while f"{base_tag}-{counter}" in self.equipment_tags:
+                counter += 1
+            base_tag = f"{base_tag}-{counter}"
         
-        # Garantir que não excede 50 caracteres
-        if len(base_tag) > 50:
-            base_tag = base_tag[:42] + hashlib.md5(filename.encode()).hexdigest()[:8]
+        # Garantir que não excede 100 caracteres (limite da coluna)
+        if len(base_tag) > 100:
+            base_tag = base_tag[:100]
         
         self.equipment_tags.add(base_tag)
         return base_tag
@@ -259,25 +307,29 @@ class RobustRelayProcessor:
             return ""
     
     def extract_relay_info_from_s40(self, file_path):
-        """Extrair informações do arquivo S40 de forma robusta"""
+        """Extrair informações do arquivo SEPAM S40 de forma robusta"""
         content = self.read_file_with_flexible_encoding(file_path)
         if not content:
             return {}
         
         info = {}
         
-        # Procurar padrões típicos em arquivos S40
+        # Padrões específicos para arquivos SEPAM .S40
         patterns = {
-            'serial_number': r'SERIAL\s*[:\=]\s*([A-Z0-9]+)',
-            'model': r'MODEL\s*[:\=]\s*([A-Z0-9]+)',
-            'firmware': r'FIRMWARE\s*[:\=]\s*([0-9\.]+)',
-            'settings': r'SETTING\s*(\d+)\s*[:\=]\s*([0-9\.]+)'
+            'application': r'application\s*=\s*(\w+)',
+            'repere': r'repere\s*=\s*([^\n]+)',
+            'modele': r'modele\s*=\s*(\d+)',
+            'serial_number': r'NS[:\s]*(\d+)',
         }
         
         for key, pattern in patterns.items():
             matches = re.findall(pattern, content, re.IGNORECASE)
             if matches:
-                info[key] = matches[0] if isinstance(matches[0], str) else matches[0][0]
+                info[key] = matches[0].strip() if isinstance(matches[0], str) else matches[0]
+        
+        # Se encontrou application=S40, marca como SEPAM
+        if info.get('application', '').upper() == 'S40':
+            info['model_type'] = 'SEPAM'
         
         return info
     
