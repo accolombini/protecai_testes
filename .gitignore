@@ -335,7 +335,7 @@ test_file.txt
 
 # ================================
 # ARQUIVOS DE TESTE E OUTPUTS TEMPORÁRIOS
-# Data: 02/11/2025
+# Data: 02/11/2025 | Atualizado: 06/11/2025
 # ================================
 
 # Arquivos de teste gerados automaticamente
@@ -348,3 +348,83 @@ outputs/reports/test_report.*
 # Logs de processamento universal (gerados automaticamente)
 outputs/logs/universal_relay_processing.log
 outputs/logs/*_processing.log
+outputs/logs/relay_processing.log
+
+# ================================
+# BACKUPS E ARQUIVOS TEMPORÁRIOS DE PIPELINE
+# Data: 06/11/2025
+# ================================
+
+# Backups automáticos de outputs
+outputs/csv_backup_*/
+outputs/excel_backup_*/
+outputs/norm_csv_backup_*/
+outputs/norm_excel_backup_*/
+outputs/pipeline_backup_*/
+
+# Análises de checkbox (geradas durante extração)
+outputs/checkbox_analysis/
+outputs/checkbox_debug/
+
+# Arquivo temporário de testes
+outputs/test_results_archive/
+
+# ================================
+# SCRIPTS DE ANÁLISE E DESENVOLVIMENTO
+# Data: 06/11/2025
+# ================================
+
+# Scripts de análise e extração (desenvolvimento)
+scripts/analyze_*.py
+scripts/extract_*.py
+scripts/test_*.py
+scripts/validate_*.py
+scripts/fix_*.py
+scripts/generate_*.py
+scripts/normalize_*.py
+scripts/populate_*.py
+scripts/rebuild_*.py
+scripts/import_*.py
+scripts/hybrid_*.py
+scripts/interactive_*.py
+scripts/precise_*.py
+scripts/frontend_*.py
+
+# Scripts SQL de desenvolvimento
+scripts/*.sql
+
+# ================================
+# TESTES E CONFIGURAÇÕES DE TESTE
+# Data: 06/11/2025
+# ================================
+
+# Configuração pytest
+pytest.ini
+
+# Testes em desenvolvimento (não commitados)
+tests/test_*.py
+tests/debug_*.py
+tests/conftest.py
+
+# Documentação de testes (manter apenas principais)
+tests/README_TESTS.md
+tests/SUMARIO_TESTES.md
+
+# ================================
+# CÓDIGO FONTE EM DESENVOLVIMENTO
+# Data: 06/11/2025
+# ================================
+
+# Módulos do pipeline em desenvolvimento
+src/enhanced_import_pipeline.py
+src/intelligent_relay_extractor.py
+
+# ================================
+# FRONTEND - CONFIGURAÇÕES DE DESENVOLVIMENTO
+# Data: 06/11/2025
+# ================================
+
+# Variáveis de ambiente do frontend
+frontend/protecai-frontend/.env.development
+frontend/protecai-frontend/.env.local
+frontend/protecai-frontend/.env.*.local
