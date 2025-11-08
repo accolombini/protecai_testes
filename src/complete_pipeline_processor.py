@@ -79,7 +79,13 @@ class CompletePipelineProcessor:
         
         # Glossário (referência universal)
         self.glossario_data = None
-        self.extractor = IntelligentRelayExtractor()
+        
+        # Template de checkbox MARCADO para Easergy
+        checkbox_template_path = self.base_dir / "outputs" / "checkbox_debug" / "templates" / "marcado_average.png"
+        
+        # Inicializar extrator inteligente (SEM template - usa densidade de pixels)
+        self.extractor = IntelligentRelayExtractor()  # Detecção por densidade, não precisa template
+        logger.info("   ✅ Extrator inicializado com detecção de checkbox por DENSIDADE DE PIXELS")
         
         logger.info("="*80)
         logger.info("🌍 PROCESSADOR COMPLETO DA PIPELINE INICIALIZADO")
