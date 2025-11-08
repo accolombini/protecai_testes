@@ -365,6 +365,11 @@ outputs/pipeline_backup_*/
 # Análises de checkbox (geradas durante extração)
 outputs/checkbox_analysis/
 outputs/checkbox_debug/
+outputs/checkbox_calibration/
+
+# Resultados de testes e relatórios (gerados automaticamente)
+outputs/test_results/
+outputs/reports/
 
 # Arquivo temporário de testes
 outputs/test_results_archive/
