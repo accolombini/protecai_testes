@@ -1,23 +1,25 @@
 """
-🌍 PROCESSADOR COMPLETO DA PIPELINE
-====================================
+🌍 PROCESSADOR COMPLETO DA PIPELINE - PASSO 1: EXTRAÇÃO BRUTA
+==============================================================
 
-Processa TODOS os arquivos de entrada (PDFs + TXTs) usando o parser universal
-e o glossário como referência de validação.
+Processa TODOS os arquivos de entrada (PDFs + TXTs) e extrai dados BRUTOS
+sem normalização/atomização.
 
 ENTRADA:
 - inputs/pdf/      (47 PDFs de configuração de relés)
 - inputs/txt/      (TXTs de configuração)
-- inputs/glossario/ (Glossário de referência)
 
-SAÍDA:
+SAÍDA (PASSO 1 - DADOS BRUTOS):
 - outputs/csv/       (CSVs brutos extraídos)
 - outputs/excel/     (Excel brutos extraídos)
-- outputs/norm_csv/  (CSVs normalizados)
-- outputs/norm_excel/(Excel normalizados)
+
+NOTA: Normalização/atomização (PASSO 2) é feita por script separado
+que lerá outputs/csv/ e gerará outputs/norm_csv/ e outputs/norm_excel/
+em formato 3FN atomizado.
 
 Autor: ProtecAI Team
 Data: 06/11/2025
+Atualizado: 10/11/2025 - Separação clara PASSO 1 (bruto) vs PASSO 2 (normalizado)
 """
 
 import sys
@@ -79,9 +81,6 @@ class CompletePipelineProcessor:
         
         # Glossário (referência universal)
         self.glossario_data = None
-        
-        # Template de checkbox MARCADO para Easergy
-        checkbox_template_path = self.base_dir / "outputs" / "checkbox_debug" / "templates" / "marcado_average.png"
         
         # Inicializar extrator inteligente (SEM template - usa densidade de pixels)
         self.extractor = IntelligentRelayExtractor()  # Detecção por densidade, não precisa template
@@ -447,9 +446,8 @@ class CompletePipelineProcessor:
                 stats['by_type']['pdf']['success'] += 1
                 stats['processed'] += 1
                 
-                # Normalizar e validar
-                normalized = self.normalize_and_validate(result, pdf_file.stem)
-                self.export_normalized(normalized, pdf_file.stem)
+                # NOTA: Normalização/atomização (PASSO 2) será feita por script separado
+                # que lerá outputs/csv/ e gerará outputs/norm_csv/ em 3FN
             else:
                 stats['by_type']['pdf']['failed'] += 1
                 stats['failed'] += 1
@@ -462,9 +460,8 @@ class CompletePipelineProcessor:
                 stats['by_type']['sepam']['success'] += 1
                 stats['processed'] += 1
                 
-                # Normalizar e validar
-                normalized = self.normalize_and_validate(result, sepam_file.stem)
-                self.export_normalized(normalized, sepam_file.stem)
+                # NOTA: Normalização/atomização (PASSO 2) será feita por script separado
+                # que lerá outputs/csv/ e gerará outputs/norm_csv/ em 3FN
             else:
                 stats['by_type']['sepam']['failed'] += 1
                 stats['failed'] += 1
