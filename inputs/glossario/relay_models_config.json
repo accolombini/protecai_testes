@@ -1,0 +1,269 @@
+{
+  "models": {
+    "MICON_P122_52": {
+      "detection_method": "checkbox",
+      "source_format": "pdf",
+      "description": "Modelo MICON_P122_52 - Detecção via checkboxes em PDF",
+      "functions": {
+        "50/51": {
+          "code_range": ["0200", "0229"],
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "code_range": ["0230", "025F"],
+          "description": "Sobrecorrente de Terra"
+        },
+        "46": {
+          "code_range": ["025D", "025D"],
+          "description": "Sequência Negativa"
+        },
+        "27": {
+          "code_range": ["0260", "028F"],
+          "description": "Subtensão"
+        },
+        "59": {
+          "code_range": ["0290", "02BF"],
+          "description": "Sobretensão"
+        }
+      },
+      "code_column": "Código",
+      "description_column": "Descrição"
+    },
+    "MICON_P122_204": {
+      "detection_method": "checkbox",
+      "source_format": "pdf",
+      "description": "Modelo MICON_P122_204 - Detecção via checkboxes em PDF",
+      "functions": {
+        "50/51": {
+          "code_range": ["0200", "0229"],
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "code_range": ["0230", "025F"],
+          "description": "Sobrecorrente de Terra"
+        },
+        "27": {
+          "code_range": ["0260", "028F"],
+          "description": "Subtensão"
+        },
+        "59": {
+          "code_range": ["0290", "02BF"],
+          "description": "Sobretensão"
+        }
+      },
+      "code_column": "Código",
+      "description_column": "Descrição"
+    },
+    "MICON_P122_205": {
+      "detection_method": "checkbox",
+      "source_format": "pdf",
+      "description": "Modelo MICON_P122_205 - Detecção via checkboxes em PDF",
+      "functions": {
+        "50/51": {
+          "code_range": ["0200", "0229"],
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "code_range": ["0230", "025F"],
+          "description": "Sobrecorrente de Terra"
+        },
+        "46": {
+          "code_range": ["025D", "025D"],
+          "description": "Sequência Negativa"
+        },
+        "27": {
+          "code_range": ["0260", "028F"],
+          "description": "Subtensão"
+        },
+        "59": {
+          "code_range": ["0290", "02BF"],
+          "description": "Sobretensão"
+        },
+        "81U/81O": {
+          "code_range": ["02C0", "02EF"],
+          "description": "Sub/Sobrefrequência"
+        },
+        "32": {
+          "code_range": ["02F0", "031F"],
+          "description": "Potência Reversa"
+        }
+      },
+      "code_column": "Código",
+      "description_column": "Descrição"
+    },
+    "MICON_P220": {
+      "detection_method": "checkbox",
+      "source_format": "pdf",
+      "description": "Modelo MICON_P220 - Detecção via checkboxes em PDF",
+      "functions": {
+        "50/51": {
+          "code_range": ["0200", "0229"],
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "code_range": ["0230", "025F"],
+          "description": "Sobrecorrente de Terra"
+        },
+        "46": {
+          "code_range": ["025D", "025D"],
+          "description": "Sequência Negativa"
+        },
+        "27": {
+          "code_range": ["0260", "028F"],
+          "description": "Subtensão"
+        },
+        "59": {
+          "code_range": ["0290", "02BF"],
+          "description": "Sobretensão"
+        },
+        "81U/81O": {
+          "code_range": ["02C0", "02EF"],
+          "description": "Sub/Sobrefrequência"
+        }
+      },
+      "code_column": "Código",
+      "description_column": "Descrição"
+    },
+    "MICON_P922": {
+      "detection_method": "checkbox",
+      "source_format": "pdf",
+      "description": "Modelo MICON_P922 - Detecção via checkboxes em PDF",
+      "functions": {
+        "50/51": {
+          "code_range": ["0200", "0229"],
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "code_range": ["0230", "025F"],
+          "description": "Sobrecorrente de Terra"
+        },
+        "46": {
+          "code_range": ["025D", "025D"],
+          "description": "Sequência Negativa"
+        },
+        "27": {
+          "code_range": ["0260", "028F"],
+          "description": "Subtensão"
+        },
+        "59": {
+          "code_range": ["0290", "02BF"],
+          "description": "Sobretensão"
+        }
+      },
+      "code_column": "Código",
+      "description_column": "Descrição"
+    },
+    "MICON_P241": {
+      "detection_method": "checkbox",
+      "source_format": "pdf",
+      "description": "Modelo MICON_P241 - Detecção via checkboxes em PDF",
+      "functions": {
+        "50/51": {
+          "code_range": ["0200", "0229"],
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "code_range": ["0230", "025F"],
+          "description": "Sobrecorrente de Terra"
+        },
+        "27": {
+          "code_range": ["0260", "028F"],
+          "description": "Subtensão"
+        },
+        "59": {
+          "code_range": ["0290", "02BF"],
+          "description": "Sobretensão"
+        },
+        "81U/81O": {
+          "code_range": ["02C0", "02EF"],
+          "description": "Sub/Sobrefrequência"
+        }
+      },
+      "code_column": "Código",
+      "description_column": "Descrição"
+    },
+    "MICON_P143": {
+      "detection_method": "function_field",
+      "source_format": "text",
+      "description": "MiCOM P143 - Detecção via campos 'I>1 Function:' no PDF",
+      "activation_pattern": "Function\\s+(\\w+)>:\\s*(Yes|No)",
+      "functions": {
+        "50/51": {
+          "activation_field": "I>",
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "activation_field": "IN",
+          "description": "Sobrecorrente de Terra"
+        },
+        "27": {
+          "activation_field": "V<",
+          "description": "Subtensão"
+        },
+        "59": {
+          "activation_field": "V>",
+          "description": "Sobretensão"
+        },
+        "81U": {
+          "activation_field": "f<",
+          "description": "Subfrequência"
+        },
+        "81O": {
+          "activation_field": "f>",
+          "description": "Sobrefrequência"
+        },
+        "46": {
+          "activation_field": "I2>",
+          "description": "Sequência Negativa"
+        }
+      },
+      "groups": [
+        "GROUP 1",
+        "GROUP 2",
+        "GROUP 3",
+        "GROUP 4"
+      ]
+    },
+    "SEPAM_S40": {
+      "detection_method": "activite_field",
+      "source_format": "ini",
+      "description": "SEPAM S40 - Detecção via campos 'activite_X='",
+      "activation_pattern": "activite_(\\d+)=([01])",
+      "functions": {
+        "27": {
+          "section": "Protection2727S",
+          "description": "Subtensão"
+        },
+        "59": {
+          "section": "Protection59",
+          "description": "Sobretensão"
+        },
+        "59N": {
+          "section": "Protection59N",
+          "description": "Sobretensão de Neutro"
+        },
+        "50/51": {
+          "section": "Protection50_51",
+          "description": "Sobrecorrente de Fase"
+        },
+        "50N/51N": {
+          "section": "Protection50_51N",
+          "description": "Sobrecorrente de Terra"
+        },
+        "46": {
+          "section": "Protection46",
+          "description": "Sequência Negativa"
+        },
+        "50BF": {
+          "section": "Protection50BF",
+          "description": "Breaker Failure"
+        }
+      }
+    }
+  },
+  "metadata": {
+    "source": "inputs/glossario/Dados_Glossario_Micon_Sepam.xlsx",
+    "version": "1.0",
+    "description": "Configuração automática extraída do glossário"
+  }
+}
