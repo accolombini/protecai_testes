@@ -278,39 +278,40 @@ class ReportService:
             Modelos duplicados (ex: "SEPAM S40" e "SEPAM_S40") são consolidados
             automaticamente usando normalização de chaves (remove '_', lowercase).
         
+        **ATUALIZAÇÃO 13/11/2025:**
+            Adicionadas métricas REAIS do banco de dados:
+            - Total de configurações (relay_settings)
+            - Total de funções de proteção
+            - Estatísticas de ativação
+            - Grupos multipart
+        
         Returns:
-            Dict[str, Any]: Dicionário com estrutura:
-                {
-                    "manufacturers": [
-                        {"code": "GE", "name": "General Electric", "count": 8},
-                        ...
-                    ],
-                    "models": [
-                        {"code": "P220", "name": "P220", "manufacturer_code": "SE", "count": 20},
-                        ...
-                    ],
-                    "bays": [
-                        {"name": "52-MP-08B", "count": 1},
-                        ...
-                    ],
-                    "statuses": [
-                        {"code": "ACTIVE", "label": "Ativo", "count": 50},
-                        ...
-                    ]
-                }
+            Dict[str, Any]: Dicionário com estrutura completa incluindo estatísticas reais
         
         Raises:
             HTTPException: Se houver erro na conexão com banco de dados
         
         Note:
             - Queries otimizadas com JOINs e agregações SQL
-            - Fabricantes sem equipamentos aparecem com count=0
-            - Modelos são consolidados por chave normalizada
-            - Performance típica: ~18ms para 50 equipamentos
+            - Todos os números são REAIS do banco de dados
+            - Performance típica: ~25ms para 50 equipamentos + 198k configs
         """
         try:
-            logger.info("Iniciando busca de metadados...")
+            logger.info("Iniciando busca de metadados REAIS...")
             with self.engine.connect() as conn:
+                # NOVO: Estatísticas gerais do sistema (DADOS REAIS!)
+                system_stats_query = text("""
+                    SELECT 
+                        (SELECT COUNT(DISTINCT id) FROM protec_ai.relay_equipment) as total_equipments,
+                        (SELECT COUNT(*) FROM protec_ai.relay_settings) as total_settings,
+                        (SELECT COUNT(*) FROM protec_ai.relay_settings WHERE is_active = true) as active_settings,
+                        (SELECT COUNT(DISTINCT id) FROM protec_ai.protection_functions) as total_functions,
+                        (SELECT COUNT(*) FROM protec_ai.multipart_groups) as multipart_groups,
+                        (SELECT COUNT(DISTINCT substation_name) FROM protec_ai.relay_equipment WHERE substation_name IS NOT NULL) as total_substations
+                """)
+                system_stats = conn.execute(system_stats_query).fetchone()
+                logger.info(f"📊 Stats reais: {system_stats.total_equipments} equipamentos, {system_stats.total_settings} configurações")
+                
                 # Manufacturers with equipment count
                 # Keep all manufacturers present in `fabricantes`, counts may be zero.
                 manufacturers_query = text("""
@@ -421,6 +422,17 @@ class ReportService:
                 logger.info(f"Metadados carregados: {len(manufacturers)} fabricantes, {len(models)} modelos, {len(bays)} barramentos")
                 
                 return {
+                    # NOVO: Estatísticas gerais do sistema (DADOS REAIS)
+                    "system_statistics": {
+                        "total_equipments": int(system_stats.total_equipments),
+                        "total_settings": int(system_stats.total_settings),
+                        "active_settings": int(system_stats.active_settings),
+                        "inactive_settings": int(system_stats.total_settings) - int(system_stats.active_settings),
+                        "total_protection_functions": int(system_stats.total_functions),
+                        "multipart_groups": int(system_stats.multipart_groups),
+                        "total_substations": int(system_stats.total_substations),
+                        "last_updated": datetime.now().isoformat()
+                    },
                     "manufacturers": [
                         {"code": m.code, "name": m.name, "count": int(m.count)}
                         for m in manufacturers

@@ -264,33 +264,89 @@ class UniversalSetupDetector:
         """
         Detecta setup ativo para relés Schneider SEPAM
         
-        Estratégia: TODOS os parâmetros são considerados ativos
-        (SEPAM exporta formato INI com apenas valores configurados)
+        Estratégia: No arquivo .S40, cada seção [ProtectionXXX] tem múltiplos grupos (_0, _1, _2, _3)
+        com um campo activite_X antes de cada grupo. Parâmetros são ativos somente se estiverem
+        ENTRE um activite_X=1 e o próximo activite_Y.
         
         Args:
             csv_path: Arquivo CSV normalizado
             
         Returns:
-            Lista de SetupParameter (todos com is_active=True)
+            Lista de SetupParameter com is_active baseado no campo activite
         """
         logger.info(f"📙 Detectando setup SEPAM: {csv_path.name}")
         
         df = pd.read_csv(csv_path)
+        
         parameters = []
+        active_count = 0
+        inactive_count = 0
+        config_count = 0
+        
+        # Estado: estamos dentro de um grupo ativo?
+        in_active_group = False
+        current_index = None
         
         for idx, row in df.iterrows():
+            code = str(row.get('Code', ''))
+            description = str(row.get('Description', ''))
+            value = str(row.get('Value', ''))
+            
+            # Detectar linha activite_X
+            if code.startswith('activite_'):
+                # Extrair índice (último número após _)
+                parts = code.split('_')
+                if len(parts) >= 2 and parts[-1].isdigit():
+                    index = parts[-1]
+                    current_index = index
+                    in_active_group = (value == '1')
+                    logger.debug(f"  🔍 {code} = {value} → grupo {index} {'ATIVO' if in_active_group else 'INATIVO'}")
+                
+                # Não incluir activite na lista final
+                continue
+            
+            # Determinar status do parâmetro atual
+            is_active = False
+            confidence = 0.8
+            detection_method = 'sepam_config'
+            
+            # Verificar se tem sufixo _X no código
+            parts = code.split('_')
+            if len(parts) >= 2 and parts[-1].isdigit():
+                param_index = parts[-1]
+                
+                # Se o índice do parâmetro bate com o grupo atual E está ativo
+                if current_index == param_index and in_active_group:
+                    is_active = True
+                    confidence = 1.0
+                    detection_method = 'sepam_activite'
+                    active_count += 1
+                else:
+                    # Índice diferente ou grupo inativo
+                    is_active = False
+                    confidence = 1.0
+                    detection_method = 'sepam_activite'
+                    inactive_count += 1
+            else:
+                # Parâmetro sem índice (configuração geral), marcar como ativo
+                is_active = True
+                confidence = 0.8
+                detection_method = 'sepam_config'
+                config_count += 1
+            
             param = SetupParameter(
-                code=str(row.get('Code', '')),
-                description=str(row.get('Description', '')),
-                value=str(row.get('Value', '')),
+                code=code,
+                description=description,
+                value=value,
                 unit=str(row.get('unit', '')),
-                is_active=True,  # ← TODOS ATIVOS!
-                confidence=1.0,   # Confiança máxima
-                detection_method='sepam_ini'
+                is_active=is_active,
+                confidence=confidence,
+                detection_method=detection_method
             )
             parameters.append(param)
         
-        logger.info(f"  ✅ {len(parameters)} parâmetros ativos (formato INI)")
+        logger.info(f"  ✅ {active_count} ativos | ❌ {inactive_count} inativos | ⚙️  {config_count} configuração")
+        logger.info(f"  📊 Total: {len(parameters)} parâmetros")
         return parameters
     
     def detect_active_setup(

@@ -18,6 +18,10 @@ try:
 except ImportError:
     fitz = None
 
+# Importar mapeamento de funções
+sys.path.insert(0, str(Path(__file__).parent))
+from map_parameters_to_functions import get_function_code_and_category
+
 # Configuração de logging
 logging.basicConfig(
     level=logging.INFO,
@@ -46,6 +50,7 @@ class NormalizedDataImporter:
         self.conn = None
         self.cursor = None
         self.manufacturer_patterns = {}  # Carregado do banco
+        self.function_map = {}  # Mapeamento function_code -> function_id
         self.stats = {
             'equipments_inserted': 0,
             'equipments_existing': 0,
@@ -53,7 +58,9 @@ class NormalizedDataImporter:
             'multipart_groups_inserted': 0,
             'units_created': 0,
             'files_processed': 0,
-            'errors': []
+            'errors': [],
+            'function_mappings': 0,
+            'category_classifications': 0
         }
         
     def connect(self):
@@ -63,10 +70,32 @@ class NormalizedDataImporter:
             self.cursor = self.conn.cursor()
             logger.info("✓ Conectado ao PostgreSQL")
             self.load_manufacturer_patterns()
+            self.load_function_map()
             return True
         except Exception as e:
             logger.error(f"✗ Erro ao conectar: {e}")
             return False
+    
+    def load_function_map(self):
+        """Carregar mapeamento function_code -> function_id do banco"""
+        try:
+            self.cursor.execute("""
+                SELECT id, function_code
+                FROM protec_ai.protection_functions
+                ORDER BY id
+            """)
+            
+            for row in self.cursor.fetchall():
+                function_id, function_code = row
+                # Armazenar primeira ocorrência de cada código (preferir IDs menores)
+                if function_code not in self.function_map:
+                    self.function_map[function_code] = function_id
+            
+            logger.info(f"✓ Carregados {len(self.function_map)} mapeamentos de funções")
+            logger.debug(f"  Funções disponíveis: {list(self.function_map.keys())}")
+        except Exception as e:
+            logger.warning(f"⚠ Erro ao carregar function_map: {e}")
+            self.function_map = {}
     
     def load_manufacturer_patterns(self):
         """Carregar padrões de detecção do banco de dados"""
@@ -417,7 +446,7 @@ class NormalizedDataImporter:
             self.conn.rollback()
             return None
     
-    def import_settings_batch(self, equipment_id, df):
+    def import_settings_batch(self, equipment_id, df, model_type='MICON'):
         """Importar settings em lote para um equipamento"""
         settings_data = []
         
@@ -437,6 +466,19 @@ class NormalizedDataImporter:
             multipart_base = row.get('multipart_base', None) if is_multipart else None
             multipart_part = int(row.get('multipart_part', 0)) if is_multipart else 0
             
+            # **NOVO: Mapear function_id e category baseado no código do parâmetro**
+            function_id = None
+            category = 'other'
+            
+            if param_code:
+                function_code, category = get_function_code_and_category(param_code, model_type)
+                
+                if function_code and function_code in self.function_map:
+                    function_id = self.function_map[function_code]
+                    self.stats['function_mappings'] += 1
+                
+                self.stats['category_classifications'] += 1
+            
             # Converter valor para numérico se possível
             set_value = None
             set_value_text = str(param_value) if pd.notna(param_value) else None
@@ -448,10 +490,10 @@ class NormalizedDataImporter:
                     pass
             
             settings_data.append((
-                equipment_id, None,  # function_id será NULL por enquanto
+                equipment_id, function_id,  # **CORRIGIDO: Agora usa function_id mapeado**
                 param_desc, param_code, set_value, set_value_text,
                 unit_id, is_active, is_multipart, multipart_base, multipart_part,
-                value_type
+                value_type, category  # **NOVO: Adiciona category**
             ))
         
         # Inserir em lote
@@ -461,13 +503,15 @@ class NormalizedDataImporter:
                 """INSERT INTO protec_ai.relay_settings 
                    (equipment_id, function_id, parameter_name, parameter_code, 
                     set_value, set_value_text, unit_id, is_active, is_multipart,
-                    multipart_base, multipart_part, value_type)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                    multipart_base, multipart_part, value_type, category)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 settings_data
             )
             self.conn.commit()
             self.stats['settings_inserted'] += len(settings_data)
             logger.info(f"  ✓ {len(settings_data)} settings inseridos")
+            logger.info(f"    → {self.stats['function_mappings']} com function_id mapeado")
+            logger.info(f"    → {self.stats['category_classifications']} com category classificada")
     
     def create_multipart_groups(self, equipment_id, df):
         """Criar grupos multipart"""

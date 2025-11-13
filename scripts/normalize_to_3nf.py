@@ -133,8 +133,17 @@ class Normalizer3NF:
         
         try:
             df_active = pd.read_csv(active_setup_path, encoding='utf-8')
-            active_codes = set(df_active['Code'].astype(str))
-            logger.info(f"   ✅ Active setup carregado: {len(active_codes)} parâmetros ativos")
+            
+            # **CORRIGIDO: Filtrar apenas parâmetros com is_active=True**
+            if 'is_active' in df_active.columns:
+                active_params = df_active[df_active['is_active'] == True]
+                active_codes = set(active_params['Code'].astype(str))
+                logger.info(f"   ✅ Active setup carregado: {len(active_codes)} parâmetros ativos (de {len(df_active)} totais)")
+            else:
+                # Fallback: se não há coluna is_active, assumir todos ativos (comportamento antigo)
+                active_codes = set(df_active['Code'].astype(str))
+                logger.warning(f"   ⚠️  Coluna is_active não encontrada, assumindo todos ativos: {len(active_codes)} parâmetros")
+            
             return active_codes
         except Exception as e:
             logger.error(f"   ❌ Erro ao carregar active setup: {e}")

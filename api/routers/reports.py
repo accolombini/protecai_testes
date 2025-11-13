@@ -409,3 +409,257 @@ async def preview_report(
     except Exception as e:
         logger.error(f"Error previewing report: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ============================================================================
+# NOVOS ENDPOINTS PROFISSIONAIS - 13/11/2025
+# ============================================================================
+
+@router.get("/statistics")
+async def get_system_statistics(db: Session = Depends(get_db)):
+    """
+    Retorna estatísticas completas do sistema em tempo real.
+    
+    **NOVO ENDPOINT - 13/11/2025**
+    
+    Fornece métricas detalhadas para dashboards e análises técnicas,
+    incluindo dados REAIS do banco de dados (não hardcoded).
+    
+    **MÉTRICAS INCLUÍDAS:**
+        - Total de equipamentos, configurações, funções
+        - Distribuição por fabricante e modelo
+        - Configurações ativas vs inativas
+        - Grupos multipart
+        - Tipos de valores (numeric, boolean, text)
+        - Distribuição por subestação
+    
+    Returns:
+        Dict com estatísticas completas do sistema
+        
+    Example Response:
+        {
+            "equipments": {
+                "total": 50,
+                "by_manufacturer": {...},
+                "by_status": {...}
+            },
+            "settings": {
+                "total": 198744,
+                "active": 198744,
+                "inactive": 0,
+                "by_type": {...}
+            },
+            "protection_functions": {
+                "total": 31,
+                "configured_count": 156
+            }
+        }
+    """
+    try:
+        service = ReportService(db)
+        
+        with service.engine.connect() as conn:
+            # Estatísticas de equipamentos
+            equipment_stats = text("""
+                SELECT 
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN status = 'ACTIVE' THEN 1 END) as active,
+                    COUNT(DISTINCT substation_name) as substations,
+                    COUNT(DISTINCT bay_name) as bays
+                FROM protec_ai.relay_equipment
+            """)
+            eq_stats = conn.execute(equipment_stats).fetchone()
+            
+            # Estatísticas de configurações
+            settings_stats = text("""
+                SELECT 
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN is_active THEN 1 END) as active,
+                    COUNT(CASE WHEN is_multipart THEN 1 END) as multipart,
+                    COUNT(CASE WHEN value_type = 'numeric' THEN 1 END) as numeric,
+                    COUNT(CASE WHEN value_type = 'boolean' THEN 1 END) as boolean,
+                    COUNT(CASE WHEN value_type = 'text' THEN 1 END) as text
+                FROM protec_ai.relay_settings
+            """)
+            set_stats = conn.execute(settings_stats).fetchone()
+            
+            # Distribuição por fabricante
+            manufacturer_dist = text("""
+                SELECT 
+                    f.nome_completo as name,
+                    COUNT(DISTINCT re.id) as equipment_count,
+                    COUNT(rs.id) as settings_count
+                FROM protec_ai.fabricantes f
+                JOIN protec_ai.relay_models rm ON rm.manufacturer_id = f.id
+                JOIN protec_ai.relay_equipment re ON re.relay_model_id = rm.id
+                LEFT JOIN protec_ai.relay_settings rs ON rs.equipment_id = re.id
+                GROUP BY f.nome_completo
+                ORDER BY equipment_count DESC
+            """)
+            mfr_dist = conn.execute(manufacturer_dist).fetchall()
+            
+            # Funções de proteção
+            functions_stats = text("""
+                SELECT 
+                    COUNT(DISTINCT pf.id) as total_functions,
+                    COUNT(DISTINCT rs.function_id) as configured_functions
+                FROM protec_ai.protection_functions pf
+                LEFT JOIN protec_ai.relay_settings rs ON rs.function_id = pf.id
+            """)
+            func_stats = conn.execute(functions_stats).fetchone()
+            
+            return {
+                "timestamp": datetime.now().isoformat(),
+                "equipments": {
+                    "total": int(eq_stats.total),
+                    "active": int(eq_stats.active),
+                    "substations": int(eq_stats.substations),
+                    "bays": int(eq_stats.bays),
+                    "by_manufacturer": [
+                        {
+                            "name": m.name,
+                            "equipment_count": int(m.equipment_count),
+                            "settings_count": int(m.settings_count)
+                        }
+                        for m in mfr_dist
+                    ]
+                },
+                "settings": {
+                    "total": int(set_stats.total),
+                    "active": int(set_stats.active),
+                    "inactive": int(set_stats.total) - int(set_stats.active),
+                    "multipart": int(set_stats.multipart),
+                    "by_type": {
+                        "numeric": int(set_stats.numeric),
+                        "boolean": int(set_stats.boolean),
+                        "text": int(set_stats.text)
+                    }
+                },
+                "protection_functions": {
+                    "total_available": int(func_stats.total_functions),
+                    "configured": int(func_stats.configured_functions)
+                }
+            }
+            
+    except Exception as e:
+        logger.error(f"Error getting statistics: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/equipment/{equipment_id}/detailed")
+async def get_equipment_detailed_report(
+    equipment_id: int,
+    include_inactive: bool = Query(True, description="Incluir configurações inativas"),
+    db: Session = Depends(get_db)
+):
+    """
+    Gera relatório técnico detalhado de um equipamento específico.
+    
+    **NOVO ENDPOINT PROFISSIONAL - 13/11/2025**
+    
+    Fornece análise completa de um equipamento individual, incluindo:
+    - Metadados completos (SEPAM/PDF)
+    - Todas as configurações (ativas e opcionalmente inativas)
+    - Grupos multipart expandidos
+    - Funções de proteção configuradas
+    - Estatísticas de parâmetros
+    
+    Args:
+        equipment_id: ID do equipamento no banco de dados
+        include_inactive: Se True, inclui configurações inativas (default: True)
+        
+    Returns:
+        Dict com relatório técnico completo
+        
+    Example:
+        GET /api/v1/reports/equipment/1/detailed?include_inactive=true
+    """
+    try:
+        service = ReportService(db)
+        
+        with service.engine.connect() as conn:
+            # Informações do equipamento
+            eq_query = text("""
+                SELECT 
+                    re.*,
+                    rm.model_name,
+                    rm.model_code,
+                    rm.voltage_class,
+                    rm.technology,
+                    f.nome_completo as manufacturer_name,
+                    f.codigo_fabricante as manufacturer_code
+                FROM protec_ai.relay_equipment re
+                JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+                WHERE re.id = :eq_id
+            """)
+            equipment = conn.execute(eq_query, {"eq_id": equipment_id}).fetchone()
+            
+            if not equipment:
+                raise HTTPException(status_code=404, detail=f"Equipamento {equipment_id} não encontrado")
+            
+            # Configurações
+            settings_filter = "" if include_inactive else "AND rs.is_active = true"
+            settings_query = text(f"""
+                SELECT 
+                    rs.*,
+                    u.unit_symbol,
+                    pf.function_name
+                FROM protec_ai.relay_settings rs
+                LEFT JOIN protec_ai.units u ON rs.unit_id = u.id
+                LEFT JOIN protec_ai.protection_functions pf ON rs.function_id = pf.id
+                WHERE rs.equipment_id = :eq_id {settings_filter}
+                ORDER BY rs.parameter_code, rs.multipart_part
+                LIMIT 5000
+            """)
+            settings = conn.execute(settings_query, {"eq_id": equipment_id}).fetchall()
+            
+            return {
+                "equipment": {
+                    "id": equipment.id,
+                    "tag": equipment.equipment_tag,
+                    "serial": equipment.serial_number,
+                    "model": equipment.model_name,
+                    "manufacturer": equipment.manufacturer_name,
+                    "location": {
+                        "substation": equipment.substation_name,
+                        "bay": equipment.bay_name,
+                        "voltage_level": equipment.voltage_level
+                    },
+                    "metadata": {
+                        "source_file": equipment.source_file,
+                        "sepam_repere": equipment.sepam_repere,
+                        "pdf_serial": equipment.code_0081
+                    }
+                },
+                "statistics": {
+                    "total_settings": len(settings),
+                    "active_settings": sum(1 for s in settings if s.is_active),
+                    "multipart_settings": sum(1 for s in settings if s.is_multipart)
+                },
+                "settings": [
+                    {
+                        "code": s.parameter_code,
+                        "name": s.parameter_name,
+                        "value": float(s.set_value) if s.set_value else None,
+                        "value_text": s.set_value_text,
+                        "unit": s.unit_symbol,
+                        "function": s.function_name,
+                        "is_active": s.is_active,
+                        "is_multipart": s.is_multipart,
+                        "multipart_info": {
+                            "base": s.multipart_base,
+                            "part": s.multipart_part
+                        } if s.is_multipart else None
+                    }
+                    for s in settings
+                ]
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting detailed report: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
