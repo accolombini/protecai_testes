@@ -322,7 +322,9 @@ class ProtecaiPipelineOrchestrator:
             return True
         
         try:
-            cmd = [sys.executable, str(SRC_DIR / "importar_dados_normalizado.py")]
+            # ATUALIZADO: Usar script correto com detecção robusta de fabricantes
+            import_script = PROJECT_ROOT / "scripts" / "import_normalized_data_to_db.py"
+            cmd = [sys.executable, str(import_script)]
             
             if self.verbose:
                 self.log_info(f"Executando: {' '.join(cmd)}")
