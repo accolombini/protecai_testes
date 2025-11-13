@@ -376,45 +376,25 @@ outputs/reports/
 outputs/test_results_archive/
 
 # ================================
-# SCRIPTS DE ANÁLISE E DESENVOLVIMENTO
-# Data: 06/11/2025
+# SCRIPTS - TODOS DEVEM SER VERSIONADOS
+# Data: 13/11/2025
 # ================================
 
-# Scripts de análise e extração (desenvolvimento)
-scripts/analyze_*.py
-scripts/extract_*.py
-scripts/test_*.py
-scripts/validate_*.py
-scripts/fix_*.py
-scripts/generate_*.py
-scripts/normalize_*.py
-scripts/populate_*.py
-scripts/rebuild_*.py
-scripts/import_*.py
-scripts/hybrid_*.py
-scripts/interactive_*.py
-scripts/precise_*.py
-scripts/frontend_*.py
-
-# Scripts SQL de desenvolvimento
-scripts/*.sql
+# IMPORTANTE: Todos os scripts em scripts/ são essenciais e devem ser versionados
+# Scripts de teste (test_*.py) e validação (validate_*.py) foram movidos para tests/
+# Nenhum script deve ser ignorado aqui!
 
 # ================================
 # TESTES E CONFIGURAÇÕES DE TESTE
-# Data: 06/11/2025
+# Data: 13/11/2025
 # ================================
 
-# Configuração pytest
-pytest.ini
+# IMPORTANTE: Testes devem ser versionados!
+# Scripts test_*.py e validate_*.py foram movidos de scripts/ para tests/
+# Apenas arquivos temporários de teste devem ser ignorados:
 
-# Testes em desenvolvimento (não commitados)
-tests/test_*.py
-tests/debug_*.py
-tests/conftest.py
-
-# Documentação de testes (manter apenas principais)
-tests/README_TESTS.md
-tests/SUMARIO_TESTES.md
+# Arquivo temporário de teste
+tests/test_filename.csv
 
 # ================================
 # CÓDIGO FONTE EM DESENVOLVIMENTO
