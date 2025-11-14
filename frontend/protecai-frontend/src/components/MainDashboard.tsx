@@ -30,17 +30,32 @@ interface SystemStats {
   systemStatus: 'healthy' | 'warning' | 'error';
 }
 
+interface TechnicalData {
+  totalEquipments: number;
+  totalSettings: number;
+  activeSettings: number;
+  protectionFunctions: number;
+  activeFunctions: number;
+}
+
 const MainDashboard: React.FC = () => {
   // Estados do componente
   const [apiStatuses, setApiStatuses] = useState<APIStatus[]>([]);
   const [systemStats, setSystemStats] = useState<SystemStats>({
-    totalEquipments: 50,
+    totalEquipments: 0,        // Será atualizado dinamicamente da API
     totalImports: 0,
-    totalEndpoints: 64,
-    totalPaths: 75,            // Será atualizado dinamicamente
-    totalMethods: 81,          // Será atualizado dinamicamente
-    postgresRecords: 470,
+    totalEndpoints: 93,        // Atualizado: 93 paths
+    totalPaths: 93,            // Será atualizado dinamicamente
+    totalMethods: 101,         // Será atualizado dinamicamente: 101 métodos
+    postgresRecords: 0,        // Será atualizado dinamicamente da API
     systemStatus: 'healthy'
+  });
+  const [technicalData, setTechnicalData] = useState<TechnicalData>({
+    totalEquipments: 0,
+    totalSettings: 0,
+    activeSettings: 0,
+    protectionFunctions: 158,
+    activeFunctions: 23
   });
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
@@ -156,6 +171,49 @@ const MainDashboard: React.FC = () => {
       return { ...api, status: 'offline', responseTime: Date.now() - startTime };
     }
   };
+
+  // Buscar estatísticas reais do banco de dados
+  const fetchRealDatabaseStats = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/database/statistics');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📊 Dados reais do banco:', data);
+        
+        // Atualizar com dados reais do protec_ai schema
+        setSystemStats(prev => ({
+          ...prev,
+          totalEquipments: data.summary?.total_equipments || 0,
+          postgresRecords: data.summary?.total_settings || 0
+        }));
+        
+        // Atualizar dados técnicos
+        setTechnicalData({
+          totalEquipments: data.summary?.total_equipments || 0,
+          totalSettings: data.summary?.total_settings || 0,
+          activeSettings: data.summary?.active_settings || 0,
+          protectionFunctions: 158,
+          activeFunctions: data.summary?.active_functions_count || 23
+        });
+      }
+    } catch (error) {
+      console.error('❌ Erro buscando estatísticas do banco:', error);
+    }
+  };
+
+  // useEffect para carregar dados automaticamente
+  useEffect(() => {
+    console.log('🚀 MainDashboard montado - iniciando descoberta...');
+    discoverAllAPIs();
+    fetchRealDatabaseStats();
+    
+    // Atualizar a cada 30 segundos
+    const interval = setInterval(() => {
+      fetchRealDatabaseStats();
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Buscar dados do sistema
   const fetchSystemData = async () => {
@@ -347,19 +405,19 @@ const MainDashboard: React.FC = () => {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">Equipamentos Processados:</span>
-                <span className="text-white font-medium">50 relés</span>
+                <span className="text-white font-medium">{technicalData.totalEquipments} relés</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Funções de Proteção:</span>
-                <span className="text-white font-medium">158 funções</span>
+                <span className="text-white font-medium">{technicalData.protectionFunctions} funções</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Funções Ativas:</span>
-                <span className="text-green-400 font-medium">23 (14.6%)</span>
+                <span className="text-green-400 font-medium">{technicalData.activeFunctions} ({((technicalData.activeFunctions / technicalData.protectionFunctions) * 100).toFixed(1)}%)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Configurações (Settings):</span>
-                <span className="text-white font-medium">218 configs</span>
+                <span className="text-white font-medium">{technicalData.totalSettings.toLocaleString()} configs</span>
               </div>
             </div>
           </div>

@@ -24,7 +24,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 # Imports dos módulos do projeto
-from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway, reports, database, system_test, relay_config_reports
+from api.routers import equipments, compare, imports, etap, etap_native, ml, validation, ml_gateway, reports, database, system_test, relay_config_reports, active_functions
 from api.core.config import settings
 from api.core.database import engine, get_db
 
@@ -169,6 +169,13 @@ app.include_router(
     relay_config_reports.router,
     tags=["Relay Configuration Reports"],
     responses={404: {"description": "Equipment not found"}},
+)
+
+app.include_router(
+    active_functions.router,
+    prefix="/api/v1",
+    tags=["Active Protection Functions"],
+    responses={404: {"description": "Relay or functions not found"}},
 )
 
 # Event handlers

@@ -103,6 +103,14 @@ class Normalizer3NF:
         'SEPAM_TYPEMAT': 'sepam_typemat',   # Tipo de material
     }
     
+    # Padrões de campos de STATUS/BINARY que devem ser text mesmo se parecerem numéricos
+    STATUS_FIELD_PATTERNS = [
+        r'status', r'alarm', r'opto.*i/p', r'relay.*o/p',
+        r'control\s+status', r'plant\s+status', r'input\s+status',
+        r'output\s+status', r'digital\s+status', r'flags',
+        r'ddb', r'test\s+pattern', r'bit\s+mask', r'binary'
+    ]
+    
     def __init__(self):
         self.stats = {
             'total_files': 0,
@@ -113,6 +121,7 @@ class Normalizer3NF:
             'booleans_converted': 0,
             'metadata_removed': 0,
             'active_params_marked': 0,
+            'status_fields_corrected': 0,
             'errors': []
         }
     
@@ -148,6 +157,25 @@ class Normalizer3NF:
         except Exception as e:
             logger.error(f"   ❌ Erro ao carregar active setup: {e}")
             return set()
+    
+    def is_status_field(self, description: str) -> bool:
+        """
+        Detecta se o campo é de STATUS/ALARM que deve ser text mesmo parecendo numérico.
+        
+        Args:
+            description: Descrição do parâmetro
+            
+        Returns:
+            True se for campo de status
+        """
+        if not description:
+            return False
+        
+        desc_lower = description.lower()
+        for pattern in self.STATUS_FIELD_PATTERNS:
+            if re.search(pattern, desc_lower):
+                return True
+        return False
     
     def extract_relay_metadata(self, df: pd.DataFrame) -> Dict[str, str]:
         """
@@ -389,11 +417,24 @@ class Normalizer3NF:
                 if bool_value is not None:
                     value_type = 'boolean'
                     value = str(bool_value)
+                elif self.is_status_field(part_info['description']):
+                    # Campo de STATUS: sempre text, mesmo se parecer numérico
+                    value_type = 'text'
+                    self.stats['status_fields_corrected'] += 1
                 elif value and unit:
                     value_type = 'numeric'
                     self.stats['units_separated'] += 1
                 elif value:
-                    value_type = 'text'
+                    # Verificar se é valor muito grande (binário/status)
+                    try:
+                        num_val = float(value)
+                        if len(str(value).replace('.', '').replace('-', '')) > 15 or abs(num_val) >= 1e9:
+                            value_type = 'text'
+                            self.stats['status_fields_corrected'] += 1
+                        else:
+                            value_type = 'numeric'
+                    except:
+                        value_type = 'text'
                 else:
                     value_type = 'null'
                 
@@ -435,14 +476,23 @@ class Normalizer3NF:
                 value_type = 'boolean'
                 value = str(bool_value)
                 self.stats['booleans_converted'] += 1
+            elif self.is_status_field(desc):
+                # Campo de STATUS: sempre text, mesmo se parecer numérico
+                value_type = 'text'
+                self.stats['status_fields_corrected'] += 1
             elif value and unit:
                 value_type = 'numeric'
                 self.stats['units_separated'] += 1
             elif value:
                 # Tentar identificar se é numérico
                 try:
-                    float(value)
-                    value_type = 'numeric'
+                    num_val = float(value)
+                    # Se valor tem mais de 15 dígitos ou é maior que 10^9, forçar text
+                    if len(str(value).replace('.', '').replace('-', '')) > 15 or abs(num_val) >= 1e9:
+                        value_type = 'text'
+                        self.stats['status_fields_corrected'] += 1
+                    else:
+                        value_type = 'numeric'
                 except:
                     value_type = 'text'
             else:
@@ -608,6 +658,7 @@ class Normalizer3NF:
         logger.info(f"   Unidades separadas: {self.stats['units_separated']}")
         logger.info(f"   Booleanos convertidos: {self.stats['booleans_converted']}")
         logger.info(f"   Parâmetros ativos marcados: {self.stats['active_params_marked']}")
+        logger.info(f"   ✅ Campos de status corrigidos: {self.stats['status_fields_corrected']}")
         
         if self.stats['errors']:
             logger.warning(f"\n⚠️  Erros encontrados: {len(self.stats['errors'])}")

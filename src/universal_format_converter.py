@@ -29,12 +29,15 @@ from datetime import datetime
 
 import pandas as pd
 from PyPDF2 import PdfReader
+import json
 
 # Imports locais
 try:
     from .file_registry_manager import FileRegistryManager
+    from .precise_parameter_extractor import PreciseParameterExtractor
 except ImportError:
     from file_registry_manager import FileRegistryManager
+    from precise_parameter_extractor import PreciseParameterExtractor
 
 # ---------------------------
 # Configuração de diretórios
@@ -88,8 +91,55 @@ class UniversalFormatConverter:
         self.re_easergy_colon = re.compile(r"^([0-9A-F]{4}):\s*([^:]+):\s*(.*)$")
         self.re_structured = re.compile(r"^([^:]+):\s*([^:]+):\s*(.*)$")
         
+        # Carregar configuração de modelos de relés
+        self.relay_config = self._load_relay_config()
+        
+        # Inicializar extrator preciso para checkboxes
+        self.precise_extractor = PreciseParameterExtractor()
+        
         if self.verbose:
             print(f"🔧 Conversor Universal iniciado")
+    
+    def _load_relay_config(self) -> Dict:
+        """Carrega configuração dos modelos de relés."""
+        config_path = PROJECT_ROOT / "inputs" / "glossario" / "relay_models_config.json"
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            self.log_warning(f"Não foi possível carregar relay_models_config.json: {e}")
+            return {"models": {}}
+    
+    def _identify_relay_model(self, filename: str) -> Optional[str]:
+        """Identifica o modelo do relé pelo nome do arquivo."""
+        filename_upper = filename.upper()
+        
+        # Padrões de identificação (mais específico primeiro)
+        patterns = {
+            'MICON_P122_205': ['P122_205', 'P122-205'],
+            'MICON_P122_52': ['P122_52', 'P122-52', 'P_122_52', 'P122 52', 'P_122 52'],
+            'MICON_P122_204': ['P122_204', 'P122-204'],
+            'MICON_P143': ['P143'],
+            'MICON_P220': ['P220'],
+            'MICON_P922': ['P922', 'P922S'],
+            'MICON_P241': ['P241'],
+            'SEPAM_S40': ['.S40']
+        }
+        
+        # Verificar extensão .S40 (SEPAM)
+        if filename.endswith('.S40') or filename.endswith('.s40'):
+            return 'SEPAM_S40'
+        
+        # Buscar padrões no nome
+        for model_name, model_patterns in patterns.items():
+            if model_name == 'SEPAM_S40':
+                continue
+            for pattern in model_patterns:
+                if pattern in filename_upper:
+                    if model_name in self.relay_config.get('models', {}):
+                        return model_name
+        
+        return None
     
     def log_info(self, msg: str):
         """Log de informação"""
@@ -235,10 +285,43 @@ class UniversalFormatConverter:
         return df[["Code", "Description", "Value"]], detected_format
     
     def convert_pdf_to_csv(self, pdf_path: Path) -> Optional[Path]:
-        """Converte PDF para CSV padronizado"""
+        """Converte PDF para CSV padronizado usando método apropriado (checkbox ou texto)"""
         self.log_info(f"Convertendo PDF: {pdf_path.name}")
         
-        # Extrair texto
+        # Identificar modelo do relé
+        relay_model = self._identify_relay_model(pdf_path.name)
+        
+        if relay_model and relay_model in self.relay_config.get('models', {}):
+            model_config = self.relay_config['models'][relay_model]
+            detection_method = model_config.get('detection_method', 'text')
+            
+            # Se usa checkboxes, usar PreciseParameterExtractor
+            if detection_method == 'checkbox':
+                self.log_info(f"  Modelo {relay_model} detectado - usando extração visual de checkboxes")
+                try:
+                    df = self.precise_extractor.extract_from_pdf(pdf_path)
+                    
+                    if df is None or df.empty:
+                        self.log_warning(f"PDF {pdf_path.name} não gerou dados válidos (checkboxes)")
+                        return None
+                    
+                    # Garantir colunas padrão
+                    for col in ["Code", "Description", "Value", "is_active"]:
+                        if col not in df.columns:
+                            df[col] = "" if col != "is_active" else False
+                    
+                    # Salvar CSV com coluna is_active
+                    output_path = OUTPUT_CSV_DIR / f"{pdf_path.stem}_active_setup.csv"
+                    df.to_csv(output_path, index=False, encoding='utf-8')
+                    
+                    self.log_success(f"PDF convertido (checkboxes): {pdf_path.name} → {output_path.name} ({len(df)} linhas)")
+                    return output_path
+                    
+                except Exception as e:
+                    self.log_error(f"Erro ao usar PreciseParameterExtractor em {pdf_path.name}: {e}")
+                    self.log_warning("  Tentando fallback para extração de texto...")
+        
+        # Fallback ou método padrão: extração de texto
         text = self.extract_text_from_pdf(pdf_path)
         if not text.strip():
             self.log_warning(f"PDF {pdf_path.name} sem texto extraível")

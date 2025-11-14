@@ -5,12 +5,84 @@ Endpoint para visualização da estrutura do banco de dados PostgreSQL
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 from sqlalchemy.engine import Connection
 from typing import List, Dict, Any
+from datetime import datetime
 from api.core.database import get_db
+import logging
 
 router = APIRouter(prefix="/database", tags=["Database"])
+logger = logging.getLogger(__name__)
 
+
+@router.get("/statistics")
+async def get_database_statistics(db: Session = Depends(get_db)):
+    """
+    📊 **Estatísticas Reais do Banco de Dados**
+    
+    Retorna contagens reais de todas as tabelas principais.
+    100% REAL - Dados direto do PostgreSQL.
+    """
+    try:
+        # Buscar contagens reais de cada tabela
+        stats = {}
+        
+        # Schema relay_configs
+        relay_equipment_query = text("SELECT COUNT(*) FROM relay_configs.relay_equipment")
+        protection_functions_query = text("SELECT COUNT(*) FROM relay_configs.protection_functions")
+        io_config_query = text("SELECT COUNT(*) FROM relay_configs.io_configuration")
+        
+        # Schema public
+        active_functions_query = text("SELECT COUNT(*) FROM active_protection_functions")
+        
+        # Executar queries
+        stats["relay_equipment"] = db.execute(relay_equipment_query).scalar() or 0
+        stats["protection_functions"] = db.execute(protection_functions_query).scalar() or 0
+        stats["io_configuration"] = db.execute(io_config_query).scalar() or 0
+        stats["active_protection_functions"] = db.execute(active_functions_query).scalar() or 0
+        
+        # Calcular totais
+        total_records = sum(stats.values())
+        
+        # Buscar relés únicos com funções ativas
+        unique_relays_query = text("SELECT COUNT(DISTINCT relay_file) FROM active_protection_functions")
+        unique_relays = db.execute(unique_relays_query).scalar() or 0
+        
+        # Query para dados reais do protec_ai schema
+        equipments_query = text("SELECT COUNT(*) FROM protec_ai.relay_equipment")
+        settings_query = text("SELECT COUNT(*) FROM protec_ai.relay_settings")
+        active_settings_query = text("SELECT COUNT(*) FROM protec_ai.relay_settings WHERE is_active = true")
+        
+        stats["total_equipments"] = db.execute(equipments_query).scalar() or 0
+        stats["total_settings"] = db.execute(settings_query).scalar() or 0
+        stats["active_settings"] = db.execute(active_settings_query).scalar() or 0
+        
+        return {
+            "database": "protecai_db",
+            "timestamp": datetime.now().isoformat(),
+            "tables": stats,
+            "summary": {
+                "total_records": total_records,
+                "relay_equipment_count": stats["relay_equipment"],
+                "protection_functions_count": stats["protection_functions"],
+                "io_configurations_count": stats["io_configuration"],
+                "active_functions_count": stats["active_protection_functions"],
+                "unique_relays_with_functions": unique_relays,
+                "total_equipments": stats["total_equipments"],
+                "total_settings": stats["total_settings"],
+                "active_settings": stats["active_settings"]
+            },
+            "data_source": "postgresql_real",
+            "note": "100% dados reais do protec_ai schema - zero mocks"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting database statistics: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving database statistics: {str(e)}"
+        )
 
 @router.get("/schema")
 async def get_database_schema(db: Connection = Depends(get_db)) -> Dict[str, Any]:

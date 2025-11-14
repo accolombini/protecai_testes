@@ -410,18 +410,28 @@ class ImportService:
     
     async def _execute_real_pipeline(self) -> Dict:
         """
-        EXECUTA PIPELINE REAL - ZERO MOCKS!
-        Chama o pipeline_completo.py validado que processa dados reais.
+        EXECUTA PIPELINE COMPLETA REAL - ZERO MOCKS!
+        
+        Fluxo completo:
+        1. Pipeline de extração (pipeline_completo.py)
+        2. Detecção de funções ativas (detect_active_functions.py)
+        3. Importação para PostgreSQL (import_active_functions_to_db.py)
         """
         try:
+            start_time = datetime.now()
+            results = {
+                "pipeline": {},
+                "detection": {},
+                "import": {}
+            }
+            
+            # ETAPA 1: Pipeline de Extração
+            logger.info("🔄 ETAPA 1/3: Executando pipeline de extração...")
             pipeline_script = self.project_root / "src" / "pipeline_completo.py"
             
-            # Executar pipeline completo real
             cmd = [sys.executable, str(pipeline_script)]
+            logger.info(f"Comando: {' '.join(cmd)}")
             
-            logger.info(f"Executando pipeline real: {' '.join(cmd)}")
-            
-            # Executar de forma assíncrona
             process = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,
@@ -431,29 +441,134 @@ class ImportService:
             
             stdout, stderr = await process.communicate()
             
-            if process.returncode == 0:
-                return {
-                    "success": True,
-                    "status": "pipeline_completed",
-                    "message": "Pipeline real executado com sucesso",
-                    "output": stdout.decode('utf-8') if stdout else "",
-                    "duration": "real_processing_time"
-                }
-            else:
-                logger.error(f"Pipeline falhou: {stderr.decode('utf-8') if stderr else 'Unknown error'}")
+            if process.returncode != 0:
+                error_msg = stderr.decode('utf-8') if stderr else 'Unknown error'
+                logger.error(f"❌ Pipeline de extração falhou: {error_msg}")
                 return {
                     "success": False,
-                    "status": "pipeline_failed", 
-                    "error": stderr.decode('utf-8') if stderr else "Pipeline execution failed",
+                    "status": "pipeline_failed",
+                    "error": error_msg,
                     "output": stdout.decode('utf-8') if stdout else ""
                 }
+            
+            results["pipeline"] = {
+                "status": "completed",
+                "output": stdout.decode('utf-8') if stdout else ""
+            }
+            logger.info("✅ ETAPA 1/3: Pipeline de extração concluída")
+            
+            # ETAPA 2: Detecção de Funções Ativas
+            logger.info("🔍 ETAPA 2/3: Detectando funções ativas...")
+            detect_script = self.project_root / "scripts" / "detect_active_functions.py"
+            
+            if detect_script.exists():
+                cmd = [sys.executable, str(detect_script)]
+                logger.info(f"Comando: {' '.join(cmd)}")
+                
+                process = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    cwd=str(self.project_root)
+                )
+                
+                stdout, stderr = await process.communicate()
+                
+                if process.returncode == 0:
+                    results["detection"] = {
+                        "status": "completed",
+                        "output": stdout.decode('utf-8') if stdout else ""
+                    }
+                    logger.info("✅ ETAPA 2/3: Detecção de funções concluída")
+                else:
+                    logger.warning(f"⚠️ Detecção de funções falhou: {stderr.decode('utf-8') if stderr else 'Unknown'}")
+                    results["detection"] = {
+                        "status": "failed",
+                        "error": stderr.decode('utf-8') if stderr else "Detection failed"
+                    }
+            else:
+                logger.warning("⚠️ Script detect_active_functions.py não encontrado")
+                results["detection"] = {"status": "skipped", "reason": "script_not_found"}
+            
+            # ETAPA 3: Importação para PostgreSQL
+            logger.info("💾 ETAPA 3/3: Importando para PostgreSQL...")
+            import_script = self.project_root / "scripts" / "import_active_functions_to_db.py"
+            
+            if import_script.exists():
+                cmd = [sys.executable, str(import_script)]
+                logger.info(f"Comando: {' '.join(cmd)}")
+                
+                process = await asyncio.create_subprocess_exec(
+                    *cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    cwd=str(self.project_root)
+                )
+                
+                stdout, stderr = await process.communicate()
+                
+                if process.returncode == 0:
+                    output = stdout.decode('utf-8') if stdout else ""
+                    results["import"] = {
+                        "status": "completed",
+                        "output": output
+                    }
+                    
+                    # Extrair estatísticas do output
+                    import re
+                    inserted_match = re.search(r'Inseridos:\s*(\d+)', output)
+                    updated_match = re.search(r'Atualizados:\s*(\d+)', output)
+                    
+                    if inserted_match or updated_match:
+                        results["import"]["stats"] = {
+                            "inserted": int(inserted_match.group(1)) if inserted_match else 0,
+                            "updated": int(updated_match.group(1)) if updated_match else 0
+                        }
+                    
+                    logger.info("✅ ETAPA 3/3: Importação PostgreSQL concluída")
+                else:
+                    logger.warning(f"⚠️ Importação PostgreSQL falhou: {stderr.decode('utf-8') if stderr else 'Unknown'}")
+                    results["import"] = {
+                        "status": "failed",
+                        "error": stderr.decode('utf-8') if stderr else "Import failed"
+                    }
+            else:
+                logger.warning("⚠️ Script import_active_functions_to_db.py não encontrado")
+                results["import"] = {"status": "skipped", "reason": "script_not_found"}
+            
+            # Calcular tempo total
+            end_time = datetime.now()
+            duration = (end_time - start_time).total_seconds()
+            
+            # Determinar status geral
+            all_completed = (
+                results["pipeline"]["status"] == "completed" and
+                results["detection"].get("status") in ["completed", "skipped"] and
+                results["import"].get("status") in ["completed", "skipped"]
+            )
+            
+            logger.info(f"✨ Pipeline completa finalizada em {duration:.2f}s")
+            
+            return {
+                "success": all_completed,
+                "status": "pipeline_completed" if all_completed else "pipeline_partial",
+                "message": "Pipeline completa executada com sucesso" if all_completed else "Pipeline executada com avisos",
+                "duration": round(duration, 2),
+                "stages": results,
+                "summary": {
+                    "extraction": results["pipeline"]["status"],
+                    "detection": results["detection"].get("status", "unknown"),
+                    "import": results["import"].get("status", "unknown"),
+                    "total_duration_seconds": round(duration, 2)
+                }
+            }
                 
         except Exception as e:
-            logger.error(f"Erro crítico executando pipeline real: {e}")
+            logger.error(f"❌ Erro crítico executando pipeline completa: {e}")
             return {
                 "success": False,
                 "status": "execution_error",
-                "error": f"Falha na execução do pipeline: {str(e)}"
+                "error": f"Falha na execução da pipeline: {str(e)}"
             }
     
     async def validate_file_structure(self, upload_id: str) -> Dict:

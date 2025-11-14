@@ -6,9 +6,10 @@ import MainDashboard from './components/MainDashboard'
 import Reports from './components/Reports'
 import DatabaseSchema from './components/DatabaseSchema'
 import RelayConfigWizard from './components/RelayConfig/RelayConfigWizard'
+import ActiveFunctions from './components/ActiveFunctions'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'upload' | 'api' | 'database' | 'test' | 'setup'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'reports' | 'upload' | 'api' | 'database' | 'test' | 'setup' | 'functions'>('dashboard')
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -45,6 +46,16 @@ function App() {
                 }`}
               >
                 ⚙️ Setup de Relés
+              </button>
+              <button
+                onClick={() => setActiveTab('functions')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  activeTab === 'functions'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:text-white'
+                }`}
+              >
+                ⚡ Funções Ativas
               </button>
               <button
                 onClick={() => setActiveTab('reports')}
@@ -105,6 +116,7 @@ function App() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'dashboard' && <MainDashboard />}
         {activeTab === 'setup' && <RelayConfigWizard />}
+        {activeTab === 'functions' && <ActiveFunctions />}
         {activeTab === 'reports' && <Reports />}
         {activeTab === 'upload' && <RealFileUpload />}
         {activeTab === 'api' && <SimpleAPITest />}
