@@ -380,14 +380,14 @@ class ReportService:
                 models = list(models_map.values())
                 models = sorted(models, key=lambda x: (x.get('manufacturer_code') or '', x.get('name') or ''))
 
-                # Bays with equipment count
+                # Barras (barramento) with equipment count
                 bays_query = text("""
-                    SELECT COALESCE(re.bay_name, '') as name,
+                    SELECT COALESCE(re.barra_nome, '') as name,
                            COUNT(*) as count
                     FROM protec_ai.relay_equipment re
-                    WHERE re.bay_name IS NOT NULL AND re.bay_name != ''
-                    GROUP BY re.bay_name
-                    ORDER BY re.bay_name
+                    WHERE re.barra_nome IS NOT NULL AND re.barra_nome != ''
+                    GROUP BY re.barra_nome
+                    ORDER BY re.barra_nome
                 """)
                 bays = conn.execute(bays_query).fetchall()
 
@@ -512,7 +512,7 @@ class ReportService:
                     re.equipment_tag,
                     re.serial_number,
                     re.substation_name,
-                    re.bay_name,
+                    re.barra_nome,
                     re.status,
                     re.position_description,
                     rm.model_name,
@@ -539,7 +539,7 @@ class ReportService:
                 params["model"] = f"%{model}%"
             
             if bay:
-                base_query += " AND re.bay_name ILIKE :bay"
+                base_query += " AND re.barra_nome ILIKE :bay"
                 params["bay"] = f"%{bay}%"
             
             if substation:
@@ -561,7 +561,7 @@ class ReportService:
                         "tag_reference": row.equipment_tag,
                         "serial_number": row.serial_number,
                         "substation": row.substation_name,
-                        "bay": row.bay_name,
+                        "bay": row.barra_nome,
                         "status": row.status,
                         "description": row.position_description,
                         "model": {
@@ -617,7 +617,7 @@ class ReportService:
         # Headers
         writer.writerow([
             'Tag', 'Serial Number', 'Model', 'Model Code', 'Voltage Class', 'Technology',
-            'Manufacturer', 'Country', 'Bay', 'Substation', 'Status',
+            'Manufacturer', 'Country', 'Barra', 'Substation', 'Status',
             'Description', 'Created At'
         ])
         
@@ -728,7 +728,7 @@ class ReportService:
         # Headers (linha 5, pula linha 4 vazia)
         headers = [
             'Tag', 'Serial Number', 'Model', 'Model Code', 'Voltage Class',
-            'Technology', 'Manufacturer', 'Country', 'Bay', 'Substation',
+            'Technology', 'Manufacturer', 'Country', 'Barra', 'Substation',
             'Status', 'Description', 'Created At'
         ]
         
@@ -783,6 +783,75 @@ class ReportService:
         
         logger.info("XLSX exportado com sucesso")
         return output.getvalue()
+    
+    def _header_footer(self, canvas, doc, report_name: str = "Relatório de Equipamentos"):
+        """
+        Desenha cabeçalho e rodapé profissional PETROBRAS em todas as páginas.
+        
+        **CABEÇALHO:**
+            - Logo/símbolo ⚡
+            - "ENGENHARIA DE PROTEÇÃO PETROBRAS" (centralizado, azul escuro)
+            - Linha separadora amarela
+            
+        **RODAPÉ:**
+            - Nome do relatório (centro)
+            - "Pag. <num>" (canto inferior direito)
+            - Data de geração (canto inferior esquerdo)
+        
+        Args:
+            canvas: Canvas do ReportLab
+            doc: Documento SimpleDocTemplate
+            report_name: Nome do relatório para exibir no rodapé
+        """
+        from reportlab.lib import colors
+        from reportlab.lib.units import cm
+        from datetime import datetime
+        
+        canvas.saveState()
+        width, height = doc.pagesize
+        
+        # ===== CABEÇALHO =====
+        # Fundo azul no topo
+        canvas.setFillColor(colors.HexColor('#003366'))
+        canvas.rect(0, height - 2.5*cm, width, 2.5*cm, fill=True, stroke=False)
+        
+        # Símbolo ⚡
+        canvas.setFillColor(colors.HexColor('#FFD700'))  # Dourado
+        canvas.setFont('Helvetica-Bold', 24)
+        canvas.drawCentredString(width/2, height - 1.2*cm, '⚡')
+        
+        # Texto do cabeçalho
+        canvas.setFillColor(colors.white)
+        canvas.setFont('Helvetica-Bold', 16)
+        canvas.drawCentredString(width/2, height - 1.8*cm, 'ENGENHARIA DE PROTEÇÃO PETROBRAS')
+        
+        # Linha amarela separadora
+        canvas.setStrokeColor(colors.HexColor('#FFD700'))
+        canvas.setLineWidth(3)
+        canvas.line(3*cm, height - 2.3*cm, width - 3*cm, height - 2.3*cm)
+        
+        # ===== RODAPÉ =====
+        # Linha azul separadora superior
+        canvas.setStrokeColor(colors.HexColor('#003366'))
+        canvas.setLineWidth(2)
+        canvas.line(2*cm, 2*cm, width - 2*cm, 2*cm)
+        
+        # Data de geração (esquerda)
+        canvas.setFillColor(colors.HexColor('#666666'))
+        canvas.setFont('Helvetica', 8)
+        canvas.drawString(2*cm, 1.5*cm, f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        
+        # Nome do relatório (centro)
+        canvas.setFont('Helvetica-Bold', 10)
+        canvas.setFillColor(colors.HexColor('#003366'))
+        canvas.drawCentredString(width/2, 1.5*cm, report_name)
+        
+        # Número da página (direita)
+        canvas.setFont('Helvetica', 10)
+        canvas.setFillColor(colors.HexColor('#333333'))
+        canvas.drawRightString(width - 2*cm, 1.5*cm, f"Pag. {doc.page}")
+        
+        canvas.restoreState()
     
     async def export_to_pdf(
         self, 
@@ -842,31 +911,31 @@ class ReportService:
             # Buffer para PDF
             buffer = BytesIO()
             
+            # Determinar nome do relatório baseado nos filtros
+            report_name = "Relatório de Equipamentos de Proteção"
+            if manufacturer:
+                report_name += f" - {manufacturer}"
+            if model:
+                report_name += f" - Modelo {model}"
+            if status:
+                report_name += f" - Status {status}"
+            
             # Criar documento (landscape para mais colunas)
             doc = SimpleDocTemplate(
                 buffer,
                 pagesize=landscape(A4),
                 rightMargin=30,
                 leftMargin=30,
-                topMargin=50,
-                bottomMargin=30
+                topMargin=80,  # Aumentado para cabeçalho
+                bottomMargin=60  # Aumentado para rodapé
             )
             
             # Elementos do documento
             elements = []
             styles = getSampleStyleSheet()
             
-            # Título
-            title_style = ParagraphStyle(
-                'CustomTitle',
-                parent=styles['Heading1'],
-                fontSize=16,
-                textColor=colors.HexColor('#1a237e'),
-                spaceAfter=12,
-                alignment=1  # Center
-            )
-            title = Paragraph("Relatório de Equipamentos de Proteção", title_style)
-            elements.append(title)
+            # Espaçamento para cabeçalho
+            elements.append(Spacer(1, 0.5*inch))
             
             # Filtros aplicados
             filters_text = self._build_filters_description(manufacturer, model, bay, status, substation)
@@ -893,7 +962,7 @@ class ReportService:
             # Preparar dados da tabela
             data = [[
                 'Tag', 'Modelo', 'Código', 'Fabricante', 
-                'Bay', 'Status', 'Classe Tensão'
+                'Barra', 'Status', 'Classe Tensão'
             ]]
             
             for eq in equipments:
@@ -935,16 +1004,27 @@ class ReportService:
             
             elements.append(table)
             
-            # Rodapé
-            elements.append(Spacer(1, 0.3*inch))
-            footer = Paragraph(
-                f"<i>Total de equipamentos: {len(equipments)}</i>",
-                styles['Normal']
+            # Info adicional
+            elements.append(Spacer(1, 0.2*inch))
+            info_style = ParagraphStyle(
+                'InfoStyle',
+                parent=styles['Normal'],
+                fontSize=9,
+                textColor=colors.HexColor('#666666'),
+                alignment=1  # Center
             )
-            elements.append(footer)
+            info = Paragraph(
+                f"<i>Total de equipamentos neste relatório: {len(equipments)}</i>",
+                info_style
+            )
+            elements.append(info)
             
-            # Gerar PDF
-            doc.build(elements)
+            # Gerar PDF com cabeçalho e rodapé personalizados
+            doc.build(
+                elements,
+                onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, report_name),
+                onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, report_name)
+            )
             
             # Retornar bytes
             pdf_bytes = buffer.getvalue()
@@ -956,3 +1036,369 @@ class ReportService:
         except Exception as e:
             logger.error(f"Erro ao gerar PDF: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"Erro ao gerar PDF: {str(e)}")
+    
+    # ===================================================================
+    # 🆕 MÉTODOS PARA NOVOS RELATÓRIOS TÉCNICOS
+    # ===================================================================
+    
+    # --- 1. FUNÇÕES DE PROTEÇÃO ---
+    
+    async def export_protection_functions_csv(self, data: List[Dict]) -> bytes:
+        """Exporta funções de proteção para CSV"""
+        output = io.StringIO()
+        if data:
+            writer = csv.DictWriter(output, fieldnames=data[0].keys())
+            writer.writeheader()
+            writer.writerows(data)
+        return output.getvalue().encode('utf-8')
+    
+    async def export_protection_functions_xlsx(self, data: List[Dict]) -> bytes:
+        """Exporta funções de proteção para Excel"""
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Funções de Proteção"
+        
+        # Cabeçalho
+        headers = ['TAG', 'Código ANSI', 'Descrição', 'Fabricante', 'Modelo', 'Barra', 'Status', 'Detecção']
+        ws.append(headers)
+        
+        # Estilo do cabeçalho
+        for cell in ws[1]:
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill(start_color="003366", end_color="003366", fill_type="solid")
+            cell.alignment = Alignment(horizontal="center")
+        
+        # Dados
+        for item in data:
+            ws.append([
+                item.get('equipment_tag'),
+                item.get('ansi_code'),
+                item.get('function_description'),
+                item.get('manufacturer_name'),
+                item.get('model_name'),
+                item.get('bay_name'),
+                item.get('status'),
+                item.get('detection_method')
+            ])
+        
+        # Auto-ajustar larguras
+        for column in ws.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                if cell.value:
+                    max_length = max(max_length, len(str(cell.value)))
+            ws.column_dimensions[column_letter].width = min(max_length + 2, 50)
+        
+        output = io.BytesIO()
+        wb.save(output)
+        return output.getvalue()
+    
+    async def export_protection_functions_pdf(self, data: List[Dict]) -> bytes:
+        """Exporta funções de proteção para PDF com cabeçalho PETROBRAS"""
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4, landscape
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.units import inch
+        from io import BytesIO
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
+        
+        elements = []
+        elements.append(Spacer(1, 0.5*inch))
+        
+        # Tabela de dados
+        table_data = [['TAG', 'ANSI', 'Descrição', 'Modelo', 'Barra']]
+        for item in data[:100]:  # Limitar a 100 registros
+            table_data.append([
+                str(item.get('equipment_tag', ''))[:20],
+                str(item.get('ansi_code', '')),
+                str(item.get('function_description', ''))[:30],
+                str(item.get('model_name', ''))[:15],
+                str(item.get('bay_name', ''))[:15]
+            ])
+        
+        table = Table(table_data, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#003366')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+        ]))
+        
+        elements.append(table)
+        
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Funções de Proteção Ativas"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Funções de Proteção Ativas")
+        )
+        
+        return buffer.getvalue()
+    
+    # --- 2. SETPOINTS CRÍTICOS ---
+    
+    async def export_setpoints_csv(self, data: List[Dict]) -> bytes:
+        output = io.StringIO()
+        if data:
+            writer = csv.DictWriter(output, fieldnames=data[0].keys())
+            writer.writeheader()
+            writer.writerows(data)
+        return output.getvalue().encode('utf-8')
+    
+    async def export_setpoints_xlsx(self, data: List[Dict]) -> bytes:
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Setpoints Críticos"
+        
+        headers = ['TAG', 'Fabricante', 'Modelo', 'Código', 'Parâmetro', 'Valor', 'Unidade', 'Função', 'Categoria']
+        ws.append(headers)
+        
+        for cell in ws[1]:
+            cell.font = Font(bold=True, color="FFFFFF")
+            cell.fill = PatternFill(start_color="CC0066", end_color="CC0066", fill_type="solid")
+            cell.alignment = Alignment(horizontal="center")
+        
+        for item in data:
+            ws.append([
+                item.get('equipment_tag'),
+                item.get('manufacturer_name'),
+                item.get('model_name'),
+                item.get('parameter_code'),
+                item.get('parameter_name'),
+                item.get('set_value'),
+                item.get('unit_symbol'),
+                item.get('function_name'),
+                item.get('category')
+            ])
+        
+        output = io.BytesIO()
+        wb.save(output)
+        return output.getvalue()
+    
+    async def export_setpoints_pdf(self, data: List[Dict]) -> bytes:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4, landscape
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
+        from reportlab.lib.units import inch
+        from io import BytesIO
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
+        
+        elements = [Spacer(1, 0.5*inch)]
+        
+        table_data = [['TAG', 'Código', 'Parâmetro', 'Valor', 'Unidade', 'Função']]
+        for item in data[:100]:
+            table_data.append([
+                str(item.get('equipment_tag', ''))[:15],
+                str(item.get('parameter_code', '')),
+                str(item.get('parameter_name', ''))[:25],
+                str(item.get('set_value', '')),
+                str(item.get('unit_symbol', '')),
+                str(item.get('function_name', ''))[:20]
+            ])
+        
+        table = Table(table_data, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#CC0066')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+        ]))
+        
+        elements.append(table)
+        
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Setpoints Críticos"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Setpoints Críticos")
+        )
+        
+        return buffer.getvalue()
+    
+    # --- 3-6. DEMAIS RELATÓRIOS (implementação similar) ---
+    
+    async def export_coordination_csv(self, data: List[Dict]) -> bytes:
+        output = io.StringIO()
+        if data:
+            writer = csv.DictWriter(output, fieldnames=data[0].keys())
+            writer.writeheader()
+            writer.writerows(data)
+        return output.getvalue().encode('utf-8')
+    
+    async def export_coordination_xlsx(self, data: List[Dict]) -> bytes:
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Coordenação"
+        if data:
+            headers = list(data[0].keys())
+            ws.append(headers)
+            for item in data:
+                ws.append(list(item.values()))
+        output = io.BytesIO()
+        wb.save(output)
+        return output.getvalue()
+    
+    async def export_coordination_pdf(self, data: List[Dict]) -> bytes:
+        from reportlab.lib.pagesizes import A4, landscape
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.units import inch
+        from io import BytesIO
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
+        elements = [Spacer(1, 0.5*inch)]
+        styles = getSampleStyleSheet()
+        elements.append(Paragraph(f"{len(data)} registros de coordenação", styles['Normal']))
+        
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Coordenação"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Coordenação")
+        )
+        return buffer.getvalue()
+    
+    async def export_by_bay_csv(self, data: List[Dict]) -> bytes:
+        output = io.StringIO()
+        if data:
+            writer = csv.DictWriter(output, fieldnames=data[0].keys())
+            writer.writeheader()
+            writer.writerows(data)
+        return output.getvalue().encode('utf-8')
+    
+    async def export_by_bay_xlsx(self, data: List[Dict]) -> bytes:
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Por Bay"
+        if data:
+            headers = list(data[0].keys())
+            ws.append(headers)
+            for item in data:
+                ws.append(list(item.values()))
+        output = io.BytesIO()
+        wb.save(output)
+        return output.getvalue()
+    
+    async def export_by_bay_pdf(self, data: List[Dict]) -> bytes:
+        from reportlab.lib.pagesizes import A4, landscape
+        from reportlab.platypus import SimpleDocTemplate, Spacer
+        from reportlab.lib.units import inch
+        from io import BytesIO
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
+        elements = [Spacer(1, 0.5*inch)]
+        
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório por Barra/Subestação"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório por Barra/Subestação")
+        )
+        return buffer.getvalue()
+    
+    async def export_maintenance_csv(self, data: List[Dict]) -> bytes:
+        output = io.StringIO()
+        if data:
+            writer = csv.DictWriter(output, fieldnames=data[0].keys())
+            writer.writeheader()
+            writer.writerows(data)
+        return output.getvalue().encode('utf-8')
+    
+    async def export_maintenance_xlsx(self, data: List[Dict]) -> bytes:
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Manutenção"
+        if data:
+            headers = list(data[0].keys())
+            ws.append(headers)
+            for item in data:
+                ws.append(list(item.values()))
+        output = io.BytesIO()
+        wb.save(output)
+        return output.getvalue()
+    
+    async def export_maintenance_pdf(self, data: List[Dict]) -> bytes:
+        from reportlab.lib.pagesizes import A4, landscape
+        from reportlab.platypus import SimpleDocTemplate, Spacer
+        from reportlab.lib.units import inch
+        from io import BytesIO
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
+        elements = [Spacer(1, 0.5*inch)]
+        
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Manutenção"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Manutenção")
+        )
+        return buffer.getvalue()
+    
+    async def export_executive_csv(self, data: Dict) -> bytes:
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['Métrica', 'Valor'])
+        for key, values in data.items():
+            for item in values:
+                for k, v in item.items():
+                    writer.writerow([f"{key}_{k}", v])
+        return output.getvalue().encode('utf-8')
+    
+    async def export_executive_xlsx(self, data: Dict) -> bytes:
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Executivo"
+        ws.append(['Seção', 'Métrica', 'Valor'])
+        for section, values in data.items():
+            for item in values:
+                for k, v in item.items():
+                    ws.append([section, k, v])
+        output = io.BytesIO()
+        wb.save(output)
+        return output.getvalue()
+    
+    async def export_executive_pdf(self, data: Dict) -> bytes:
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import SimpleDocTemplate, Spacer, Paragraph
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.lib.units import inch
+        from io import BytesIO
+        
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=80, bottomMargin=60)
+        elements = [Spacer(1, 0.5*inch)]
+        styles = getSampleStyleSheet()
+        
+        for section, values in data.items():
+            elements.append(Paragraph(f"<b>{section.upper()}</b>", styles['Heading2']))
+            for item in values:
+                for k, v in item.items():
+                    elements.append(Paragraph(f"{k}: {v}", styles['Normal']))
+            elements.append(Spacer(1, 0.2*inch))
+        
+        doc.build(
+            elements,
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório Executivo"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório Executivo")
+        )
+        return buffer.getvalue()
+

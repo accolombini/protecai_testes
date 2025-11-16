@@ -497,7 +497,7 @@ export default function RelayConfigWizard() {
                 <div className="font-semibold">{selectedEquipment.model_name || '❌ undefined'}</div>
               </div>
               <div>
-                <span className="text-gray-600">Bay:</span>
+                <span className="text-gray-600">Barra:</span>
                 <div className="font-semibold">{selectedEquipment.bay_name || '❌ undefined'}</div>
               </div>
               <div>

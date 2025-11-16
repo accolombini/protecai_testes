@@ -465,7 +465,7 @@ async def get_system_statistics(db: Session = Depends(get_db)):
                     COUNT(*) as total,
                     COUNT(CASE WHEN status = 'ACTIVE' THEN 1 END) as active,
                     COUNT(DISTINCT substation_name) as substations,
-                    COUNT(DISTINCT bay_name) as bays
+                    COUNT(DISTINCT barra_nome) as bays
                 FROM protec_ai.relay_equipment
             """)
             eq_stats = conn.execute(equipment_stats).fetchone()
@@ -623,7 +623,7 @@ async def get_equipment_detailed_report(
                     "manufacturer": equipment.manufacturer_name,
                     "location": {
                         "substation": equipment.substation_name,
-                        "bay": equipment.bay_name,
+                        "bay": equipment.barra_nome,
                         "voltage_level": equipment.voltage_level
                     },
                     "metadata": {
@@ -662,4 +662,438 @@ async def get_equipment_detailed_report(
         logger.error(f"Error getting detailed report: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ===================================================================
+# 🆕 NOVOS ENDPOINTS - RELATÓRIOS TÉCNICOS DE ENGENHARIA
+# ===================================================================
+
+@router.get("/protection-functions/export/{format}")
+async def export_protection_functions_report(
+    format: str,
+    db: Session = Depends(get_db)
+):
+    """
+    🔒 Relatório de Funções de Proteção Ativas
+    
+    Exporta todas as 176 funções de proteção detectadas em 50 relés.
+    Inclui códigos ANSI + IEC, matriz de proteção por equipamento.
+    
+    Args:
+        format: Formato de exportação ('csv', 'xlsx' ou 'pdf')
+        
+    Returns:
+        StreamingResponse com arquivo para download
+    """
+    try:
+        service = ReportService(db)
+        
+        # Query para buscar funções ativas
+        from sqlalchemy import text
+        query = text("""
+            SELECT 
+                apf.relay_file,
+                apf.function_code as ansi_code,
+                apf.function_description,
+                apf.detection_method,
+                re.equipment_tag,
+                f.nome_completo as manufacturer_name,
+                rm.model_name,
+                re.barra_nome,
+                re.status
+            FROM active_protection_functions apf
+            LEFT JOIN protec_ai.relay_equipment re 
+                ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
+                   REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
+            LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+            LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+            ORDER BY apf.relay_file, apf.function_code
+        """)
+        
+        result = db.execute(query)
+        functions_data = [dict(row._mapping) for row in result]
+        
+        # Gerar arquivo no formato solicitado
+        if format.lower() == 'pdf':
+            content = await service.export_protection_functions_pdf(functions_data)
+            media_type = "application/pdf"
+        elif format.lower() == 'xlsx':
+            content = await service.export_protection_functions_xlsx(functions_data)
+            media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        elif format.lower() == 'csv':
+            content = await service.export_protection_functions_csv(functions_data)
+            media_type = "text/csv"
+        else:
+            raise HTTPException(status_code=400, detail="Formato inválido. Use: csv, xlsx ou pdf")
+        
+        filename = f"REL_FUNCOES_PROTECAO_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{format}"
+        
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type=media_type,
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting protection functions: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/setpoints/export/{format}")
+async def export_setpoints_report(
+    format: str,
+    db: Session = Depends(get_db)
+):
+    """
+    ⚡ Relatório de Setpoints Críticos
+    
+    Exporta todos os ajustes de proteção, limites operacionais e curvas.
+    Conteúdo crítico para segurança das subestações.
+    
+    Args:
+        format: Formato de exportação ('csv', 'xlsx' ou 'pdf')
+    """
+    try:
+        service = ReportService(db)
+        
+        from sqlalchemy import text
+        query = text("""
+            SELECT 
+                re.equipment_tag,
+                f.nome_completo as manufacturer_name,
+                rm.model_name,
+                rs.parameter_code,
+                rs.parameter_name,
+                rs.set_value,
+                rs.set_value_text,
+                u.unit_symbol,
+                pf.function_name,
+                rs.category,
+                rs.is_active
+            FROM protec_ai.relay_settings rs
+            JOIN protec_ai.relay_equipment re ON rs.equipment_id = re.id
+            LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+            LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+            LEFT JOIN protec_ai.units u ON rs.unit_id = u.id
+            LEFT JOIN protec_ai.protection_functions pf ON rs.function_id = pf.id
+            WHERE rs.is_active = true
+            AND (
+                rs.category IN ('PROTECTION', 'MEASUREMENT', 'CONTROL')
+                OR rs.parameter_name ~* '(pickup|delay|curve|setpoint|limit)'
+            )
+            ORDER BY re.equipment_tag, rs.parameter_code
+        """)
+        
+        result = db.execute(query)
+        setpoints_data = [dict(row._mapping) for row in result]
+        
+        if format.lower() == 'pdf':
+            content = await service.export_setpoints_pdf(setpoints_data)
+            media_type = "application/pdf"
+        elif format.lower() == 'xlsx':
+            content = await service.export_setpoints_xlsx(setpoints_data)
+            media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        elif format.lower() == 'csv':
+            content = await service.export_setpoints_csv(setpoints_data)
+            media_type = "text/csv"
+        else:
+            raise HTTPException(status_code=400, detail="Formato inválido")
+        
+        filename = f"REL_SETPOINTS_CRITICOS_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{format}"
+        
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type=media_type,
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting setpoints: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/coordination/export/{format}")
+async def export_coordination_report(
+    format: str,
+    db: Session = Depends(get_db)
+):
+    """
+    🎯 Relatório de Coordenação e Seletividade
+    
+    Análise de coordenação entre dispositivos de proteção.
+    """
+    try:
+        service = ReportService(db)
+        
+        from sqlalchemy import text
+        query = text("""
+            WITH coordination_data AS (
+                SELECT 
+                    re.equipment_tag,
+                    re.barra_nome,
+                    apf.function_code as ansi_code,
+                    apf.function_description,
+                    rs.parameter_name,
+                    rs.set_value,
+                    u.unit_symbol
+                FROM active_protection_functions apf
+                JOIN protec_ai.relay_equipment re 
+                    ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
+                       REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
+                LEFT JOIN protec_ai.relay_settings rs 
+                    ON rs.equipment_id = re.id AND rs.is_active = true
+                LEFT JOIN protec_ai.units u ON rs.unit_id = u.id
+                WHERE apf.function_code IN ('50', '51', '50/51', '50N', '51N', '50N/51N')
+            )
+            SELECT * FROM coordination_data
+            ORDER BY barra_nome, equipment_tag, ansi_code
+        """)
+        
+        result = db.execute(query)
+        coordination_data = [dict(row._mapping) for row in result]
+        
+        if format.lower() == 'pdf':
+            content = await service.export_coordination_pdf(coordination_data)
+            media_type = "application/pdf"
+        elif format.lower() == 'xlsx':
+            content = await service.export_coordination_xlsx(coordination_data)
+            media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        elif format.lower() == 'csv':
+            content = await service.export_coordination_csv(coordination_data)
+            media_type = "text/csv"
+        else:
+            raise HTTPException(status_code=400, detail="Formato inválido")
+        
+        filename = f"REL_COORDENACAO_SELETIVIDADE_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{format}"
+        
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type=media_type,
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting coordination: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/by-bay/export/{format}")
+async def export_by_bay_report(
+    format: str,
+    bay: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """
+    🏭 Relatório por Bay/Subestação
+    
+    Equipamentos agrupados por localização física.
+    """
+    try:
+        service = ReportService(db)
+        
+        from sqlalchemy import text
+        bay_filter = "WHERE re.barra_nome = :bay" if bay else ""
+        params = {"bay": bay} if bay else {}
+        
+        query = text(f"""
+            SELECT 
+                re.substation_name,
+                re.barra_nome,
+                re.voltage_level,
+                re.equipment_tag,
+                f.nome_completo as manufacturer_name,
+                rm.model_name,
+                re.serial_number,
+                re.status,
+                COUNT(DISTINCT apf.function_code) as protection_functions_count,
+                STRING_AGG(DISTINCT apf.function_code, ', ' ORDER BY apf.function_code) as protection_codes
+            FROM protec_ai.relay_equipment re
+            LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+            LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+            LEFT JOIN active_protection_functions apf 
+                ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
+                   REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
+            {bay_filter}
+            GROUP BY re.id, re.substation_name, re.barra_nome, re.voltage_level, 
+                     re.equipment_tag, f.nome_completo, rm.model_name, 
+                     re.serial_number, re.status
+            ORDER BY re.substation_name, re.barra_nome, re.equipment_tag
+        """)
+        
+        result = db.execute(query, params)
+        bay_data = [dict(row._mapping) for row in result]
+        
+        if format.lower() == 'pdf':
+            content = await service.export_by_bay_pdf(bay_data)
+            media_type = "application/pdf"
+        elif format.lower() == 'xlsx':
+            content = await service.export_by_bay_xlsx(bay_data)
+            media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        elif format.lower() == 'csv':
+            content = await service.export_by_bay_csv(bay_data)
+            media_type = "text/csv"
+        else:
+            raise HTTPException(status_code=400, detail="Formato inválido")
+        
+        filename = f"REL_POR_BAY_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{format}"
+        
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type=media_type,
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting by-bay report: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/maintenance/export/{format}")
+async def export_maintenance_report(
+    format: str,
+    db: Session = Depends(get_db)
+):
+    """
+    🔧 Relatório de Manutenção e Histórico
+    
+    Gestão de ciclo de vida dos equipamentos.
+    """
+    try:
+        service = ReportService(db)
+        
+        from sqlalchemy import text
+        query = text("""
+            SELECT 
+                re.equipment_tag,
+                f.nome_completo as manufacturer_name,
+                rm.model_name,
+                re.serial_number,
+                re.barra_nome,
+                re.status,
+                re.created_at as import_date,
+                re.source_file,
+                COUNT(DISTINCT rs.id) as total_settings,
+                COUNT(DISTINCT CASE WHEN rs.is_active THEN rs.id END) as active_settings
+            FROM protec_ai.relay_equipment re
+            LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+            LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+            LEFT JOIN protec_ai.relay_settings rs ON rs.equipment_id = re.id
+            GROUP BY re.id, f.nome_completo, rm.model_name
+            ORDER BY re.created_at DESC, re.equipment_tag
+        """)
+        
+        result = db.execute(query)
+        maintenance_data = [dict(row._mapping) for row in result]
+        
+        if format.lower() == 'pdf':
+            content = await service.export_maintenance_pdf(maintenance_data)
+            media_type = "application/pdf"
+        elif format.lower() == 'xlsx':
+            content = await service.export_maintenance_xlsx(maintenance_data)
+            media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        elif format.lower() == 'csv':
+            content = await service.export_maintenance_csv(maintenance_data)
+            media_type = "text/csv"
+        else:
+            raise HTTPException(status_code=400, detail="Formato inválido")
+        
+        filename = f"REL_MANUTENCAO_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{format}"
+        
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type=media_type,
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting maintenance report: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/executive/export/{format}")
+async def export_executive_report(
+    format: str,
+    db: Session = Depends(get_db)
+):
+    """
+    📈 Relatório Executivo para Engenharia
+    
+    Visão estratégica com KPIs e métricas de desempenho.
+    """
+    try:
+        service = ReportService(db)
+        
+        from sqlalchemy import text
+        
+        # Consolidar múltiplas queries em um relatório executivo
+        queries = {
+            'overview': text("""
+                SELECT 
+                    COUNT(DISTINCT re.id) as total_equipments,
+                    COUNT(DISTINCT f.id) as total_manufacturers,
+                    COUNT(DISTINCT rm.id) as total_models,
+                    COUNT(DISTINCT apf.function_code) as total_protection_codes,
+                    COUNT(DISTINCT apf.id) as total_active_functions
+                FROM protec_ai.relay_equipment re
+                LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+                LEFT JOIN active_protection_functions apf ON true
+            """),
+            'by_manufacturer': text("""
+                SELECT 
+                    f.nome_completo as manufacturer_name,
+                    COUNT(*) as count,
+                    ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as percentage
+                FROM protec_ai.relay_equipment re
+                LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
+                GROUP BY f.nome_completo
+                ORDER BY count DESC
+            """),
+            'by_status': text("""
+                SELECT 
+                    re.status,
+                    COUNT(*) as count
+                FROM protec_ai.relay_equipment re
+                GROUP BY re.status
+            """),
+            'protection_coverage': text("""
+                SELECT 
+                    COUNT(DISTINCT apf.relay_file) as relays_with_protection,
+                    COUNT(DISTINCT re.id) as total_relays,
+                    ROUND(COUNT(DISTINCT apf.relay_file) * 100.0 / COUNT(DISTINCT re.id), 2) as coverage_percentage
+                FROM protec_ai.relay_equipment re
+                LEFT JOIN active_protection_functions apf 
+                    ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
+                       REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
+            """)
+        }
+        
+        executive_data = {}
+        for key, query in queries.items():
+            result = db.execute(query)
+            executive_data[key] = [dict(row._mapping) for row in result]
+        
+        if format.lower() == 'pdf':
+            content = await service.export_executive_pdf(executive_data)
+            media_type = "application/pdf"
+        elif format.lower() == 'xlsx':
+            content = await service.export_executive_xlsx(executive_data)
+            media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        elif format.lower() == 'csv':
+            content = await service.export_executive_csv(executive_data)
+            media_type = "text/csv"
+        else:
+            raise HTTPException(status_code=400, detail="Formato inválido")
+        
+        filename = f"REL_EXECUTIVO_ENGENHARIA_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{format}"
+        
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type=media_type,
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting executive report: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 

@@ -41,10 +41,11 @@ interface ReportFilters {
   manufacturer: string;
   status: string;
   model: string;
-  busbar: string;  // Mapeia para bay no backend
+  busbar: string;  // Mapeia para barra no backend
 }
 
-type ReportType = 'overview' | 'all-relays' | 'by-manufacturer' | 'by-status' | 'custom';
+type ReportType = 'overview' | 'all-relays' | 'by-manufacturer' | 'by-status' | 'custom' |
+                 'protection-functions' | 'setpoints' | 'coordination' | 'by-bay' | 'maintenance' | 'executive';
 type ExportFormat = 'csv' | 'xlsx' | 'pdf';
 
 // ===== COMPONENTE PRINCIPAL =====
@@ -159,7 +160,17 @@ const Reports: React.FC = () => {
         if (value) params.append(key, String(value));
       });
       
-      const url = `http://localhost:8000/api/v1/reports/export/${format}?${params.toString()}`;
+      // Determinar URL baseada no tipo de relatório
+      let url: string;
+      if (['protection-functions', 'setpoints', 'coordination', 'by-bay', 'maintenance', 'executive'].includes(selectedReport)) {
+        // Novos relatórios técnicos
+        url = `http://localhost:8000/api/v1/reports/${selectedReport}/export/${format}?${params.toString()}`;
+      } else {
+        // Relatórios básicos (mantém URL original)
+        url = `http://localhost:8000/api/v1/reports/export/${format}?${params.toString()}`;
+      }
+      
+      console.log(`🌐 Chamando endpoint: ${url}`);
       
       const response = await fetch(url);
       if (!response.ok) {
@@ -248,26 +259,40 @@ const Reports: React.FC = () => {
   // ===== RENDERIZAÇÃO =====
   return (
     <div className="space-y-6">
-      {/* Header Principal */}
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-white mb-2">
-              Sistema de Relatórios - PETROBRAS
-            </h1>
-            <p className="text-gray-300">
-              Exportação multi-formato de dados de relés de proteção
-            </p>
+      {/* 🎨 CABEÇALHO PROFISSIONAL PETROBRAS */}
+      <div className="bg-linear-to-r from-blue-900 via-blue-800 to-green-900 rounded-lg p-8 border-2 border-blue-600 shadow-2xl">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4 shadow-lg">
+            <span className="text-4xl font-bold text-blue-900">⚡</span>
           </div>
-          <div className="flex items-center space-x-6">
-            <div className="text-right">
-              <div className="text-3xl font-bold text-blue-400">{equipments.length}</div>
-              <div className="text-sm text-gray-400">Equipamentos Totais</div>
+          <h1 className="text-3xl font-bold text-white mb-2 tracking-wide uppercase">
+            ENGENHARIA DE PROTEÇÃO PETROBRAS
+          </h1>
+          <div className="h-1 w-64 bg-linear-to-r from-transparent via-yellow-400 to-transparent mx-auto mb-4"></div>
+          <p className="text-blue-100 text-lg font-medium">
+            Sistema de Relatórios - Relés de Proteção
+          </p>
+          <p className="text-blue-200 text-sm mt-2">
+            Exportação multi-formato de dados técnicos e operacionais
+          </p>
+        </div>
+        
+        <div className="flex items-center justify-center space-x-12 bg-black/20 rounded-lg py-4 px-6 backdrop-blur-sm">
+          <div className="text-center">
+            <div className="text-4xl font-bold text-yellow-400 mb-1">{equipments.length}</div>
+            <div className="text-sm text-blue-200 uppercase tracking-wide">Equipamentos Totais</div>
+          </div>
+          <div className="h-12 w-px bg-blue-400/30"></div>
+          <div className="text-center">
+            <div className="text-4xl font-bold text-green-400 mb-1">{filteredData.length}</div>
+            <div className="text-sm text-blue-200 uppercase tracking-wide">Registros Filtrados</div>
+          </div>
+          <div className="h-12 w-px bg-blue-400/30"></div>
+          <div className="text-center">
+            <div className="text-4xl font-bold text-purple-400 mb-1">
+              {metadata?.manufacturers.length || 0}
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-green-400">{filteredData.length}</div>
-              <div className="text-sm text-gray-400">Filtrados</div>
-            </div>
+            <div className="text-sm text-blue-200 uppercase tracking-wide">Fabricantes</div>
           </div>
         </div>
       </div>
@@ -303,7 +328,7 @@ const Reports: React.FC = () => {
             </div>
             <div className="flex items-start gap-2">
               <span>✓</span>
-              <span>Inclui dados completos: fabricante, modelo, bay, subestação</span>
+              <span>Inclui dados completos: fabricante, modelo, barra, subestação</span>
             </div>
           </div>
         </div>
@@ -312,7 +337,10 @@ const Reports: React.FC = () => {
       {/* Seletor de Tipo de Relatório */}
       <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
         <h2 className="text-lg font-semibold text-white mb-4">Selecione o Tipo de Relatório</h2>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        
+        {/* RELATÓRIOS BÁSICOS */}
+        <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">📊 Relatórios Básicos</h3>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
           <button
             onClick={() => setSelectedReport('overview')}
             className={`p-4 rounded-lg border-2 transition-all ${
@@ -376,6 +404,88 @@ const Reports: React.FC = () => {
             <DocumentTextIcon className="h-6 w-6 text-orange-400 mx-auto mb-2" />
             <div className="text-white font-medium text-sm">Personalizado</div>
             <div className="text-gray-400 text-xs mt-1">{activeFiltersCount} filtros</div>
+          </button>
+        </div>
+
+        {/* RELATÓRIOS TÉCNICOS DE ENGENHARIA */}
+        <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">⚡ Relatórios Técnicos de Engenharia</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button
+            onClick={() => setSelectedReport('protection-functions')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              selectedReport === 'protection-functions'
+                ? 'border-cyan-500 bg-cyan-500/10'
+                : 'border-gray-600 hover:border-gray-500'
+            }`}
+          >
+            <div className="text-2xl mb-2">🔒</div>
+            <div className="text-white font-medium text-sm">Funções de Proteção</div>
+            <div className="text-gray-400 text-xs mt-1">176 funções ativas</div>
+          </button>
+
+          <button
+            onClick={() => setSelectedReport('setpoints')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              selectedReport === 'setpoints'
+                ? 'border-pink-500 bg-pink-500/10'
+                : 'border-gray-600 hover:border-gray-500'
+            }`}
+          >
+            <div className="text-2xl mb-2">⚡</div>
+            <div className="text-white font-medium text-sm">Setpoints Críticos</div>
+            <div className="text-gray-400 text-xs mt-1">Ajustes e limites</div>
+          </button>
+
+          <button
+            onClick={() => setSelectedReport('coordination')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              selectedReport === 'coordination'
+                ? 'border-indigo-500 bg-indigo-500/10'
+                : 'border-gray-600 hover:border-gray-500'
+            }`}
+          >
+            <div className="text-2xl mb-2">🎯</div>
+            <div className="text-white font-medium text-sm">Coordenação</div>
+            <div className="text-gray-400 text-xs mt-1">Seletividade</div>
+          </button>
+
+          <button
+            onClick={() => setSelectedReport('by-bay')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              selectedReport === 'by-bay'
+                ? 'border-teal-500 bg-teal-500/10'
+                : 'border-gray-600 hover:border-gray-500'
+            }`}
+          >
+            <div className="text-2xl mb-2">🏭</div>
+            <div className="text-white font-medium text-sm">Por Barra/Subestação</div>
+            <div className="text-gray-400 text-xs mt-1">Topologia</div>
+          </button>
+
+          <button
+            onClick={() => setSelectedReport('maintenance')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              selectedReport === 'maintenance'
+                ? 'border-amber-500 bg-amber-500/10'
+                : 'border-gray-600 hover:border-gray-500'
+            }`}
+          >
+            <div className="text-2xl mb-2">🔧</div>
+            <div className="text-white font-medium text-sm">Manutenção</div>
+            <div className="text-gray-400 text-xs mt-1">Histórico</div>
+          </button>
+
+          <button
+            onClick={() => setSelectedReport('executive')}
+            className={`p-4 rounded-lg border-2 transition-all ${
+              selectedReport === 'executive'
+                ? 'border-red-500 bg-red-500/10'
+                : 'border-gray-600 hover:border-gray-500'
+            }`}
+          >
+            <div className="text-2xl mb-2">📈</div>
+            <div className="text-white font-medium text-sm">Executivo</div>
+            <div className="text-gray-400 text-xs mt-1">KPIs e análises</div>
           </button>
         </div>
       </div>
@@ -746,6 +856,383 @@ const Reports: React.FC = () => {
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ⚡ NOVO: Relatório de Funções de Proteção Ativas */}
+      {selectedReport === 'protection-functions' && (
+        <div className="bg-gray-800 rounded-lg border border-cyan-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-4xl">🔒</div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">Relatório de Funções de Proteção Ativas</h2>
+                <p className="text-sm text-gray-400">176 funções detectadas em 50 relés (códigos ANSI + IEC)</p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <ExportButtons filterParams={{}} />
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="bg-cyan-900/30 border border-cyan-700 rounded-lg p-4 mb-6">
+              <h3 className="text-cyan-300 font-semibold mb-3">📊 Conteúdo do Relatório:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-cyan-100">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Todas as 176 funções ativas detectadas</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Códigos ANSI (50/51, 27, 59, 46, etc.)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Nomenclatura IEC (I&gt;, Ie&gt;, U&lt;, tI&gt;, etc.)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Matriz de proteção por equipamento</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Distribuição por barra</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Análise de cobertura (primária/backup)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-700/50 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white font-medium">Dados completos de proteção de todos os 50 relés</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Inclui: TAG, Modelo, Fabricante, Barra, Funções ANSI, Status
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-cyan-400">176</div>
+                  <div className="text-xs text-gray-400">funções ativas</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ⚡ NOVO: Relatório de Setpoints Críticos */}
+      {selectedReport === 'setpoints' && (
+        <div className="bg-gray-800 rounded-lg border border-pink-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-4xl">⚡</div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">Relatório de Setpoints Críticos</h2>
+                <p className="text-sm text-gray-400">Ajustes de proteção, limites operacionais e curvas</p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <ExportButtons filterParams={{}} />
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="bg-pink-900/30 border border-pink-700 rounded-lg p-4 mb-6">
+              <h3 className="text-pink-300 font-semibold mb-3">⚙️ Parâmetros Incluídos:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-pink-100">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Pickup de corrente (In, Ie)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Delays e temporizações (t&gt;, t&gt;&gt;)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Curvas IEC/ANSI (NI, VI, EI, MI)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Limites de tensão (U&lt;, U&gt;)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Fatores de potência e ângulos</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Alarmes e configurações críticas</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-amber-400 mb-2">
+                <span className="text-xl">⚠️</span>
+                <span className="font-semibold">ATENÇÃO: Relatório Crítico</span>
+              </div>
+              <p className="text-sm text-amber-200">
+                Este relatório contém ajustes que impactam diretamente a segurança e operação das subestações.
+                Qualquer modificação deve ser aprovada pela Engenharia de Proteção PETROBRAS.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🎯 NOVO: Relatório de Coordenação e Seletividade */}
+      {selectedReport === 'coordination' && (
+        <div className="bg-gray-800 rounded-lg border border-indigo-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-4xl">🎯</div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">Relatório de Coordenação e Seletividade</h2>
+                <p className="text-sm text-gray-400">Análise de coordenação entre dispositivos de proteção</p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <ExportButtons filterParams={{}} />
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="bg-indigo-900/30 border border-indigo-700 rounded-lg p-4 mb-6">
+              <h3 className="text-indigo-300 font-semibold mb-3">🔄 Análises Realizadas:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-indigo-100">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Coordenação de sobrecorrente (50/51)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Proteção de terra (50N/51N)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Seletividade entre relés upstream/downstream</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Margem de segurança (CTI)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Curvas tempo x corrente</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Identificação de conflitos</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-700/50 rounded-lg p-4">
+              <p className="text-white font-medium mb-2">🔍 Escopo da Análise</p>
+              <p className="text-sm text-gray-400">
+                Verifica coordenação entre todos os dispositivos de proteção por barra/alimentador, 
+                identificando sobreposições, gaps de proteção e configurações que podem levar a 
+                atuações indevidas ou falta de seletividade.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🏭 NOVO: Relatório por Barra/Subestação */}
+      {selectedReport === 'by-bay' && (
+        <div className="bg-gray-800 rounded-lg border border-teal-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-4xl">🏭</div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">Relatório por Barra/Subestação</h2>
+                <p className="text-sm text-gray-400">Equipamentos agrupados por localização física</p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <ExportButtons filterParams={{}} />
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="bg-teal-900/30 border border-teal-700 rounded-lg p-4 mb-6">
+              <h3 className="text-teal-300 font-semibold mb-3">🗺️ Organização Topológica:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-teal-100">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Agrupamento por barra</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Hierarquia por subestação</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Topologia de proteção</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Equipamentos por área</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Relação primário/backup</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Status operacional por localização</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-700/50 rounded-lg p-4">
+              <p className="text-white font-medium mb-2">📍 Visualização Geográfica</p>
+              <p className="text-sm text-gray-400">
+                Permite visualizar todos os equipamentos organizados por sua posição física na instalação,
+                facilitando identificação de redundâncias, zonas de proteção e planejamento de manutenção.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🔧 NOVO: Relatório de Manutenção */}
+      {selectedReport === 'maintenance' && (
+        <div className="bg-gray-800 rounded-lg border border-amber-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-4xl">🔧</div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">Relatório de Manutenção e Histórico</h2>
+                <p className="text-sm text-gray-400">Gestão de ciclo de vida dos equipamentos</p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <ExportButtons filterParams={{}} />
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-4 mb-6">
+              <h3 className="text-amber-300 font-semibold mb-3">📅 Informações de Manutenção:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-amber-100">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Data de comissionamento</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Última manutenção realizada</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Próximas manutenções programadas</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Histórico de modificações</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Vida útil estimada</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Alertas de equipamentos críticos</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-700/50 rounded-lg p-4">
+              <p className="text-white font-medium mb-2">🔔 Alertas e Notificações</p>
+              <p className="text-sm text-gray-400">
+                Identifica equipamentos que requerem atenção urgente, vencimento de calibrações,
+                firmware desatualizado ou configurações que não seguem os padrões mais recentes da PETROBRAS.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📈 NOVO: Relatório Executivo */}
+      {selectedReport === 'executive' && (
+        <div className="bg-gray-800 rounded-lg border border-red-700">
+          <div className="p-6 border-b border-gray-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="text-4xl">📈</div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">Relatório Executivo para Engenharia</h2>
+                <p className="text-sm text-gray-400">Visão estratégica e KPIs de desempenho</p>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <ExportButtons filterParams={{}} />
+            </div>
+          </div>
+          
+          <div className="p-6">
+            <div className="bg-red-900/30 border border-red-700 rounded-lg p-4 mb-6">
+              <h3 className="text-red-300 font-semibold mb-3">📊 Indicadores e Métricas:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-red-100">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>KPIs de confiabilidade (MTBF, MTTR)</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Índice de disponibilidade dos relés</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Análise de criticidade por equipamento</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Conformidade com padrões PETROBRAS</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Investimentos e renovação de frota</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Recomendações técnicas prioritárias</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-green-900/30 border border-green-700 rounded-lg p-4">
+                <div className="text-2xl font-bold text-green-400 mb-1">100%</div>
+                <div className="text-sm text-green-200">Cobertura de Proteção</div>
+                <div className="text-xs text-gray-400 mt-1">50/50 relés mapeados</div>
+              </div>
+              <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4">
+                <div className="text-2xl font-bold text-blue-400 mb-1">176</div>
+                <div className="text-sm text-blue-200">Funções Ativas</div>
+                <div className="text-xs text-gray-400 mt-1">14 códigos ANSI únicos</div>
+              </div>
+              <div className="bg-purple-900/30 border border-purple-700 rounded-lg p-4">
+                <div className="text-2xl font-bold text-purple-400 mb-1">9</div>
+                <div className="text-sm text-purple-200">Modelos Diferentes</div>
+                <div className="text-xs text-gray-400 mt-1">2 fabricantes principais</div>
+              </div>
+            </div>
+
+            <div className="bg-gray-700/50 rounded-lg p-4">
+              <p className="text-white font-medium mb-2">🎯 Visão Estratégica</p>
+              <p className="text-sm text-gray-400">
+                Relatório consolidado para apresentação à gerência e tomada de decisões estratégicas.
+                Inclui análises de tendências, projeções de investimento e roadmap de modernização do sistema de proteção.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

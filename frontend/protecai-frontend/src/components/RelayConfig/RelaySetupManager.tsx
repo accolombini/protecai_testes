@@ -266,13 +266,13 @@ export default function RelaySetupManager() {
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            🔍 Buscar por TAG, Bay ou Fabricante:
+            🔍 Buscar por TAG, Barra ou Fabricante:
           </label>
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Ex: 21-REL-87B-001, Bay 21, GE..."
+            placeholder="Ex: 21-REL-87B-001, Barra PN, GE..."
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
@@ -325,7 +325,7 @@ export default function RelaySetupManager() {
                 <div className="font-semibold">{selectedEquipment.model_name}</div>
               </div>
               <div>
-                <span className="text-gray-600">Bay:</span>
+                <span className="text-gray-600">Barra:</span>
                 <div className="font-semibold">{selectedEquipment.bay_name}</div>
               </div>
               <div>

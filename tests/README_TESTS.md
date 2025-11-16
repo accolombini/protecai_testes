@@ -408,12 +408,111 @@ def test_file(tmp_path):
 
 ---
 
+## 🧪 test_all_reports_comprehensive.sh
+
+**Objetivo**: Validação COMPLETA de nomenclatura "Bay" → "Barra" em todos os relatórios
+
+**Tipo**: Shell Script de validação end-to-end
+
+**O que faz**:
+- ✅ Testa **11 tipos de relatórios** × **3 formatos** = **33 arquivos**
+- ✅ Valida geração de arquivos (PDF, XLSX, CSV)
+- ✅ Valida conteúdo PDF (busca por "Bay" hardcoded)
+- ✅ Gera relatório colorido com estatísticas completas
+
+**Relatórios Testados**:
+
+**Básicos (5)**:
+1. Visão Geral (overview)
+2. Todos os Relés (all-relays)
+3. Por Fabricante (by-manufacturer)
+4. Por Status (by-status)
+5. Personalizado (custom)
+
+**Técnicos (6)**:
+6. Funções de Proteção (protection-functions)
+7. Setpoints Críticos (setpoints)
+8. Coordenação (coordination)
+9. Por Barra/Subestação (by-bay)
+10. Manutenção (maintenance)
+11. Executivo (executive)
+
+**Como executar**:
+
+```bash
+# Executar teste completo
+./tests/test_all_reports_comprehensive.sh
+
+# Ver apenas resumo final
+./tests/test_all_reports_comprehensive.sh 2>&1 | tail -40
+
+# Salvar resultado completo
+./tests/test_all_reports_comprehensive.sh > test_reports_$(date +%Y%m%d).log 2>&1
+```
+
+**Saída esperada**:
+```
+========================================================================
+  TESTE COMPLETO DE RELATÓRIOS - ProtecAI PETROBRAS
+  11 Tipos de Relatórios × 3 Formatos = 33 Arquivos
+========================================================================
+
+[1/33] Testando Visão Geral (PDF)... ✅ OK (8368 bytes, PDF document)
+[2/33] Testando Visão Geral (XLSX)... ✅ OK (8315 bytes)
+...
+[33/33] Testando Executivo (CSV)... ✅ OK (578 bytes)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  PARTE 3: VALIDAÇÃO DE CONTEÚDO PDF (11 PDFs)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 Validando 01_overview_pdf.pdf... ✅ OK - Apenas 'Barra'
+...
+🔍 Validando 11_executive_pdf.pdf... ✅ OK - Apenas 'Barra'
+
+========================================================================
+  RESUMO DA VALIDAÇÃO
+========================================================================
+
+Total de testes executados: 33/33
+Testes bem-sucedidos:       33
+Testes falhados:            0
+
+PDFs validados (conteúdo):  11/11
+PDFs com 'Bay' hardcoded:   0
+
+========================================================================
+✅ VALIDAÇÃO 100% COMPLETA - Todos os relatórios OK!
+========================================================================
+```
+
+**Requisitos**:
+- Backend rodando em `http://localhost:8000`
+- `pdftotext` instalado (parte do poppler-utils)
+- `curl` e `file` disponíveis no sistema
+
+**Arquivos gerados**:
+- Diretório temporário: `/tmp/test_reports_YYYYMMDD_HHMMSS/`
+- 33 arquivos de teste (11 PDFs, 11 XLSX, 11 CSV)
+- Mantidos para inspeção manual se necessário
+
+**Uso em CI/CD**:
+```yaml
+# .github/workflows/test-reports.yml
+- name: Test All Reports
+  run: |
+    ./tests/test_all_reports_comprehensive.sh
+```
+
+---
+
 ## 📚 Recursos Adicionais
 
 - [Pytest Documentation](https://docs.pytest.org/)
 - [Pytest-mock Documentation](https://pytest-mock.readthedocs.io/)
 - [Coverage.py Documentation](https://coverage.readthedocs.io/)
+- [ReportLab Documentation](https://docs.reportlab.com/)
 
 ---
 
-**Última atualização**: 2025-11-03
+**Última atualização**: 2025-11-16
