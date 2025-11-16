@@ -3,7 +3,7 @@ Router de Equipamentos - CRUD Completo com Sistema Unificado
 ============================================================
 
 Endpoints para gerenciamento de equipamentos de proteção com
-integração transparente entre schemas protec_ai e relay_configs.
+integração transparente entre schemas protec_ai e protec_ai.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query

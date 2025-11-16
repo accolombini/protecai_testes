@@ -29,9 +29,9 @@ async def get_database_statistics(db: Session = Depends(get_db)):
         stats = {}
         
         # Schema relay_configs
-        relay_equipment_query = text("SELECT COUNT(*) FROM relay_configs.relay_equipment")
-        protection_functions_query = text("SELECT COUNT(*) FROM relay_configs.protection_functions")
-        io_config_query = text("SELECT COUNT(*) FROM relay_configs.io_configuration")
+        relay_equipment_query = text("SELECT COUNT(*) FROM protec_ai.relay_equipment")
+        protection_functions_query = text("SELECT COUNT(*) FROM protec_ai.protection_functions")
+        io_config_query = text("SELECT COUNT(*) FROM protec_ai.io_configuration")
         
         # Schema public
         active_functions_query = text("SELECT COUNT(*) FROM active_protection_functions")

@@ -49,9 +49,9 @@ class UnifiedEquipmentService:
                     (SELECT COUNT(*) FROM protec_ai.tokens_valores) as parsed_tokens,
                     (SELECT COUNT(*) FROM protec_ai.valores_originais) as original_values,
                     (SELECT COUNT(DISTINCT codigo_campo) FROM protec_ai.campos_originais) as unique_parameters,
-                    (SELECT COUNT(*) FROM relay_configs.relay_equipment) as relay_equipment_count,
-                    (SELECT COUNT(*) FROM relay_configs.etap_studies) as etap_studies,
-                    (SELECT COUNT(*) FROM relay_configs.etap_sync_logs) as sync_logs
+                    (SELECT COUNT(*) FROM protec_ai.relay_equipment) as relay_equipment_count,
+                    (SELECT COUNT(*) FROM protec_ai.etap_studies) as etap_studies,
+                    (SELECT COUNT(*) FROM protec_ai.etap_sync_logs) as sync_logs
                 """)
                 
                 result = conn.execute(query).fetchone()
@@ -115,7 +115,7 @@ class UnifiedEquipmentService:
                     """)
                     protec_ai_result = conn.execute(protec_ai_query).fetchall()
                 
-                # Buscar em relay_configs.manufacturers (pode estar vazio)
+                # Buscar em protec_ai.manufacturers (pode estar vazio)
                 if query:
                     relay_configs_query = text("""
                         SELECT 
@@ -124,8 +124,8 @@ class UnifiedEquipmentService:
                             name,
                             country,
                             created_at,
-                            (SELECT COUNT(*) FROM relay_configs.relay_models WHERE manufacturer_id = m.id) as model_count
-                        FROM relay_configs.manufacturers m
+                            (SELECT COUNT(*) FROM protec_ai.relay_models WHERE manufacturer_id = m.id) as model_count
+                        FROM protec_ai.manufacturers m
                         WHERE name ILIKE :search_pattern
                         ORDER BY name
                     """)
@@ -140,8 +140,8 @@ class UnifiedEquipmentService:
                             name,
                             country,
                             created_at,
-                            (SELECT COUNT(*) FROM relay_configs.relay_models WHERE manufacturer_id = m.id) as model_count
-                        FROM relay_configs.manufacturers m
+                            (SELECT COUNT(*) FROM protec_ai.relay_models WHERE manufacturer_id = m.id) as model_count
+                        FROM protec_ai.manufacturers m
                         ORDER BY name
                     """)
                     relay_configs_result = conn.execute(relay_configs_query).fetchall()
@@ -227,9 +227,9 @@ class UnifiedEquipmentService:
                                 m.nome_completo as manufacturer_name,
                                 '' as manufacturer_country,
                                 re.created_at
-                            FROM relay_configs.relay_equipment re
-                            JOIN relay_configs.relay_models rm ON re.relay_model_id = rm.id
-                            JOIN relay_configs.fabricantes m ON rm.manufacturer_id = m.id
+                            FROM protec_ai.relay_equipment re
+                            JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                            JOIN protec_ai.fabricantes m ON rm.manufacturer_id = m.id
                             WHERE m.nome_completo ILIKE :manufacturer_pattern
                             ORDER BY re.id
                         """)
@@ -253,14 +253,14 @@ class UnifiedEquipmentService:
                                 m.nome_completo as manufacturer_name,
                                 '' as manufacturer_country,
                                 re.created_at
-                            FROM relay_configs.relay_equipment re
-                            JOIN relay_configs.relay_models rm ON re.relay_model_id = rm.id
-                            JOIN relay_configs.fabricantes m ON rm.manufacturer_id = m.id
+                            FROM protec_ai.relay_equipment re
+                            JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                            JOIN protec_ai.fabricantes m ON rm.manufacturer_id = m.id
                             ORDER BY re.id
                         """)
                         structured_equipment = conn.execute(structured_query).fetchall()
                 else:
-                    logger.warning("⚠️ relay_configs.relay_equipment table does not exist - using fallback")
+                    logger.warning("⚠️ protec_ai.relay_equipment table does not exist - using fallback")
                 
                 # Processar equipamentos relay_configs
                 for eq in structured_equipment:
@@ -521,13 +521,13 @@ class UnifiedEquipmentService:
                     ec.phase_ct_secondary,
                     ec.nominal_voltage,
                     -- Contagem de funções de proteção
-                    (SELECT COUNT(*) FROM relay_configs.protection_functions WHERE equipment_id = re.id) as protection_count,
+                    (SELECT COUNT(*) FROM protec_ai.protection_functions WHERE equipment_id = re.id) as protection_count,
                     -- Contagem de I/O
-                    (SELECT COUNT(*) FROM relay_configs.io_configuration WHERE equipment_id = re.id) as io_count
-                FROM relay_configs.relay_equipment re
-                JOIN relay_configs.relay_models rm ON re.relay_model_id = rm.id
-                JOIN relay_configs.manufacturers m ON rm.manufacturer_id = m.id
-                LEFT JOIN relay_configs.electrical_configuration ec ON re.id = ec.equipment_id
+                    (SELECT COUNT(*) FROM protec_ai.io_configuration WHERE equipment_id = re.id) as io_count
+                FROM protec_ai.relay_equipment re
+                JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
+                JOIN protec_ai.manufacturers m ON rm.manufacturer_id = m.id
+                LEFT JOIN protec_ai.electrical_configuration ec ON re.id = ec.equipment_id
                 WHERE re.id = :equipment_id
             """)
             
@@ -1051,7 +1051,7 @@ class UnifiedEquipmentService:
             with self.engine.connect() as conn:
                 etap_query = text("""
                     SELECT id, equipment_name, equipment_type, model_name, manufacturer
-                    FROM relay_configs.etap_equipment_configs 
+                    FROM protec_ai.etap_equipment_configs 
                     WHERE id = :equipment_id
                 """)
                 etap_result = conn.execute(etap_query, {"equipment_id": equipment_id}).fetchone()

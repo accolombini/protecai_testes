@@ -821,7 +821,7 @@ class ImportService:
     async def _get_postgresql_import_history(self, offset: int, limit: int) -> List[Dict]:
         """
         BUSCAR HISTÓRICO REAL NO POSTGRESQL
-        Consulta tabelas relay_configs.import_history e protec_ai.arquivos
+        Consulta tabelas protec_ai.import_history e protec_ai.arquivos
         """
         try:
             if not self.db_engine:
@@ -839,7 +839,7 @@ class ImportService:
                         0 as records_imported,
                         100.0 as success_rate,
                         0.0 as processing_time
-                    FROM relay_configs.import_history 
+                    FROM protec_ai.import_history 
                     ORDER BY created_at DESC
                     LIMIT :limit OFFSET :offset
                 """)
@@ -1445,12 +1445,12 @@ class ImportService:
                 # 1. Estatísticas do schema relay_configs (estrutura real)
                 relay_stats_query = text("""
                     SELECT 
-                        (SELECT COUNT(*) FROM relay_configs.relay_equipment) as total_equipment,
-                        (SELECT COUNT(*) FROM relay_configs.protection_functions) as total_protection_functions,
-                        (SELECT COUNT(*) FROM relay_configs.protection_functions WHERE enabled = true) as enabled_functions,
-                        (SELECT COUNT(*) FROM relay_configs.io_configuration) as total_io_configs,
-                        (SELECT COUNT(*) FROM relay_configs.manufacturers) as total_manufacturers,
-                        (SELECT COUNT(*) FROM relay_configs.import_history) as import_history_count
+                        (SELECT COUNT(*) FROM protec_ai.relay_equipment) as total_equipment,
+                        (SELECT COUNT(*) FROM protec_ai.protection_functions) as total_protection_functions,
+                        (SELECT COUNT(*) FROM protec_ai.protection_functions WHERE enabled = true) as enabled_functions,
+                        (SELECT COUNT(*) FROM protec_ai.io_configuration) as total_io_configs,
+                        (SELECT COUNT(*) FROM protec_ai.manufacturers) as total_manufacturers,
+                        (SELECT COUNT(*) FROM protec_ai.import_history) as import_history_count
                 """)
                 
                 # 2. Estatísticas do schema protec_ai (estrutura real corrigida)
@@ -1632,7 +1632,7 @@ class ImportService:
                         COUNT(DISTINCT codigo_ansi) as protection_functions,
                         COUNT(DISTINCT modelo_rele) as relay_models,
                         COUNT(DISTINCT CASE WHEN valor_original IS NOT NULL THEN 1 END) as valid_parameters
-                    FROM relay_configs.configuracoes_reles cr
+                    FROM protec_ai.configuracoes_reles cr
                     WHERE cr.arquivo_origem ILIKE :filename_pattern
                 """)
                 
@@ -2072,7 +2072,7 @@ class ImportService:
                 try:
                     # Tentar remover dados que possam ter import_id como referência
                     tables_to_check = [
-                        "relay_configs.equipamentos",
+                        "protec_ai.equipamentos",
                         "protec_ai.tokens_valores"
                     ]
                     
@@ -2549,7 +2549,7 @@ class ImportService:
                         {
                             "job_id": "import_20251025_100000",
                             "status": "completed",
-                            "filename": "relay_configs.xlsx",
+                            "filename": "protec_ai.xlsx",
                             "records_processed": 1658
                         }
                     ],

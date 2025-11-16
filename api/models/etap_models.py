@@ -118,8 +118,8 @@ class EtapEquipmentConfig(Base):
     __table_args__ = {"schema": "relay_configs"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    study_id = Column(Integer, ForeignKey("relay_configs.etap_studies.id"), nullable=False)
-    equipment_id = Column(Integer, ForeignKey("relay_configs.relay_equipment.id"))
+    study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"), nullable=False)
+    equipment_id = Column(Integer, ForeignKey("protec_ai.relay_equipment.id"))
     
     # Identificação do equipamento no estudo
     etap_device_id = Column(String(100))  # ID do dispositivo no ETAP
@@ -162,7 +162,7 @@ class ProtectionCurve(Base):
     __table_args__ = {"schema": "relay_configs"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    equipment_config_id = Column(Integer, ForeignKey("relay_configs.etap_equipment_configs.id"))
+    equipment_config_id = Column(Integer, ForeignKey("protec_ai.etap_equipment_configs.id"))
     
     # Identificação da curva
     curve_name = Column(String(255), nullable=False)
@@ -199,7 +199,7 @@ class CoordinationResult(Base):
     __table_args__ = {"schema": "relay_configs"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    study_id = Column(Integer, ForeignKey("relay_configs.etap_studies.id"), nullable=False)
+    study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"), nullable=False)
     
     # Identificação do par de coordenação
     upstream_device = Column(String(100), nullable=False)
@@ -240,7 +240,7 @@ class SimulationResult(Base):
     __table_args__ = {"schema": "relay_configs"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    study_id = Column(Integer, ForeignKey("relay_configs.etap_studies.id"), nullable=False)
+    study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"), nullable=False)
     
     # Identificação da simulação
     simulation_type = Column(String(50))  # Short Circuit, Load Flow, etc.
@@ -284,7 +284,7 @@ class EtapSyncLog(Base):
     # Identificação da sincronização
     sync_type = Column(String(50))  # IMPORT, EXPORT, SYNC
     operation = Column(String(100))  # Descrição da operação
-    study_id = Column(Integer, ForeignKey("relay_configs.etap_studies.id"))
+    study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"))
     
     # Status da sincronização
     status = Column(String(50))  # SUCCESS, FAILED, IN_PROGRESS
@@ -394,5 +394,5 @@ class EtapImportHistory(Base):
     import_source = Column(String(100))  # WEB_UI, API, BATCH
     
     # Relacionamentos opcionais
-    study_id = Column(Integer, ForeignKey("relay_configs.etap_studies.id"))
+    study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"))
     study = relationship("EtapStudy")

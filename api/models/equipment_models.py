@@ -35,7 +35,7 @@ class RelayModel(Base):
     __table_args__ = {'schema': 'relay_configs'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    manufacturer_id = Column(Integer, ForeignKey('relay_configs.manufacturers.id'), nullable=False)
+    manufacturer_id = Column(Integer, ForeignKey('protec_ai.manufacturers.id'), nullable=False)
     name = Column(String(255), nullable=False)
     model_type = Column(String(100))
     family = Column(String(100))
@@ -56,7 +56,7 @@ class RelayEquipment(Base):
     __table_args__ = {'schema': 'relay_configs'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    model_id = Column(Integer, ForeignKey('relay_configs.relay_models.id'), nullable=False)
+    model_id = Column(Integer, ForeignKey('protec_ai.relay_models.id'), nullable=False)
     serial_number = Column(String(100))
     tag_reference = Column(String(50))
     plant_reference = Column(String(100))
@@ -82,7 +82,7 @@ class ElectricalConfiguration(Base):
     __table_args__ = {'schema': 'relay_configs'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    equipment_id = Column(Integer, ForeignKey('relay_configs.relay_equipment.id'), nullable=False)
+    equipment_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
     phase_ct_primary = Column(Float)
     phase_ct_secondary = Column(Float)
     neutral_ct_primary = Column(Float)
@@ -103,7 +103,7 @@ class ProtectionFunction(Base):
     __table_args__ = {'schema': 'relay_configs'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    equipment_id = Column(Integer, ForeignKey('relay_configs.relay_equipment.id'), nullable=False)
+    equipment_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
     function_code = Column(String(10), nullable=False)
     function_name = Column(String(100), nullable=False)
     enabled = Column(Boolean, default=True)
@@ -123,7 +123,7 @@ class IOConfiguration(Base):
     __table_args__ = {'schema': 'relay_configs'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    equipment_id = Column(Integer, ForeignKey('relay_configs.relay_equipment.id'), nullable=False)
+    equipment_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
     channel_number = Column(Integer, nullable=False)
     channel_type = Column(String(20), nullable=False)  # 'digital_input', 'digital_output', 'analog_input'
     signal_type = Column(String(50))
@@ -142,8 +142,8 @@ class ComparisonReport(Base):
     __table_args__ = {'schema': 'relay_configs'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    equipment1_id = Column(Integer, ForeignKey('relay_configs.relay_equipment.id'), nullable=False)
-    equipment2_id = Column(Integer, ForeignKey('relay_configs.relay_equipment.id'), nullable=False)
+    equipment1_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
+    equipment2_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
     comparison_type = Column(String(50), default='full')
     similarity_score = Column(Float)
     differences_count = Column(Integer)
