@@ -397,7 +397,7 @@ const MainDashboard: React.FC = () => {
       </div>
 
       {/* SCHEMA PRINCIPAL - PIPELINE (protec_ai) - NOSSO */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 rounded-lg p-6 border-2 border-blue-500 shadow-lg">
+      <div className="bg-linear-to-r from-blue-900 to-blue-800 rounded-lg p-6 border-2 border-blue-500 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <ServerIcon className="h-8 w-8 text-blue-300" />
