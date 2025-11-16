@@ -387,74 +387,109 @@ const MainDashboard: React.FC = () => {
         <div className="bg-orange-900 rounded-lg p-6 border border-orange-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-200 text-sm font-medium">Registros DB</p>
-              <p className="text-3xl font-bold text-white">{systemStats.postgresRecords}</p>
+              <p className="text-orange-200 text-sm font-medium">Settings (protec_ai)</p>
+              <p className="text-3xl font-bold text-white">{technicalData.totalSettings.toLocaleString()}</p>
             </div>
             <DocumentTextIcon className="h-12 w-12 text-orange-400" />
           </div>
-          <p className="text-orange-200 text-sm mt-2">PostgreSQL 16 - Dados Reais</p>
+          <p className="text-orange-200 text-sm mt-2">relay_settings • Schema PIPELINE</p>
         </div>
       </div>
 
-      {/* Dados Técnicos */}
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <h2 className="text-xl font-semibold text-white mb-4">Dados Técnicos - Relés de Proteção (Dados Reais)</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium text-blue-400">Equipamentos & Funções</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Equipamentos Processados:</span>
-                <span className="text-white font-medium">{technicalData.totalEquipments} relés</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Funções de Proteção:</span>
-                <span className="text-white font-medium">{technicalData.protectionFunctions} funções</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Funções Ativas:</span>
-                <span className="text-green-400 font-medium">{technicalData.activeFunctions} ({((technicalData.activeFunctions / technicalData.protectionFunctions) * 100).toFixed(1)}%)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Configurações (Settings):</span>
-                <span className="text-white font-medium">{technicalData.totalSettings.toLocaleString()} configs</span>
-              </div>
+      {/* SCHEMA PRINCIPAL - PIPELINE (protec_ai) - NOSSO */}
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 rounded-lg p-6 border-2 border-blue-500 shadow-lg">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <ServerIcon className="h-8 w-8 text-blue-300" />
+            <div>
+              <h2 className="text-2xl font-bold text-white">SCHEMA PIPELINE (protec_ai)</h2>
+              <p className="text-blue-200 text-sm">Time Dados • Schema de Produção • NOSSO</p>
             </div>
           </div>
-          
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium text-green-400">Schema ETAP (relay_configs)</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Estrutura:</span>
-                <span className="text-green-400 font-medium">✅ Preparada</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Status Dados:</span>
-                <span className="text-blue-400 font-medium">Vazio (Correto)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Pronto para Team ETAP:</span>
-                <span className="text-green-400 font-medium">✅ Sim</span>
-              </div>
+          <div className="bg-green-500 text-white px-4 py-2 rounded-full font-semibold text-sm">
+            ✅ OPERACIONAL
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-blue-800/50 rounded-lg p-4 border border-blue-600">
+            <p className="text-blue-200 text-xs mb-1">Equipamentos</p>
+            <p className="text-3xl font-bold text-white">{technicalData.totalEquipments}</p>
+            <p className="text-blue-300 text-xs mt-1">relés processados</p>
+          </div>
+          <div className="bg-blue-800/50 rounded-lg p-4 border border-blue-600">
+            <p className="text-blue-200 text-xs mb-1">Configurações</p>
+            <p className="text-3xl font-bold text-white">{technicalData.totalSettings.toLocaleString()}</p>
+            <p className="text-blue-300 text-xs mt-1">settings ativos</p>
+          </div>
+          <div className="bg-blue-800/50 rounded-lg p-4 border border-blue-600">
+            <p className="text-blue-200 text-xs mb-1">Funções Ativas</p>
+            <p className="text-3xl font-bold text-white">{technicalData.activeFunctions}</p>
+            <p className="text-blue-300 text-xs mt-1">de {technicalData.protectionFunctions} funções</p>
+          </div>
+          <div className="bg-blue-800/50 rounded-lg p-4 border border-blue-600">
+            <p className="text-blue-200 text-xs mb-1">APIs Online</p>
+            <p className="text-3xl font-bold text-white">{onlineAPIs}/{apiStatuses.length}</p>
+            <p className="text-blue-300 text-xs mt-1">endpoints ativos</p>
+          </div>
+        </div>
+      </div>
+
+      {/* SCHEMAS AUXILIARES - ETAP E ML */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gray-800 rounded-lg p-6 border border-green-600">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-semibold text-green-400">Schema ETAP</h3>
+              <p className="text-gray-400 text-sm">(relay_configs) • Time ETAP</p>
+            </div>
+            <CpuChipIcon className="h-8 w-8 text-green-400" />
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400">Estrutura:</span>
+              <span className="text-green-400 font-medium">✅ Preparada</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400">Status:</span>
+              <span className="text-blue-400 font-medium">Vazio (Aguardando)</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400">Responsável:</span>
+              <span className="text-green-400 font-medium">Time ETAP</span>
+            </div>
+            <div className="mt-4 bg-green-900/30 border border-green-700 rounded p-3">
+              <p className="text-green-300 text-xs text-center">
+                🎯 Pronto para simulações ETAP
+              </p>
             </div>
           </div>
-          
-          <div className="space-y-3">
-            <h3 className="text-lg font-medium text-purple-400">Schema ML (ml_gateway)</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Estrutura:</span>
-                <span className="text-green-400 font-medium">✅ Preparada</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Status Dados:</span>
-                <span className="text-blue-400 font-medium">Vazio (Correto)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Pronto para Team ML:</span>
-                <span className="text-green-400 font-medium">✅ Sim</span>
-              </div>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-6 border border-purple-600">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-semibold text-purple-400">Schema ML</h3>
+              <p className="text-gray-400 text-sm">(ml_gateway) • Time ML</p>
+            </div>
+            <BoltIcon className="h-8 w-8 text-purple-400" />
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400">Estrutura:</span>
+              <span className="text-green-400 font-medium">✅ Preparada</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400">Status:</span>
+              <span className="text-blue-400 font-medium">Vazio (Aguardando)</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-400">Responsável:</span>
+              <span className="text-purple-400 font-medium">Time ML</span>
+            </div>
+            <div className="mt-4 bg-purple-900/30 border border-purple-700 rounded p-3">
+              <p className="text-purple-300 text-xs text-center">
+                🤖 Pronto para modelos preditivos
+              </p>
             </div>
           </div>
         </div>
