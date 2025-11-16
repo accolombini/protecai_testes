@@ -213,20 +213,20 @@ class UnifiedEquipmentService:
                     if manufacturer_filter:
                         structured_query = text("""
                             SELECT 
-                                'relay_configs' as source_schema,
+                                'protec_ai' as source_schema,
                                 re.id,
-                                re.tag as equipment_tag,
-                                '' as serial_number,
-                                re.location as substation_name,
-                                '' as barra_nome,
+                                re.equipment_tag,
+                                re.serial_number,
+                                re.substation_name,
+                                re.barra_nome,
                                 re.status,
-                                '' as position_description,
+                                re.position_description,
                                 rm.model_name,
-                                rm.series,
+                                rm.model_code as series,
                                 '' as family,
                                 m.nome_completo as manufacturer_name,
                                 '' as manufacturer_country,
-                                re.created_at
+                                re.installation_date as created_at
                             FROM protec_ai.relay_equipment re
                             JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
                             JOIN protec_ai.fabricantes m ON rm.manufacturer_id = m.id
@@ -239,20 +239,20 @@ class UnifiedEquipmentService:
                     else:
                         structured_query = text("""
                             SELECT 
-                                'relay_configs' as source_schema,
+                                'protec_ai' as source_schema,
                                 re.id,
-                                re.tag as equipment_tag,
-                                '' as serial_number,
-                                re.location as substation_name,
-                                '' as barra_nome,
+                                re.equipment_tag,
+                                re.serial_number,
+                                re.substation_name,
+                                re.barra_nome,
                                 re.status,
-                                '' as position_description,
+                                re.position_description,
                                 rm.model_name,
-                                rm.series,
+                                rm.model_code as series,
                                 '' as family,
                                 m.nome_completo as manufacturer_name,
                                 '' as manufacturer_country,
-                                re.created_at
+                                re.installation_date as created_at
                             FROM protec_ai.relay_equipment re
                             JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
                             JOIN protec_ai.fabricantes m ON rm.manufacturer_id = m.id
@@ -495,39 +495,38 @@ class UnifiedEquipmentService:
             query = text("""
                 SELECT 
                     re.id,
-                    re.tag_reference,
+                    re.equipment_tag as tag_reference,
                     re.serial_number,
-                    re.plant_reference,
-                    re.bay_position,
-                    re.software_version,
-                    re.frequency,
-                    re.description,
+                    re.substation_name as plant_reference,
+                    re.barra_nome as bay_position,
+                    '' as software_version,
+                    0 as frequency,
+                    re.position_description as description,
                     re.installation_date,
                     re.commissioning_date,
                     re.status,
-                    rm.name as model_name,
-                    rm.model_type,
-                    rm.family,
-                    rm.application_type,
-                    rm.voltage_class,
-                    rm.current_class,
-                    rm.protection_functions,
-                    m.name as manufacturer_name,
-                    m.country as manufacturer_country,
-                    m.website,
-                    m.support_contact,
+                    rm.model_name,
+                    '' as model_type,
+                    '' as family,
+                    '' as application_type,
+                    '' as voltage_class,
+                    '' as current_class,
+                    ARRAY[]::text[] as protection_functions,
+                    m.nome_completo as manufacturer_name,
+                    '' as manufacturer_country,
+                    '' as website,
+                    '' as support_contact,
                     -- Configuração elétrica
-                    ec.phase_ct_primary,
-                    ec.phase_ct_secondary,
-                    ec.nominal_voltage,
+                    0 as phase_ct_primary,
+                    0 as phase_ct_secondary,
+                    0 as nominal_voltage,
                     -- Contagem de funções de proteção
-                    (SELECT COUNT(*) FROM protec_ai.protection_functions WHERE equipment_id = re.id) as protection_count,
+                    (SELECT COUNT(*) FROM protec_ai.equipment_protection_functions WHERE equipment_id = re.id) as protection_count,
                     -- Contagem de I/O
-                    (SELECT COUNT(*) FROM protec_ai.io_configuration WHERE equipment_id = re.id) as io_count
+                    0 as io_count
                 FROM protec_ai.relay_equipment re
                 JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
-                JOIN protec_ai.manufacturers m ON rm.manufacturer_id = m.id
-                LEFT JOIN protec_ai.electrical_configuration ec ON re.id = ec.equipment_id
+                JOIN protec_ai.fabricantes m ON rm.manufacturer_id = m.id
                 WHERE re.id = :equipment_id
             """)
             

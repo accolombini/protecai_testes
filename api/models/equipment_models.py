@@ -16,7 +16,7 @@ Base = declarative_base()
 class Manufacturer(Base):
     """Fabricante de equipamentos de proteção"""
     __tablename__ = 'manufacturers'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
@@ -32,7 +32,7 @@ class Manufacturer(Base):
 class RelayModel(Base):
     """Modelo de relé de proteção"""
     __tablename__ = 'relay_models'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     manufacturer_id = Column(Integer, ForeignKey('protec_ai.manufacturers.id'), nullable=False)
@@ -53,7 +53,7 @@ class RelayModel(Base):
 class RelayEquipment(Base):
     """Equipamento de relé instalado"""
     __tablename__ = 'relay_equipment'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     model_id = Column(Integer, ForeignKey('protec_ai.relay_models.id'), nullable=False)
@@ -79,7 +79,7 @@ class RelayEquipment(Base):
 class ElectricalConfiguration(Base):
     """Configuração elétrica do equipamento"""
     __tablename__ = 'electrical_configuration'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     equipment_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
@@ -100,7 +100,7 @@ class ElectricalConfiguration(Base):
 class ProtectionFunction(Base):
     """Funções de proteção configuradas"""
     __tablename__ = 'protection_functions'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     equipment_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
@@ -120,7 +120,7 @@ class ProtectionFunction(Base):
 class IOConfiguration(Base):
     """Configuração de entradas e saídas"""
     __tablename__ = 'io_configuration'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     equipment_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
@@ -139,7 +139,7 @@ class IOConfiguration(Base):
 class ComparisonReport(Base):
     """Relatórios de comparação entre equipamentos"""
     __tablename__ = 'comparison_reports'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     equipment1_id = Column(Integer, ForeignKey('protec_ai.relay_equipment.id'), nullable=False)
@@ -157,7 +157,7 @@ class ComparisonReport(Base):
 class ImportHistory(Base):
     """Histórico de importações de dados"""
     __tablename__ = 'import_history'
-    __table_args__ = {'schema': 'relay_configs'}
+    __table_args__ = {'schema': 'protec_ai'}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     filename = Column(String(255), nullable=False)

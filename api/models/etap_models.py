@@ -73,7 +73,7 @@ class EtapStudy(Base):
     Baseado na estrutura real dos dados da Petrobras
     """
     __tablename__ = "etap_studies"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4, unique=True, nullable=False)
@@ -115,7 +115,7 @@ class EtapEquipmentConfig(Base):
     Mapeia dados reais extraídos dos PDFs da Petrobras
     """
     __tablename__ = "etap_equipment_configs"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"), nullable=False)
@@ -159,7 +159,7 @@ class ProtectionCurve(Base):
     Baseado nos tipos de curvas identificados nos dados reais
     """
     __tablename__ = "protection_curves"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     equipment_config_id = Column(Integer, ForeignKey("protec_ai.etap_equipment_configs.id"))
@@ -196,7 +196,7 @@ class CoordinationResult(Base):
     Resultados de estudos de coordenação
     """
     __tablename__ = "coordination_results"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"), nullable=False)
@@ -237,7 +237,7 @@ class SimulationResult(Base):
     Resultados de simulações ETAP
     """
     __tablename__ = "simulation_results"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     study_id = Column(Integer, ForeignKey("protec_ai.etap_studies.id"), nullable=False)
@@ -277,7 +277,7 @@ class EtapSyncLog(Base):
     Preparado para futuras integrações com etapPy™ API
     """
     __tablename__ = "etap_sync_logs"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     
@@ -324,7 +324,7 @@ class EtapFieldMapping(Base):
     Baseado na análise dos CSVs reais da Petrobras
     """
     __tablename__ = "etap_field_mappings"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     
@@ -362,7 +362,7 @@ class EtapImportHistory(Base):
     Histórico de importações de dados ETAP
     """
     __tablename__ = "etap_import_history"
-    __table_args__ = {"schema": "relay_configs"}
+    __table_args__ = {"schema": "protec_ai"}
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     
