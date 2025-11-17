@@ -37,7 +37,7 @@ try:
     from .precise_parameter_extractor import PreciseParameterExtractor
 except ImportError:
     from file_registry_manager import FileRegistryManager
-    from precise_parameter_extractor import PreciseParameterExtractor
+    from src.precise_parameter_extractor import PreciseParameterExtractor
 
 # ---------------------------
 # Configuração de diretórios

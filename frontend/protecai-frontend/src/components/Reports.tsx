@@ -44,6 +44,22 @@ interface ReportFilters {
   busbar: string;  // Mapeia para barra no backend
 }
 
+interface ActiveFunctionsStats {
+  total_functions: number;
+  total_relays: number;
+  total_models: number;
+  unique_function_codes: number;
+}
+
+interface DatabaseStats {
+  total_equipments: number;
+  total_settings: number;
+  active_settings: number;
+  protection_functions_count: number;
+  active_functions_count: number;
+  unique_relays_with_functions: number;
+}
+
 type ReportType = 'overview' | 'all-relays' | 'by-manufacturer' | 'by-status' | 'custom' |
                  'protection-functions' | 'setpoints' | 'coordination' | 'by-bay' | 'maintenance' | 'executive';
 type ExportFormat = 'csv' | 'xlsx' | 'pdf';
@@ -54,6 +70,8 @@ const Reports: React.FC = () => {
   const [selectedReport, setSelectedReport] = useState<ReportType>('overview');
   const [equipments, setEquipments] = useState<RelayEquipment[]>([]);
   const [metadata, setMetadata] = useState<ReportMetadata | null>(null);
+  const [activeFunctionsStats, setActiveFunctionsStats] = useState<ActiveFunctionsStats | null>(null);
+  const [databaseStats, setDatabaseStats] = useState<DatabaseStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
@@ -70,6 +88,8 @@ const Reports: React.FC = () => {
     console.log('📊 INICIALIZANDO MÓDULO DE RELATÓRIOS...');
     loadMetadata();
     loadEquipments();
+    loadActiveFunctionsStats();
+    loadDatabaseStats();
   }, []);
 
   // Carregar metadados
@@ -113,6 +133,58 @@ const Reports: React.FC = () => {
       console.error('❌ Erro ao carregar equipamentos:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Carregar estatísticas de funções ativas
+  const loadActiveFunctionsStats = async () => {
+    try {
+      console.log('🔍 Carregando estatísticas de funções ativas...');
+      const response = await fetch('http://localhost:8000/api/v1/active-functions/summary');
+      
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Estatísticas de funções ativas carregadas:', data.summary);
+      setActiveFunctionsStats(data.summary);
+    } catch (error) {
+      console.error('❌ Erro ao carregar estatísticas de funções ativas:', error);
+      // Fallback para evitar quebrar o frontend
+      setActiveFunctionsStats({
+        total_functions: 0,
+        total_relays: 0,
+        total_models: 0,
+        unique_function_codes: 0
+      });
+    }
+  };
+
+  // Carregar estatísticas do banco de dados
+  const loadDatabaseStats = async () => {
+    try {
+      console.log('🔍 Carregando estatísticas do banco de dados...');
+      const response = await fetch('http://localhost:8000/api/v1/database/statistics');
+      
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Estatísticas do banco carregadas:', data);
+      // Backend retorna os dados dentro de data.summary
+      setDatabaseStats(data.summary);
+    } catch (error) {
+      console.error('❌ Erro ao carregar estatísticas do banco:', error);
+      setDatabaseStats({
+        total_equipments: 0,
+        total_settings: 0,
+        active_settings: 0,
+        protection_functions_count: 0,
+        active_functions_count: 0,
+        unique_relays_with_functions: 0
+      });
     }
   };
 
@@ -279,13 +351,15 @@ const Reports: React.FC = () => {
         
         <div className="flex items-center justify-center space-x-12 bg-black/20 rounded-lg py-4 px-6 backdrop-blur-sm">
           <div className="text-center">
-            <div className="text-4xl font-bold text-yellow-400 mb-1">{equipments.length}</div>
+            <div className="text-4xl font-bold text-yellow-400 mb-1">{databaseStats?.total_equipments || 0}</div>
             <div className="text-sm text-blue-200 uppercase tracking-wide">Equipamentos Totais</div>
           </div>
           <div className="h-12 w-px bg-blue-400/30"></div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-green-400 mb-1">{filteredData.length}</div>
-            <div className="text-sm text-blue-200 uppercase tracking-wide">Registros Filtrados</div>
+            <div className="text-4xl font-bold text-green-400 mb-1">
+              {activeFunctionsStats?.total_functions || 0}
+            </div>
+            <div className="text-sm text-blue-200 uppercase tracking-wide">Funções Ativas</div>
           </div>
           <div className="h-12 w-px bg-blue-400/30"></div>
           <div className="text-center">
@@ -364,7 +438,7 @@ const Reports: React.FC = () => {
           >
             <CpuChipIcon className="h-6 w-6 text-green-400 mx-auto mb-2" />
             <div className="text-white font-medium text-sm">Todos os Relés</div>
-            <div className="text-gray-400 text-xs mt-1">{equipments.length} registros</div>
+            <div className="text-gray-400 text-xs mt-1">{databaseStats?.total_equipments || 0} registros</div>
           </button>
 
           <button
@@ -420,7 +494,9 @@ const Reports: React.FC = () => {
           >
             <div className="text-2xl mb-2">🔒</div>
             <div className="text-white font-medium text-sm">Funções de Proteção</div>
-            <div className="text-gray-400 text-xs mt-1">176 funções ativas</div>
+            <div className="text-gray-400 text-xs mt-1">
+              {activeFunctionsStats ? `${activeFunctionsStats.total_functions} funções ativas` : 'Carregando...'}
+            </div>
           </button>
 
           <button
@@ -497,7 +573,7 @@ const Reports: React.FC = () => {
             <div className="bg-blue-900 rounded-lg p-6 border border-blue-700">
               <div className="flex items-center justify-between mb-4">
                 <CpuChipIcon className="h-8 w-8 text-blue-400" />
-                <span className="text-2xl font-bold text-white">{equipments.length}</span>
+                <span className="text-2xl font-bold text-white">{databaseStats?.total_equipments || 0}</span>
               </div>
               <h3 className="text-blue-200 font-medium">Total de Equipamentos</h3>
               <p className="text-blue-300 text-sm mt-2">Relés de proteção cadastrados</p>
@@ -507,11 +583,11 @@ const Reports: React.FC = () => {
               <div className="flex items-center justify-between mb-4">
                 <CheckCircleIcon className="h-8 w-8 text-green-400" />
                 <span className="text-2xl font-bold text-white">
-                  {equipments.filter(e => e.status === 'ACTIVE').length}
+                  {activeFunctionsStats?.total_relays || 0}
                 </span>
               </div>
-              <h3 className="text-green-200 font-medium">Equipamentos Ativos</h3>
-              <p className="text-green-300 text-sm mt-2">Em operação normal</p>
+              <h3 className="text-green-200 font-medium">Relés com Funções</h3>
+              <p className="text-green-300 text-sm mt-2">Com proteções configuradas</p>
             </div>
 
             <div className="bg-purple-900 rounded-lg p-6 border border-purple-700">
@@ -532,7 +608,7 @@ const Reports: React.FC = () => {
               <ExportButtons />
             </div>
             <p className="text-gray-400 text-sm">
-              Exporte todos os {equipments.length} equipamentos cadastrados no sistema em formato CSV, Excel ou PDF
+              Exporte todos os {databaseStats?.total_equipments || 0} equipamentos cadastrados no sistema em formato CSV, Excel ou PDF
             </p>
           </div>
         </div>
@@ -548,7 +624,7 @@ const Reports: React.FC = () => {
                   Relatório Completo de Equipamentos
                 </h2>
                 <p className="text-sm text-gray-400">
-                  {equipments.length} equipamentos • Atualizado em {lastUpdate.toLocaleTimeString('pt-BR')}
+                  {databaseStats?.total_equipments || 0} equipamentos • Atualizado em {lastUpdate.toLocaleTimeString('pt-BR')}
                 </p>
               </div>
               <ExportButtons />
@@ -600,10 +676,10 @@ const Reports: React.FC = () => {
             </table>
           </div>
           
-          {equipments.length > 20 && (
+          {(databaseStats?.total_equipments || 0) > 20 && (
             <div className="p-4 bg-gray-700/50 text-center">
               <p className="text-sm text-gray-400">
-                Mostrando 20 de {equipments.length} equipamentos. Exporte para ver todos os registros.
+                Mostrando 20 de {databaseStats?.total_equipments || 0} equipamentos. Exporte para ver todos os registros.
               </p>
             </div>
           )}
@@ -867,7 +943,11 @@ const Reports: React.FC = () => {
               <div className="text-4xl">🔒</div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Relatório de Funções de Proteção Ativas</h2>
-                <p className="text-sm text-gray-400">176 funções detectadas em 50 relés (códigos ANSI + IEC)</p>
+                <p className="text-sm text-gray-400">
+                  {activeFunctionsStats 
+                    ? `${activeFunctionsStats.total_functions} funções detectadas em ${activeFunctionsStats.total_relays} relés (códigos ANSI + IEC)`
+                    : 'Carregando estatísticas...'}
+                </p>
               </div>
             </div>
             <div className="flex justify-end">
@@ -881,7 +961,11 @@ const Reports: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-cyan-100">
                 <div className="flex items-start gap-2">
                   <span className="text-green-400">✓</span>
-                  <span>Todas as 176 funções ativas detectadas</span>
+                  <span>
+                    {activeFunctionsStats 
+                      ? `Todas as ${activeFunctionsStats.total_functions} funções ativas detectadas`
+                      : 'Todas as funções ativas detectadas'}
+                  </span>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-green-400">✓</span>
@@ -1209,19 +1293,33 @@ const Reports: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-green-900/30 border border-green-700 rounded-lg p-4">
-                <div className="text-2xl font-bold text-green-400 mb-1">100%</div>
+                <div className="text-2xl font-bold text-green-400 mb-1">
+                  {databaseStats && databaseStats.total_equipments > 0 
+                    ? Math.round((databaseStats.unique_relays_with_functions / databaseStats.total_equipments) * 100) 
+                    : 0}%
+                </div>
                 <div className="text-sm text-green-200">Cobertura de Proteção</div>
-                <div className="text-xs text-gray-400 mt-1">50/50 relés mapeados</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {databaseStats?.unique_relays_with_functions || 0}/{databaseStats?.total_equipments || 0} relés mapeados
+                </div>
               </div>
               <div className="bg-blue-900/30 border border-blue-700 rounded-lg p-4">
-                <div className="text-2xl font-bold text-blue-400 mb-1">176</div>
+                <div className="text-2xl font-bold text-blue-400 mb-1">
+                  {activeFunctionsStats?.total_functions || 0}
+                </div>
                 <div className="text-sm text-blue-200">Funções Ativas</div>
-                <div className="text-xs text-gray-400 mt-1">14 códigos ANSI únicos</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {activeFunctionsStats?.unique_function_codes || 0} códigos ANSI únicos
+                </div>
               </div>
               <div className="bg-purple-900/30 border border-purple-700 rounded-lg p-4">
-                <div className="text-2xl font-bold text-purple-400 mb-1">9</div>
+                <div className="text-2xl font-bold text-purple-400 mb-1">
+                  {activeFunctionsStats?.total_models || 0}
+                </div>
                 <div className="text-sm text-purple-200">Modelos Diferentes</div>
-                <div className="text-xs text-gray-400 mt-1">2 fabricantes principais</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  {metadata?.manufacturers.length || 0} fabricantes
+                </div>
               </div>
             </div>
 

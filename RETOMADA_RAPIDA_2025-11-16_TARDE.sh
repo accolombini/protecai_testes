@@ -1,0 +1,203 @@
+#!/bin/bash
+# ====================================================================
+# RETOMADA RÁPIDA - 16 de Novembro de 2025 (TARDE)
+# ====================================================================
+
+echo "🎯 PROTECAI - RETOMADA RÁPIDA"
+echo "======================================"
+echo ""
+
+# 1. CONTEXTO ATUAL
+echo "📊 CONTEXTO ATUAL:"
+echo "  - Total de equipamentos: 50"
+echo "  - Fabricantes: 2 (Schneider Electric 84%, General Electric 16%)"
+echo "  - Modelos: 8"
+echo "  - Códigos de proteção: 14"
+echo "  - Funções ativas detectadas: 176 ✅"
+echo ""
+
+# 2. PROBLEMA IDENTIFICADO
+echo "❌ PROBLEMA ATUAL:"
+echo "  - Detecção de checkboxes com MUITOS falsos positivos"
+echo "  - P122 página 1: 271 checkboxes detectados (esperado: ~20-40)"
+echo "  - Elementos detectados erroneamente:"
+echo "    • Pontos da árvore de navegação (X=111-143)"
+echo "    • Ícones de pasta (amarelos)"
+echo "    • Elementos decorativos"
+echo ""
+
+# 3. CAUSA RAIZ
+echo "🔍 CAUSA RAIZ:"
+echo "  - FALTA MASCARAMENTO DE TEXTO antes da detecção"
+echo "  - Código atual detecta LETRAS como checkboxes"
+echo "  - Filtro HSV implementado, mas conversão RGB→BGR incorreta"
+echo ""
+
+# 4. SOLUÇÃO DISPONÍVEL
+echo "✅ SOLUÇÃO VALIDADA (08/11/2025):"
+echo "  - Arquivo: scripts/universal_checkbox_detector.py"
+echo "  - Precisão: 100% (119/119 checkboxes no P922)"
+echo "  - Funcionalidades:"
+echo "    • Mascaramento de texto ANTES da detecção"
+echo "    • Filtro HSV de saturação (threshold=40)"
+echo "    • Auto-calibração de densidade (31.6%)"
+echo ""
+
+# 5. EVIDÊNCIA DE QUE O SISTEMA FUNCIONA
+echo "🎉 EVIDÊNCIA DE SUCESSO:"
+echo "  - 176 funções ativas JÁ detectadas no banco"
+echo "  - Sistema NÃO está totalmente quebrado"
+echo "  - Problema é APENAS na precisão da detecção de checkboxes"
+echo ""
+
+# 6. PLANO DE AÇÃO
+echo "📋 PLANO DE AÇÃO IMEDIATO:"
+echo ""
+echo "PASSO 1: VALIDAR CÓDIGO DE REFERÊNCIA"
+echo "  cd /Users/accol/Library/Mobile\ Documents/com~apple~CloudDocs/UNIVERSIDADES/UFF/PROJETOS/PETROBRAS/PETRO_ProtecAI/protecai_testes"
+echo "  python scripts/universal_checkbox_detector.py 'inputs/pdf/P122_204-PN-06_LADO_A_2014-08-01.pdf' 1"
+echo ""
+
+echo "PASSO 2: CONTAR CHECKBOXES MANUALMENTE"
+echo "  Abrir: inputs/pdf/P122_204-PN-06_LADO_A_2014-08-01.pdf"
+echo "  Contar checkboxes na página 1"
+echo "  Anotar quantidade esperada"
+echo ""
+
+echo "PASSO 3: COMPARAR RESULTADOS"
+echo "  Detectados pelo universal_checkbox_detector: ?"
+echo "  Contagem manual: ?"
+echo "  Diferença: ?"
+echo ""
+
+echo "PASSO 4: COPIAR CÓDIGO VALIDADO"
+echo "  Se universal_checkbox_detector.py estiver correto:"
+echo "  - Copiar método detect_checkboxes() para precise_parameter_extractor.py"
+echo "  - Copiar método de mascaramento de texto"
+echo "  - Testar incrementalmente"
+echo ""
+
+# 7. TESTES DE VALIDAÇÃO
+echo "🧪 TESTES DE VALIDAÇÃO:"
+echo ""
+echo "  # Teste atual (QUEBRADO - 271 checkboxes)"
+echo "  python test_page1_only.py"
+echo ""
+echo "  # Teste com código validado"
+echo "  python scripts/universal_checkbox_detector.py 'inputs/pdf/P122_204-PN-06_LADO_A_2014-08-01.pdf' 1"
+echo ""
+echo "  # Pipeline completa"
+echo "  python scripts/reprocess_pipeline_complete.py"
+echo ""
+
+# 8. MÉTRICAS DE SUCESSO
+echo "✅ CRITÉRIOS DE SUCESSO:"
+echo "  - Checkboxes detectados na página 1: 20-40 (não 271)"
+echo "  - Precisão: >95%"
+echo "  - Falsos positivos: <5%"
+echo "  - LED 5 extrai valores: tI>, tI>>"
+echo "  - Funções ativas mantém: ~176"
+echo ""
+
+# 9. ARQUIVOS IMPORTANTES
+echo "📁 ARQUIVOS CHAVE:"
+echo "  ✅ scripts/universal_checkbox_detector.py (FUNCIONA 100%)"
+echo "  ✅ PONTO_DE_RETOMADA_2025-11-08.md (documentação validada)"
+echo "  ❌ src/precise_parameter_extractor.py (QUEBRADO)"
+echo "  ❌ test_page1_only.py (teste mostrando 271 falsos positivos)"
+echo "  📋 STATUS_CRITICO_2025-11-16_PIPELINE_QUEBRADA.md (análise completa)"
+echo ""
+
+# 10. COMANDOS ÚTEIS
+echo "🛠️  COMANDOS ÚTEIS:"
+echo ""
+echo "  # Ativar virtualenv"
+echo "  source /Volumes/Mac_XIV/virtualenvs/protecai_testes/bin/activate"
+echo ""
+echo "  # Ver funções ativas no banco"
+echo "  psql -U postgres -d protecai_testes -c \"SELECT COUNT(*) as funcoes_ativas FROM relay_parameters WHERE value IS NOT NULL AND value != '';\""
+echo ""
+echo "  # Ver overview do sistema"
+echo "  python scripts/generate_relay_report.py"
+echo ""
+echo "  # Git status"
+echo "  git status"
+echo ""
+
+# 11. LIÇÕES APRENDIDAS
+echo "💡 LIÇÕES APRENDIDAS:"
+echo "  ❌ NÃO tentar ajustar filtros sem entender causa raiz"
+echo "  ❌ NÃO ignorar código validado (universal_checkbox_detector.py)"
+echo "  ❌ NÃO adicionar hard-coded X/Y sem mascaramento de texto"
+echo "  ✅ USAR código que funciona como base"
+echo "  ✅ VALIDAR incrementalmente (cada mudança isolada)"
+echo "  ✅ CONTAR manualmente antes de comparar"
+echo ""
+
+# 12. PRÓXIMO AGENTE - INSTRUÇÕES
+echo "🎯 INSTRUÇÕES PARA PRÓXIMO AGENTE:"
+echo ""
+echo "1. LER:"
+echo "   - STATUS_CRITICO_2025-11-16_PIPELINE_QUEBRADA.md"
+echo "   - PONTO_DE_RETOMADA_2025-11-08.md"
+echo ""
+echo "2. EXECUTAR:"
+echo "   python scripts/universal_checkbox_detector.py 'inputs/pdf/P122_204-PN-06_LADO_A_2014-08-01.pdf' 1"
+echo ""
+echo "3. CONTAR:"
+echo "   Abrir PDF manualmente, contar checkboxes página 1"
+echo ""
+echo "4. COMPARAR:"
+echo "   Detectados vs Manual → Se ≈ igual, COPIAR esse código"
+echo ""
+echo "5. NÃO FAZER:"
+echo "   - Ajustar filtros sem entender"
+echo "   - Adicionar hard-coded X/Y"
+echo "   - Testar múltiplas mudanças juntas"
+echo ""
+
+# 13. REALIDADE vs PERCEPÇÃO
+echo "🔍 REALIDADE vs PERCEPÇÃO:"
+echo ""
+echo "  PERCEPÇÃO ERRADA:"
+echo "    ❌ 'Pipeline totalmente quebrada'"
+echo "    ❌ 'Sistema não funciona'"
+echo "    ❌ 'Nenhuma função detectada'"
+echo ""
+echo "  REALIDADE:"
+echo "    ✅ 176 funções ativas JÁ NO BANCO"
+echo "    ✅ 50 equipamentos processados"
+echo "    ✅ Sistema funciona, MAS com falsos positivos"
+echo "    ✅ Problema é de PRECISÃO, não de funcionamento"
+echo ""
+
+# 14. FOCO CORRETO
+echo "🎯 FOCO CORRETO:"
+echo ""
+echo "  OBJETIVO: Melhorar precisão de 60-70% para >95%"
+echo "  MÉTODO: Copiar código validado (universal_checkbox_detector.py)"
+echo "  VALIDAÇÃO: Contar manual vs detectado"
+echo "  META: Reduzir de 271 para ~20-40 checkboxes na página 1"
+echo ""
+
+# 15. COMANDOS DE TESTE RÁPIDO
+echo "⚡ TESTE RÁPIDO (copie e cole):"
+echo ""
+echo "# Ativar ambiente"
+echo "source /Volumes/Mac_XIV/virtualenvs/protecai_testes/bin/activate"
+echo ""
+echo "# Teste código validado"
+echo "python scripts/universal_checkbox_detector.py 'inputs/pdf/P122_204-PN-06_LADO_A_2014-08-01.pdf' 1"
+echo ""
+echo "# Teste código atual (quebrado)"
+echo "python test_page1_only.py"
+echo ""
+echo "# Ver output"
+echo "open outputs/checkbox_debug/"
+echo ""
+
+echo "======================================"
+echo "✅ Script de retomada gerado!"
+echo "📋 Leia STATUS_CRITICO_2025-11-16_PIPELINE_QUEBRADA.md"
+echo "🎯 Foco: Copiar código validado, não ajustar filtros"
+echo "======================================"

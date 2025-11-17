@@ -1215,8 +1215,11 @@ class ReportService:
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#CC0066')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
         ]))
         
@@ -1255,22 +1258,47 @@ class ReportService:
         return output.getvalue()
     
     async def export_coordination_pdf(self, data: List[Dict]) -> bytes:
+        from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4, landscape
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
         from reportlab.lib.units import inch
         from io import BytesIO
         
         buffer = BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
         elements = [Spacer(1, 0.5*inch)]
-        styles = getSampleStyleSheet()
-        elements.append(Paragraph(f"{len(data)} registros de coordenação", styles['Normal']))
+        
+        # Tabela de coordenação
+        table_data = [['TAG', 'Barra', 'ANSI', 'Descrição', 'Parâmetro', 'Valor', 'Unidade']]
+        for item in data[:100]:  # Limitar a 100 registros por página
+            table_data.append([
+                str(item.get('equipment_tag', ''))[:15],
+                str(item.get('barra_nome', ''))[:12],
+                str(item.get('ansi_code', ''))[:5],
+                str(item.get('function_description', ''))[:25],
+                str(item.get('parameter_name', ''))[:20],
+                str(item.get('set_value', ''))[:10],
+                str(item.get('unit_symbol', ''))[:5]
+            ])
+        
+        table = Table(table_data, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#FF6600')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+        ]))
+        
+        elements.append(table)
         
         doc.build(
             elements,
-            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Coordenação"),
-            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Coordenação")
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Coordenação e Seletividade"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Coordenação e Seletividade")
         )
         return buffer.getvalue()
     
@@ -1297,14 +1325,42 @@ class ReportService:
         return output.getvalue()
     
     async def export_by_bay_pdf(self, data: List[Dict]) -> bytes:
+        from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4, landscape
-        from reportlab.platypus import SimpleDocTemplate, Spacer
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
         from reportlab.lib.units import inch
         from io import BytesIO
         
         buffer = BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
         elements = [Spacer(1, 0.5*inch)]
+        
+        # Tabela por Bay/Subestação
+        table_data = [['Subestação', 'Barra', 'TAG', 'Fabricante', 'Modelo', 'Funções', 'Códigos']]
+        for item in data:
+            table_data.append([
+                str(item.get('substation_name', ''))[:15],
+                str(item.get('barra_nome', ''))[:12],
+                str(item.get('equipment_tag', ''))[:15],
+                str(item.get('manufacturer_name', ''))[:12],
+                str(item.get('model_name', ''))[:10],
+                str(item.get('protection_functions_count', '0')),
+                str(item.get('protection_codes', ''))[:30]
+            ])
+        
+        table = Table(table_data, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#009900')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+        ]))
+        
+        elements.append(table)
         
         doc.build(
             elements,
@@ -1336,8 +1392,9 @@ class ReportService:
         return output.getvalue()
     
     async def export_maintenance_pdf(self, data: List[Dict]) -> bytes:
+        from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4, landscape
-        from reportlab.platypus import SimpleDocTemplate, Spacer
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer
         from reportlab.lib.units import inch
         from io import BytesIO
         
@@ -1345,10 +1402,38 @@ class ReportService:
         doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), topMargin=80, bottomMargin=60)
         elements = [Spacer(1, 0.5*inch)]
         
+        # Tabela de manutenção
+        table_data = [['TAG', 'Fabricante', 'Modelo', 'Serial', 'Barra', 'Status', 'Settings Total', 'Settings Ativos']]
+        for item in data:
+            table_data.append([
+                str(item.get('equipment_tag', ''))[:18],
+                str(item.get('manufacturer_name', ''))[:15],
+                str(item.get('model_name', ''))[:12],
+                str(item.get('serial_number', ''))[:12],
+                str(item.get('barra_nome', ''))[:12],
+                str(item.get('status', ''))[:10],
+                str(item.get('total_settings', '0')),
+                str(item.get('active_settings', '0'))
+            ])
+        
+        table = Table(table_data, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#CC6600')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+        ]))
+        
+        elements.append(table)
+        
         doc.build(
             elements,
-            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Manutenção"),
-            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Manutenção")
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Manutenção e Histórico"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório de Manutenção e Histórico")
         )
         return buffer.getvalue()
     
@@ -1377,10 +1462,12 @@ class ReportService:
         return output.getvalue()
     
     async def export_executive_pdf(self, data: Dict) -> bytes:
+        from reportlab.lib import colors
         from reportlab.lib.pagesizes import A4
-        from reportlab.platypus import SimpleDocTemplate, Spacer, Paragraph
-        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Paragraph
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib.units import inch
+        from reportlab.lib.enums import TA_CENTER
         from io import BytesIO
         
         buffer = BytesIO()
@@ -1388,17 +1475,70 @@ class ReportService:
         elements = [Spacer(1, 0.5*inch)]
         styles = getSampleStyleSheet()
         
+        # Estilo para KPIs
+        kpi_style = ParagraphStyle(
+            'KPI',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor=colors.HexColor('#003366'),
+            alignment=TA_CENTER
+        )
+        
+        # Overview (KPIs principais)
+        if 'overview' in data and data['overview']:
+            overview = data['overview'][0]
+            elements.append(Paragraph("<b>VISÃO GERAL DO SISTEMA</b>", styles['Heading2']))
+            kpi_data = [
+                ['Equipamentos', 'Fabricantes', 'Modelos', 'Funções Ativas'],
+                [
+                    str(overview.get('total_equipments', 0)),
+                    str(overview.get('total_manufacturers', 0)),
+                    str(overview.get('total_models', 0)),
+                    str(overview.get('total_active_functions', 0))
+                ]
+            ]
+            kpi_table = Table(kpi_data)
+            kpi_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#003366')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('FONTSIZE', (0, 1), (-1, 1), 18),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 15),
+                ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+            ]))
+            elements.append(kpi_table)
+            elements.append(Spacer(1, 0.3*inch))
+        
+        # Outras seções
         for section, values in data.items():
-            elements.append(Paragraph(f"<b>{section.upper()}</b>", styles['Heading2']))
-            for item in values:
-                for k, v in item.items():
-                    elements.append(Paragraph(f"{k}: {v}", styles['Normal']))
-            elements.append(Spacer(1, 0.2*inch))
+            if section != 'overview':
+                elements.append(Paragraph(f"<b>{section.replace('_', ' ').upper()}</b>", styles['Heading3']))
+                section_data = []
+                if values and len(values) > 0:
+                    headers = list(values[0].keys())
+                    section_data.append(headers)
+                    for item in values[:10]:  # Top 10
+                        section_data.append([str(item.get(h, '')) for h in headers])
+                    
+                    section_table = Table(section_data, repeatRows=1)
+                    section_table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#366092')),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('FONTSIZE', (0, 0), (-1, -1), 9),
+                        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+                    ]))
+                    elements.append(section_table)
+                elements.append(Spacer(1, 0.2*inch))
         
         doc.build(
             elements,
-            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório Executivo"),
-            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório Executivo")
+            onFirstPage=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório Executivo para Engenharia"),
+            onLaterPages=lambda canvas, doc: self._header_footer(canvas, doc, "Relatório Executivo para Engenharia")
         )
         return buffer.getvalue()
 

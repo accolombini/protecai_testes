@@ -77,16 +77,24 @@ class IntelligentRelayExtractor:
     def extract_from_easergy(self, pdf_path: Path) -> pd.DataFrame:
         """
         Extrai parâmetros de relés Easergy (P122, P220, P922)
-        Usa detecção de checkboxes para identificar parâmetros configurados
+        Usa PreciseParameterExtractor com correlação Y-coordinate correta
         """
         print(f"   📘 Tipo: Easergy (usa checkboxes)")
         
-        if self.template_checkbox is None:
-            # Pipeline nova usa análise de código, não templates de checkbox
-            return self._extract_all_text_parameters(pdf_path, 'easergy')
+        # Usa o PreciseParameterExtractor que funciona corretamente
+        from src.precise_parameter_extractor import PreciseParameterExtractor
         
-        # Extrair com detecção de checkboxes
-        return self._extract_with_checkbox_detection(pdf_path)
+        extractor = PreciseParameterExtractor()
+        df = extractor.extract_from_pdf(pdf_path)
+        
+        # Filtra apenas parâmetros ativos (checkbox marcado) E MANTÉM is_active
+        if not df.empty and 'is_active' in df.columns:
+            df_active = df[df['is_active'] == True].copy()
+            # Remove apenas colunas auxiliares (NÃO remove is_active!)
+            df_active = df_active.drop(columns=['confidence', 'y_coordinate', 'checkbox_density'], errors='ignore')
+            return df_active
+        
+        return df
     
     def extract_from_micom(self, pdf_path: Path) -> pd.DataFrame:
         """
@@ -94,7 +102,9 @@ class IntelligentRelayExtractor:
         Extrai todos os parâmetros (MiCOM não usa checkboxes)
         """
         print(f"   📗 Tipo: MiCOM (sem checkboxes, extrai todos)")
-        return self._extract_all_text_parameters(pdf_path, 'micom')
+        
+        # MiCOM usa layout em colunas - precisa preservar posicionamento
+        return self._extract_micom_with_layout(pdf_path)
     
     def extract_from_sepam(self, file_path: Path) -> pd.DataFrame:
         """
@@ -172,6 +182,80 @@ class IntelligentRelayExtractor:
         # Limpar valores None/nan
         df = df.replace(['None', 'nan', 'NaN', 'NAN'], '')
         df = df.fillna('')
+        # SEPAM não usa checkboxes - TODOS são considerados ativos
+        if not df.empty:
+            df['is_active'] = True
+        
+        return df
+    
+    def _extract_micom_with_layout(self, pdf_path: Path) -> pd.DataFrame:
+        """
+        Extrai parâmetros MiCOM respeitando layout em colunas do PDF
+        
+        MiCOM usa layout: [Código] [Descrição] [Valor]
+        Exemplo: 00.01: Language: English
+        
+        Palavras estão na mesma linha Y mas em posições X diferentes.
+        """
+        doc = fitz.open(str(pdf_path))
+        params = []
+        pattern = re.compile(r'^\d{2}\.\d{2}[A-Z]?:')
+        
+        # Processar todas as páginas
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            
+            # Extrair palavras com coordenadas
+            words = page.get_text('words')  # (x0, y0, x1, y1, text, block, line, word_num)
+            
+            # Agrupar palavras por linha Y (±3px de tolerância)
+            lines_dict = {}
+            for word in words:
+                x0, y0, x1, y1, text, block_num, line_num, word_num = word
+                
+                # Encontrar linha existente ou criar nova
+                found_line = None
+                for y_key in lines_dict:
+                    if abs(y_key - y0) < 3:  # Mesma linha
+                        found_line = y_key
+                        break
+                
+                if found_line is None:
+                    found_line = y0
+                    lines_dict[found_line] = []
+                
+                lines_dict[found_line].append((x0, text))
+            
+            # Processar cada linha
+            for y_coord in sorted(lines_dict.keys()):
+                line_words = sorted(lines_dict[y_coord], key=lambda w: w[0])  # Ordenar por X
+                line_text = ' '.join([w[1] for w in line_words])
+                
+                # Verificar se linha tem código MiCOM
+                if pattern.match(line_text):
+                    parts = line_text.split(':', 2)  # Dividir no máximo em 3 partes
+                    
+                    if len(parts) >= 2:
+                        code = parts[0].strip()
+                        description = parts[1].strip() if len(parts) > 1 else ""
+                        value = parts[2].strip() if len(parts) > 2 else ""
+                        
+                        params.append({
+                            'Code': code,
+                            'Description': description,
+                            'Value': value
+                        })
+        
+        doc.close()
+        
+        df = pd.DataFrame(params)
+        
+        if not df.empty:
+            df = df.replace(['None', 'nan', 'NaN', 'NAN'], '')
+            df = df.fillna('')
+            df = df.drop_duplicates(subset=['Code', 'Description'], keep='first')
+            # MiCOM não usa checkboxes - TODOS são considerados ativos
+            df['is_active'] = True
         
         return df
     
@@ -257,6 +341,7 @@ class IntelligentRelayExtractor:
                     
                     elif relay_type == 'micom':
                         # MiCOM: 0C.1E: Digital Input: Value
+                        # FORMATO: Pode ser inline ou valor na próxima linha
                         if ':' not in line:
                             i += 1
                             continue
@@ -268,11 +353,21 @@ class IntelligentRelayExtractor:
                         value = ""
                         
                         if ':' in rest:
+                            # Formato: 00.01: Description: Value
                             parts = rest.split(':', 1)
                             description = parts[0].strip()
                             value = parts[1].strip()
                         else:
+                            # Formato: 00.01: Description (valor pode estar na próxima linha)
                             description = rest
+                            
+                            # Verificar se próxima linha tem valor (não começa com código)
+                            if i + 1 < len(lines):
+                                next_line = lines[i + 1].strip()
+                                # Se próxima linha não é código MiCOM (XX.XX:) e não é vazia
+                                if next_line and not re.match(r'^\d{2}\.\d{2}[A-Z]?:', next_line):
+                                    value = next_line
+                                    i += 1  # Pular próxima linha pois já foi processada
                         
                         params.append({
                             'Code': code_part,

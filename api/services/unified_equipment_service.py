@@ -262,11 +262,11 @@ class UnifiedEquipmentService:
                 else:
                     logger.warning("⚠️ protec_ai.relay_equipment table does not exist - using fallback")
                 
-                # Processar equipamentos relay_configs
+                # Processar equipamentos protec_ai
                 for eq in structured_equipment:
                     results.append({
-                        "id": f"relay_configs_{eq.id}",
-                        "source": "relay_configs",
+                        "id": f"protec_ai_{eq.id}",
+                        "source": "protec_ai",
                         "tag_reference": eq.equipment_tag,
                         "serial_number": eq.serial_number,
                         "plant_reference": eq.substation_name,

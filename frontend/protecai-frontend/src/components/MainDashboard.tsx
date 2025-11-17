@@ -54,8 +54,8 @@ const MainDashboard: React.FC = () => {
     totalEquipments: 0,
     totalSettings: 0,
     activeSettings: 0,
-    protectionFunctions: 158,
-    activeFunctions: 23
+    protectionFunctions: 0,
+    activeFunctions: 0
   });
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
@@ -187,13 +187,13 @@ const MainDashboard: React.FC = () => {
           postgresRecords: data.summary?.total_settings || 0
         }));
         
-        // Atualizar dados técnicos
+        // Atualizar dados técnicos com 100% dados reais
         setTechnicalData({
           totalEquipments: data.summary?.total_equipments || 0,
           totalSettings: data.summary?.total_settings || 0,
           activeSettings: data.summary?.active_settings || 0,
-          protectionFunctions: 158,
-          activeFunctions: data.summary?.active_functions_count || 23
+          protectionFunctions: data.summary?.protection_functions_count || 0,
+          activeFunctions: data.summary?.active_functions_count || 0
         });
       }
     } catch (error) {
@@ -220,13 +220,8 @@ const MainDashboard: React.FC = () => {
     try {
       console.log('🔍 BUSCANDO DADOS DO SISTEMA...');
       
-      // Usar dados conhecidos da nossa arquitetura
-      setSystemStats(prev => ({
-        ...prev,
-        totalEquipments: 50,    // 50 equipamentos reais
-        postgresRecords: 470,   // Total aproximado
-        totalEndpoints: 64      // Endpoints conhecidos
-      }));
+      // Dados serão carregados via fetchRealDatabaseStats()
+      // Removido hardcoded de 50 equipamentos
       
       // Buscar estatísticas se disponível
       try {

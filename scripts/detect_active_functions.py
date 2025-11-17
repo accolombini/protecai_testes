@@ -74,7 +74,10 @@ def identify_relay_model(file_path: Path, config: Dict) -> Optional[str]:
 
 def detect_micon_functions(csv_path: Path, model_config: Dict) -> Set[str]:
     """
-    Detecta funções ativas em relés MICON usando checkboxes e code ranges.
+    Detecta funções ativas em relés MICON Easergy.
+    
+    Para Easergy, a presença de campos "Function X>" no CSV indica que
+    a função está HABILITADA, independente do valor estar vazio.
     
     Args:
         csv_path: Caminho do CSV com parâmetros
@@ -88,44 +91,47 @@ def detect_micon_functions(csv_path: Path, model_config: Dict) -> Set[str]:
     # Carrega CSV de parâmetros
     df = pd.read_csv(csv_path)
     
-    # Normaliza nomes de colunas (pode ser Code/Value ou param_code/param_value)
+    # Normaliza nomes de colunas
     df.columns = df.columns.str.lower()
     
-    # Identifica colunas de código e valor
+    # Identifica colunas
     code_col = 'code' if 'code' in df.columns else 'param_code'
-    value_col = 'value' if 'value' in df.columns else 'param_value'
+    desc_col = 'description' if 'description' in df.columns else 'param_description'
     
-    if code_col not in df.columns or value_col not in df.columns:
+    if code_col not in df.columns:
         return active_functions
     
-    # Filtra apenas parâmetros com checkbox marcado (valor = '■' ou similar)
-    # OU valores não-vazios que indicam configuração ativa
-    checked_params = df[
-        (df[value_col].notna()) & 
-        (df[value_col].astype(str).str.strip() != '')
-    ]
-    
-    # Para cada parâmetro marcado, identifica a função
-    for _, row in checked_params.iterrows():
-        param_code = str(row[code_col]).upper().strip()
+    # Para cada função configurada no modelo
+    for function, func_config in model_config['functions'].items():
+        code_range = func_config['code_range']
+        start_code = code_range[0]
+        end_code = code_range[1]
         
-        # Remove sufixos e prefixos para extrair código hex
-        code_hex = re.search(r'[0-9A-F]{4}', param_code)
-        if not code_hex:
-            continue
+        # Procura por qualquer parâmetro neste range de código
+        # Se existe ao menos um campo "Function X>" neste range, a função está ativa
+        for _, row in df.iterrows():
+            param_code = str(row[code_col]).upper().strip()
             
-        code_value = code_hex.group()
-        
-        # Busca qual função este código pertence
-        for function, func_config in model_config['functions'].items():
-            code_range = func_config['code_range']
-            start_code = code_range[0]
-            end_code = code_range[1]
+            # Extrai código hex
+            code_match = re.search(r'\b([0-9A-F]{4})\b', param_code)
+            if not code_match:
+                continue
             
-            # Verifica se o código está no range da função
+            code_value = code_match.group(1)
+            
+            # Verifica se está no range desta função
             if start_code <= code_value <= end_code:
-                active_functions.add(function)
-                break
+                # Para Easergy, verifica se é um campo "Function"
+                if desc_col in df.columns:
+                    description = str(row[desc_col]).lower()
+                    if 'function' in description:
+                        # Encontrou campo de função neste range, marca como ativa
+                        active_functions.add(function)
+                        break
+                else:
+                    # Fallback: qualquer código no range indica função ativa
+                    active_functions.add(function)
+                    break
     
     return active_functions
 
@@ -279,15 +285,14 @@ def detect_active_functions(file_path: Path) -> Dict[str, any]:
         active_funcs = set()
         
         if model_config['detection_method'] == 'checkbox':
-            # MICON com checkboxes - precisa do CSV de parâmetros
-            # Usa o diretório do script como base para caminho do projeto
+            # MICON com checkboxes - usa CSV de parâmetros
             project_base = Path(__file__).parent.parent
             csv_path = project_base / 'outputs' / 'csv' / f"{file_path.stem}_params.csv"
             
             if csv_path.exists():
                 active_funcs = detect_micon_functions(csv_path, model_config)
             else:
-                result['error'] = f'CSV não encontrado: {csv_path}'
+                result['error'] = f'CSV não encontrado: {csv_path.name}'
                 return result
                 
         elif model_config['detection_method'] == 'function_field':

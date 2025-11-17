@@ -65,17 +65,38 @@ class CSVNormalizer:
             # Ler CSV
             df = pd.read_csv(csv_path, encoding='utf-8')
             
-            # Verificar colunas obrigatórias
-            missing_cols = [col for col in self.REQUIRED_COLUMNS if col not in df.columns]
-            if missing_cols:
-                logger.warning(f"  ⚠️  Colunas faltando: {missing_cols}")
-                # Adicionar colunas faltando com valores vazios
-                for col in missing_cols:
-                    df[col] = ''
+            # MAPEAR COLUNAS DO CSV EXTRAÍDO PARA O FORMATO NORMALIZADO
+            # CSVs extraídos têm: Code, Description, Value, is_active (desde correção)
+            # Precisamos mapear para: parameter_code, parameter_name, set_value
+            
+            if 'Code' in df.columns and 'Description' in df.columns and 'Value' in df.columns:
+                # Renomear colunas principais
+                df = df.rename(columns={
+                    'Code': 'parameter_code',
+                    'Description': 'parameter_name',
+                    'Value': 'set_value'
+                })
+                
+                # Se is_active já existe no CSV extraído, usar esse valor
+                # Se não existir, considerar válido se tiver valor
+                if 'is_active' not in df.columns:
+                    df['is_active'] = df['set_value'].apply(self._validate_value)
+            
+            # Adicionar colunas que não existem nos CSVs extraídos
+            if 'unit_of_measure' not in df.columns:
+                df['unit_of_measure'] = ''
+            if 'section' not in df.columns:
+                df['section'] = ''
+            if 'subsection' not in df.columns:
+                df['subsection'] = ''
+            if 'category' not in df.columns:
+                df['category'] = ''
+            if 'source_file' not in df.columns:
+                df['source_file'] = csv_path.name
             
             # Adicionar colunas adicionais
             df['normalized_value'] = df['set_value'].apply(self._normalize_value)
-            df['is_valid'] = df['set_value'].apply(self._validate_value)
+            df['is_valid'] = df['is_active']  # is_valid é IGUAL a is_active (não mais baseado em valor não-vazio)
             df['extraction_date'] = datetime.now().isoformat()
             
             # Reordenar colunas

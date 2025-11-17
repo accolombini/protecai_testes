@@ -25,38 +25,31 @@ async def get_database_statistics(db: Session = Depends(get_db)):
     100% REAL - Dados direto do PostgreSQL.
     """
     try:
-        # Buscar contagens reais de cada tabela
+        # Buscar contagens reais de cada tabela EXISTENTE no protec_ai schema
         stats = {}
         
-        # Schema relay_configs
+        # Tabelas principais
         relay_equipment_query = text("SELECT COUNT(*) FROM protec_ai.relay_equipment")
+        relay_settings_query = text("SELECT COUNT(*) FROM protec_ai.relay_settings")
+        active_functions_query = text("SELECT COUNT(*) FROM protec_ai.active_protection_functions")
         protection_functions_query = text("SELECT COUNT(*) FROM protec_ai.protection_functions")
-        io_config_query = text("SELECT COUNT(*) FROM protec_ai.io_configuration")
-        
-        # Schema public
-        active_functions_query = text("SELECT COUNT(*) FROM active_protection_functions")
         
         # Executar queries
         stats["relay_equipment"] = db.execute(relay_equipment_query).scalar() or 0
-        stats["protection_functions"] = db.execute(protection_functions_query).scalar() or 0
-        stats["io_configuration"] = db.execute(io_config_query).scalar() or 0
+        stats["relay_settings"] = db.execute(relay_settings_query).scalar() or 0
         stats["active_protection_functions"] = db.execute(active_functions_query).scalar() or 0
+        stats["protection_functions"] = db.execute(protection_functions_query).scalar() or 0
         
         # Calcular totais
         total_records = sum(stats.values())
         
         # Buscar relés únicos com funções ativas
-        unique_relays_query = text("SELECT COUNT(DISTINCT relay_file) FROM active_protection_functions")
+        unique_relays_query = text("SELECT COUNT(DISTINCT relay_file) FROM protec_ai.active_protection_functions")
         unique_relays = db.execute(unique_relays_query).scalar() or 0
         
-        # Query para dados reais do protec_ai schema
-        equipments_query = text("SELECT COUNT(*) FROM protec_ai.relay_equipment")
-        settings_query = text("SELECT COUNT(*) FROM protec_ai.relay_settings")
+        # Buscar settings ativos
         active_settings_query = text("SELECT COUNT(*) FROM protec_ai.relay_settings WHERE is_active = true")
-        
-        stats["total_equipments"] = db.execute(equipments_query).scalar() or 0
-        stats["total_settings"] = db.execute(settings_query).scalar() or 0
-        stats["active_settings"] = db.execute(active_settings_query).scalar() or 0
+        active_settings = db.execute(active_settings_query).scalar() or 0
         
         return {
             "database": "protecai_db",
@@ -64,17 +57,15 @@ async def get_database_statistics(db: Session = Depends(get_db)):
             "tables": stats,
             "summary": {
                 "total_records": total_records,
-                "relay_equipment_count": stats["relay_equipment"],
+                "total_equipments": stats["relay_equipment"],
+                "total_settings": stats["relay_settings"],
+                "active_settings": active_settings,
                 "protection_functions_count": stats["protection_functions"],
-                "io_configurations_count": stats["io_configuration"],
                 "active_functions_count": stats["active_protection_functions"],
-                "unique_relays_with_functions": unique_relays,
-                "total_equipments": stats["total_equipments"],
-                "total_settings": stats["total_settings"],
-                "active_settings": stats["active_settings"]
+                "unique_relays_with_functions": unique_relays
             },
             "data_source": "postgresql_real",
-            "note": "100% dados reais do protec_ai schema - zero mocks"
+            "note": "100% dados reais do protec_ai schema - zero mocks ou tabelas inexistentes"
         }
         
     except Exception as e:

@@ -700,7 +700,7 @@ async def export_protection_functions_report(
                 rm.model_name,
                 re.barra_nome,
                 re.status
-            FROM active_protection_functions apf
+            FROM protec_ai.active_protection_functions apf
             LEFT JOIN protec_ai.relay_equipment re 
                 ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
                    REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
@@ -835,7 +835,7 @@ async def export_coordination_report(
                     rs.parameter_name,
                     rs.set_value,
                     u.unit_symbol
-                FROM active_protection_functions apf
+                FROM protec_ai.active_protection_functions apf
                 JOIN protec_ai.relay_equipment re 
                     ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
                        REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
@@ -909,7 +909,7 @@ async def export_by_bay_report(
             FROM protec_ai.relay_equipment re
             LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
             LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
-            LEFT JOIN active_protection_functions apf 
+            LEFT JOIN protec_ai.active_protection_functions apf 
                 ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
                    REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
             {bay_filter}
@@ -1036,7 +1036,7 @@ async def export_executive_report(
                 FROM protec_ai.relay_equipment re
                 LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
                 LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
-                LEFT JOIN active_protection_functions apf ON true
+                LEFT JOIN protec_ai.active_protection_functions apf ON true
             """),
             'by_manufacturer': text("""
                 SELECT 
@@ -1062,7 +1062,7 @@ async def export_executive_report(
                     COUNT(DISTINCT re.id) as total_relays,
                     ROUND(COUNT(DISTINCT apf.relay_file) * 100.0 / COUNT(DISTINCT re.id), 2) as coverage_percentage
                 FROM protec_ai.relay_equipment re
-                LEFT JOIN active_protection_functions apf 
+                LEFT JOIN protec_ai.active_protection_functions apf 
                     ON REGEXP_REPLACE(re.equipment_tag, '\\.(pdf|S40|txt|xlsx)$', '', 'i') = 
                        REGEXP_REPLACE(apf.relay_file, '\\.(pdf|S40|txt|xlsx)$', '', 'i')
             """)

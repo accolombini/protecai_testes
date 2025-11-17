@@ -42,7 +42,7 @@ async def get_relay_active_functions(
                 detection_method,
                 source_file,
                 detection_timestamp
-            FROM active_protection_functions
+            FROM protec_ai.active_protection_functions
             WHERE relay_file ILIKE :relay_pattern
             ORDER BY function_code
         """)
@@ -113,7 +113,7 @@ async def get_active_functions_summary(db: Session = Depends(get_db)):
                 COUNT(DISTINCT relay_file) as total_relays,
                 COUNT(DISTINCT relay_model) as total_models,
                 COUNT(DISTINCT function_code) as unique_functions
-            FROM active_protection_functions
+            FROM protec_ai.active_protection_functions
         """)
         
         stats_result = db.execute(stats_query).fetchone()
@@ -124,7 +124,7 @@ async def get_active_functions_summary(db: Session = Depends(get_db)):
                 function_code,
                 function_description,
                 COUNT(*) as relay_count
-            FROM active_protection_functions
+            FROM protec_ai.active_protection_functions
             GROUP BY function_code, function_description
             ORDER BY relay_count DESC
         """)
@@ -136,7 +136,7 @@ async def get_active_functions_summary(db: Session = Depends(get_db)):
             SELECT 
                 relay_model,
                 COUNT(*) as function_count
-            FROM active_protection_functions
+            FROM protec_ai.active_protection_functions
             GROUP BY relay_model
             ORDER BY function_count DESC
         """)
@@ -219,7 +219,7 @@ async def search_active_functions(
                 function_description,
                 detection_method,
                 detection_timestamp
-            FROM active_protection_functions
+            FROM protec_ai.active_protection_functions
             WHERE {where_clause}
             ORDER BY relay_file, function_code
         """)

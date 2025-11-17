@@ -69,7 +69,7 @@ class PreciseParameterExtractor:
     # Separação: 15.6% entre max_vazio_ruído(34%) e novo threshold(37%)
     
     # Tolerância para correlação Y (pixels)
-    Y_TOLERANCE = 8  # ±8 pixels de tolerância
+    Y_TOLERANCE = 25  # ±25 pixels de tolerância (ajustado após debug: menor distância real = 19.7px)
     
     def __init__(self):
         """Inicializa extrator"""
@@ -107,65 +107,129 @@ class PreciseParameterExtractor:
         
         return enhanced
     
-    def detect_checkboxes(self, image: np.ndarray) -> List[Checkbox]:
+    def detect_checkboxes(self, page: fitz.Page, dpi: int = 300) -> List[Checkbox]:
         """
-        ETAPA 2: Detecta checkboxes por densidade de pixels
+        ETAPA 2: Detecta checkboxes usando método VALIDADO (universal_checkbox_detector.py)
         
-        Algoritmo:
-        - Adaptive thresholding para binarização
-        - Detecção de contornos
-        - Filtro por tamanho e aspect ratio
-        - Cálculo de densidade de pixels brancos
-        - Threshold: 30% pixels brancos = checkbox marcado ☑
+        ESTRATÉGIA VALIDADA (100% precisão P922, 42 checkboxes P122 página 1):
+        1. Renderizar página em alta resolução
+        2. **MASCARAR TODO O TEXTO** (crítico! elimina 229 falsos positivos)
+        3. Detectar contornos quadrados
+        4. FILTRAR ícones coloridos via saturação HSV
+        5. Calcular densidade do interior (shrink)
+        6. Filtrar por geometria e densidade mínima
         
         Args:
-            image: Imagem em escala de cinza (JÁ MELHORADA)
+            page: Página PyMuPDF para processar
+            dpi: Resolução de renderização (default: 300)
             
         Returns:
             Lista de checkboxes detectados com status (marcado/vazio)
         """
-        # Binarização adaptativa
+        # 1. Extrair texto para mascaramento
+        text_dict = page.get_text("dict")
+        
+        # 2. Renderizar em alta resolução
+        mat = fitz.Matrix(dpi/72, dpi/72)
+        pixmap = page.get_pixmap(matrix=mat)
+        
+        # Converter pixmap para numpy array
+        img_np = np.frombuffer(pixmap.samples, dtype=np.uint8)
+        img_np = img_np.reshape(pixmap.height, pixmap.width, pixmap.n)
+        
+        # Converter para BGR
+        if pixmap.n == 4:  # RGBA
+            img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGBA2BGR)
+        else:  # RGB
+            img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        
+        # Guardar imagem colorida para filtro HSV
+        img_color = img_bgr.copy()
+        
+        # 3. MASCARAR TODO O TEXTO (crítico!)
+        img_masked = img_bgr.copy()
+        scale = dpi / 72
+        
+        for block in text_dict["blocks"]:
+            if block["type"] == 0:  # Bloco de texto
+                bbox = block["bbox"]
+                x0 = int(bbox[0] * scale)
+                y0 = int(bbox[1] * scale)
+                x1 = int(bbox[2] * scale)
+                y1 = int(bbox[3] * scale)
+                # Pintar de branco (mascara o texto)
+                cv2.rectangle(img_masked, (x0, y0), (x1, y1), (255, 255, 255), -1)
+        
+        # 4. Pré-processar
+        gray = cv2.cvtColor(img_masked, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray, (3, 3), 0)
         binary = cv2.adaptiveThreshold(
-            image, 255, 
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-            cv2.THRESH_BINARY_INV, 
+            blurred, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY_INV,
             11, 2
         )
         
-        # Detecção de contornos
-        contours, _ = cv2.findContours(
-            binary, 
-            cv2.RETR_LIST, 
-            cv2.CHAIN_APPROX_SIMPLE
-        )
+        # 5. Detectar contornos
+        contours, _ = cv2.findContours(binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         
+        # 6. Filtrar e analisar checkboxes - FILTROS UNIVERSAIS
         checkboxes = []
         
         for contour in contours:
             x, y, w, h = cv2.boundingRect(contour)
             
-            # Filtro 1: Tamanho (10-40 pixels)
-            if not (self.CHECKBOX_MIN_SIZE < w < self.CHECKBOX_MAX_SIZE and 
-                    self.CHECKBOX_MIN_SIZE < h < self.CHECKBOX_MAX_SIZE):
+            # FILTRO 1: Tamanho básico (10-40px) - UNIVERSAL
+            if not (10 < w < 40 and 10 < h < 40):
                 continue
             
-            # Filtro 2: Aspect ratio (quadrado ~1.0)
+            # FILTRO 2: Forma quadrada - UNIVERSAL
             aspect_ratio = w / float(h)
-            if not (self.CHECKBOX_ASPECT_RATIO_MIN < aspect_ratio < self.CHECKBOX_ASPECT_RATIO_MAX):
+            if not (0.7 < aspect_ratio < 1.3):
                 continue
             
-            # Filtro 3: Área mínima
-            if cv2.contourArea(contour) < self.CHECKBOX_MIN_AREA:
+            # FILTRO 3: Área mínima - UNIVERSAL
+            area = cv2.contourArea(contour)
+            if area < 50:
                 continue
             
-            # Cálculo de densidade
-            checkbox_region = binary[y:y+h, x:x+w]
-            white_pixels = np.sum(checkbox_region == 255)
-            total_pixels = w * h
-            density = white_pixels / total_pixels
+            # FILTRO 4: REJEITA ÍCONES COLORIDOS (saturação HSV)
+            # Checkboxes P&B: saturação ~0-30
+            # Ícones coloridos: saturação >60
+            roi_color = img_color[y:y+h, x:x+w]
+            if roi_color.size > 0:
+                roi_hsv = cv2.cvtColor(roi_color, cv2.COLOR_BGR2HSV)
+                mean_saturation = np.mean(roi_hsv[:,:,1])
+                
+                MAX_SATURATION_THRESHOLD = 40
+                if mean_saturation > MAX_SATURATION_THRESHOLD:
+                    continue  # Rejeita ícone colorido
             
-            # Determinar se está marcado (acima do threshold calibrado)
-            is_marked = density > self.CHECKBOX_MARKED_THRESHOLD
+            # FILTRO 5: Densidade interior mínima
+            shrink = 3
+            x_inner = x + shrink
+            y_inner = y + shrink
+            w_inner = w - (shrink * 2)
+            h_inner = h - (shrink * 2)
+            
+            if w_inner <= 0 or h_inner <= 0:
+                continue
+            
+            interior_region = binary[y_inner:y_inner+h_inner, x_inner:x_inner+w_inner]
+            
+            if interior_region.size == 0:
+                continue
+            
+            white_pixels = np.sum(interior_region == 255)
+            total_pixels = interior_region.size
+            density = white_pixels / total_pixels if total_pixels > 0 else 0
+            
+            # Densidade mínima elimina apenas ruído (2%)
+            if density < 0.02:
+                continue
+            
+            # Determinar se está marcado (threshold calibrado: 31.6%)
+            is_marked = density > 0.316
             
             checkboxes.append(Checkbox(
                 x=x, y=y, width=w, height=h,
@@ -231,62 +295,206 @@ class PreciseParameterExtractor:
         
         return lines
     
+    def extract_text_near_checkbox(
+        self,
+        page: fitz.Page,
+        checkbox: Checkbox,
+        dpi_scale: float = 300/72
+    ) -> str:
+        """
+        Extrai texto que está À DIREITA de um checkbox marcado
+        
+        Para LED 5, captura "tI>", "tI>>", etc que aparecem ao lado do checkbox
+        
+        Args:
+            page: Página do PDF
+            checkbox: Checkbox detectado
+            dpi_scale: Fator de conversão DPI (300/72)
+            
+        Returns:
+            Texto encontrado à direita do checkbox
+        """
+        # Converter coordenadas do checkbox para DPI 72
+        x_72 = checkbox.x / dpi_scale
+        y_72 = checkbox.y / dpi_scale
+        w_72 = checkbox.width / dpi_scale
+        h_72 = checkbox.height / dpi_scale
+        
+        # Região de busca: AMPLIADA para capturar texto que pode estar à esquerda
+        # Texto "tI>>" pode estar ANTES do checkbox, não depois!
+        search_rect = fitz.Rect(
+            x_72 - 30,           # início: 30px ANTES do checkbox (pegar texto à esquerda)
+            y_72 - 5,            # topo: 5px acima
+            x_72 + w_72 + 60,   # fim: 60px à direita
+            y_72 + h_72 + 5     # base: 5px abaixo
+        )
+        
+        # Extrair texto nesta região
+        words = page.get_text("words", clip=search_rect)
+        
+        if not words:
+            return ""
+        
+        # Pegar palavras à direita e procurar por padrões de proteção
+        # words formato: (x0, y0, x1, y1, "word", block_no, line_no, word_no)
+        words_sorted = sorted(words, key=lambda w: w[0])  # ordenar por X
+        
+        if not words_sorted:
+            return ""
+        
+        # DEBUG: Ver todas as palavras capturadas
+        # words_texts = [w[4] for w in words_sorted]
+        # if words_texts:  # Só printar se houver palavras
+        #     checkbox_y = checkbox.y / dpi_scale
+        #     print(f"  Checkbox Y={checkbox_y:.1f}: {words_texts} → '{max(words_sorted, key=lambda w: len(w[4]))[4] if words_sorted else ''}'")
+        
+        # Estratégia ROBUSTA: Pegar a palavra mais significativa
+        # Funciona para: tI>, tI>>, I>>>, Them Trip, Brkn Cond., etc
+        
+        if not words_sorted:
+            return ""
+        
+        # Coletar todos os textos válidos (excluir ruído)
+        valid_words = []
+        for word in words_sorted:
+            text = word[4].strip()
+            # Filtrar ruído (pontuação isolada, números muito pequenos)
+            if text and len(text) > 0 and text not in [':', ',', '-', '(', ')']:
+                valid_words.append(text)
+        
+        if not valid_words:
+            return ""
+        
+        # Prioridade 1: Se houver palavra com ">", pegar a MAIS LONGA com ">"
+        words_with_arrow = [w for w in valid_words if '>' in w]
+        if words_with_arrow:
+            return max(words_with_arrow, key=len)
+        
+        # Prioridade 2: Palavra mais longa (captura "Them", "Trip", "Brkn", "Cond.", etc)
+        return max(valid_words, key=len)
+    
     def correlate_checkboxes_with_lines(
         self, 
         checkboxes: List[Checkbox], 
         lines: List[ParameterLine],
+        page: fitz.Page,
         dpi_scale: float = 300/72
     ) -> List[Dict]:
         """
-        ETAPA 4: Correlaciona checkboxes com linhas de parâmetros por Y-coordinate
+        ETAPA 4: Correlaciona checkboxes com linhas de parâmetros (LÓGICA HIERÁRQUICA)
         
-        Algoritmo:
-        1. Converte Y do checkbox (DPI 300) para Y da linha (DPI 72)
-        2. Para cada linha, busca checkbox na mesma altura (±8px)
-        3. Se encontrou checkbox marcado → is_active = TRUE
-        4. Se não encontrou ou checkbox vazio → is_active = FALSE
+        ESTRATÉGIA DUPLA:
+        1. Checkboxes NA MESMA LINHA do parâmetro (±25px) → correlação direta
+        2. Checkboxes ABAIXO do parâmetro (sublinhas) → correlação hierárquica
+           - Ex: LED 5 (0150) tem checkboxes nas sublinhas (tI>, tI>>, etc)
+           - Se QUALQUER checkbox marcado está abaixo → parâmetro-pai é ATIVO
+           - NOVO: Extrair TODOS os valores dos checkboxes marcados e concatenar
         
         Args:
             checkboxes: Lista de checkboxes detectados (coordenadas em DPI 300)
             lines: Lista de linhas de parâmetros (coordenadas em DPI 72)
+            page: Página do PDF (para extração de texto)
             dpi_scale: Fator de conversão (300/72 = 4.166)
             
         Returns:
             Lista de dicts com code, description, value, is_active
         """
         results = []
+        matched_checkboxes = set()  # Rastrear checkboxes já usados
         
+        # ETAPA 1: Correlação DIRETA + HIERÁRQUICA
         for line in lines:
-            # Buscar checkbox na mesma linha (Y-coordinate)
             line_y = line.y_coordinate  # Já está em DPI 72
             
             matched_checkbox = None
             min_distance = float('inf')
             
             for checkbox in checkboxes:
-                # Converter Y do checkbox (DPI 300) para DPI 72
                 checkbox_y_72 = checkbox.y / dpi_scale
-                
-                # Calcular distância
                 distance = abs(checkbox_y_72 - line_y)
                 
-                # Se está dentro da tolerância E é a mais próxima
+                # Correlação direta: checkbox na mesma altura
                 if distance < self.Y_TOLERANCE and distance < min_distance:
                     matched_checkbox = checkbox
                     min_distance = distance
             
+            # Verificar se há checkboxes marcados ABAIXO (sublinhas)
+            # Buscar até 100px abaixo (cobre grupo de checkboxes)
+            has_marked_children = False
+            child_values = []  # Valores extraídos dos checkboxes filhos
+            
+            for checkbox in checkboxes:
+                checkbox_y_72 = checkbox.y / dpi_scale
+                distance_below = checkbox_y_72 - line_y
+                
+                # Checkbox está ABAIXO do parâmetro (sublinhas)
+                if 5 < distance_below < 100:  # Entre 5px e 100px abaixo
+                    matched_checkboxes.add(id(checkbox))
+                    
+                    if checkbox.is_marked:
+                        has_marked_children = True
+                        # Extrair texto do checkbox marcado
+                        texto = self.extract_text_near_checkbox(page, checkbox, dpi_scale)
+                        if texto:
+                            child_values.append(texto)
+            
             # Determinar is_active
-            is_active = matched_checkbox is not None and matched_checkbox.is_marked
+            # ATIVO se: checkbox direto marcado OU tem checkboxes marcados nas sublinhas
+            is_active = (matched_checkbox is not None and matched_checkbox.is_marked) or has_marked_children
+            
+            # Determinar valor
+            # Prioridade 1: Valor próprio da linha
+            # Prioridade 2: Valores dos checkboxes filhos (concatenados com vírgula)
+            # Prioridade 3: Texto do checkbox direto
+            value = line.value  # valor padrão
+            
+            if child_values:
+                # Concatenar valores dos checkboxes filhos
+                value = ", ".join(sorted(child_values))  # Ordenar para consistência
+            elif matched_checkbox and matched_checkbox.is_marked and not line.value:
+                checkbox_text = self.extract_text_near_checkbox(page, matched_checkbox, dpi_scale)
+                if checkbox_text:
+                    value = checkbox_text
+                    matched_checkboxes.add(id(matched_checkbox))
             
             results.append({
                 'Code': line.code,
                 'Description': line.description,
-                'Value': line.value,
+                'Value': value,
                 'is_active': is_active,
                 'confidence': line.confidence,
                 'y_coordinate': line.y_coordinate,
                 'checkbox_density': matched_checkbox.density if matched_checkbox else 0.0
             })
+        
+        # ETAPA 2: Checkboxes órfãos (não associados a nenhuma linha)
+        # Criar entradas individuais para checkboxes marcados sem linha-pai clara
+        for checkbox in checkboxes:
+            if checkbox.is_marked and id(checkbox) not in matched_checkboxes:
+                checkbox_text = self.extract_text_near_checkbox(page, checkbox, dpi_scale)
+                if checkbox_text:
+                    # Tentar achar a linha "pai" mais próxima ACIMA
+                    parent_line = None
+                    checkbox_y_72 = checkbox.y / dpi_scale
+                    min_distance_above = float('inf')
+                    
+                    for line in lines:
+                        distance_above = checkbox_y_72 - line.y_coordinate
+                        # Linha está ACIMA do checkbox (dentro de 100px)
+                        if 0 < distance_above < 100 and distance_above < min_distance_above:
+                            parent_line = line
+                            min_distance_above = distance_above
+                    
+                    if parent_line:
+                        results.append({
+                            'Code': parent_line.code,
+                            'Description': f"{parent_line.description} → {checkbox_text}",
+                            'Value': checkbox_text,
+                            'is_active': True,
+                            'confidence': 0.95,
+                            'y_coordinate': checkbox_y_72,
+                            'checkbox_density': checkbox.density
+                        })
         
         return results
     
@@ -314,30 +522,14 @@ class PreciseParameterExtractor:
         for page_num in range(len(doc)):
             page = doc[page_num]
             
-            # Renderizar página em alta resolução (300 DPI)
-            mat = fitz.Matrix(300/72, 300/72)
-            pix = page.get_pixmap(matrix=mat)
-            img = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
+            # ETAPA 1: Detectar checkboxes (usa mascaramento de texto interno)
+            checkboxes = self.detect_checkboxes(page, dpi=300)
             
-            # Converter para grayscale
-            if img.shape[2] == 4:  # RGBA
-                gray = cv2.cvtColor(img, cv2.COLOR_RGBA2GRAY)
-            elif img.shape[2] == 3:  # RGB
-                gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-            else:
-                gray = img
-            
-            # ETAPA 1: Melhorar qualidade
-            enhanced = self.enhance_pdf_quality(gray)
-            
-            # ETAPA 2: Detectar checkboxes
-            checkboxes = self.detect_checkboxes(enhanced)
-            
-            # ETAPA 3: Extrair linhas de parâmetros
+            # ETAPA 2: Extrair linhas de parâmetros
             lines = self.extract_parameter_lines(page)
             
-            # ETAPA 4: Correlacionar checkboxes com linhas
-            page_results = self.correlate_checkboxes_with_lines(checkboxes, lines)
+            # ETAPA 3: Correlacionar checkboxes com linhas (passar dpi_scale!)
+            page_results = self.correlate_checkboxes_with_lines(checkboxes, lines, page, dpi_scale=300/72)
             
             all_results.extend(page_results)
         
