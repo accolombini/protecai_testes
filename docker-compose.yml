@@ -2,10 +2,10 @@
 # ProtecAI - Docker Compose ÚNICO E CONSOLIDADO
 # =============================================
 # Arquivo ÚNICO para todo o projeto - SEM DUPLICAÇÕES
-# 
+#
 # USO:
 #   docker compose up -d          # Start containers
-#   docker compose down           # Stop containers  
+#   docker compose down           # Stop containers
 #   docker compose config         # Validate config
 #   docker compose logs postgres  # View logs
 
@@ -64,7 +64,7 @@ services:
     profiles: ["api", "production"]
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/api/Dockerfile
     container_name: protecai-api
     restart: unless-stopped
     environment:
@@ -100,4 +100,4 @@ volumes:
 networks:
   protecai_network:
     name: protecai_network
-    driver: bridgeVeja 
+    driver: bridgeVeja
