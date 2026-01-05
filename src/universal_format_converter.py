@@ -32,12 +32,10 @@ from PyPDF2 import PdfReader
 import json
 
 # Imports locais
-try:
-    from .file_registry_manager import FileRegistryManager
-    from .precise_parameter_extractor import PreciseParameterExtractor
-except ImportError:
-    from file_registry_manager import FileRegistryManager
-    from src.precise_parameter_extractor import PreciseParameterExtractor
+import os
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from src.file_registry_manager import FileRegistryManager
+from src.precise_parameter_extractor import PreciseParameterExtractor
 
 # ---------------------------
 # Configuração de diretórios

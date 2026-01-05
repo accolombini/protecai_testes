@@ -511,7 +511,16 @@ class ReportService:
                     re.id,
                     re.equipment_tag,
                     re.serial_number,
-                    re.substation_name,
+                    COALESCE(
+                        NULLIF(re.substation_name, ''),
+                        CASE 
+                            WHEN re.equipment_tag ~ '^P\\d{3}_\\d{3}' THEN 
+                                SUBSTRING(re.equipment_tag FROM '_(\\d{3})-')
+                            WHEN re.equipment_tag ~ '^\\d{2}-' THEN 
+                                SUBSTRING(re.equipment_tag FROM '^(\\d{2})')
+                            ELSE NULL
+                        END
+                    ) as substation_name,
                     re.barra_nome,
                     re.status,
                     re.position_description,
@@ -1202,13 +1211,22 @@ class ReportService:
         
         table_data = [['TAG', 'Código', 'Parâmetro', 'Valor', 'Unidade', 'Função']]
         for item in data[:100]:
+            # Obter valor: priorizar numérico, depois texto, senão '-'
+            value = item.get('set_value')
+            if value is None or value == '':
+                value = item.get('set_value_text', '-')
+            elif isinstance(value, bool):
+                value = 'Sim' if value else 'Não'
+            else:
+                value = str(value)
+            
             table_data.append([
                 str(item.get('equipment_tag', ''))[:15],
-                str(item.get('parameter_code', '')),
-                str(item.get('parameter_name', ''))[:25],
-                str(item.get('set_value', '')),
-                str(item.get('unit_symbol', '')),
-                str(item.get('function_name', ''))[:20]
+                str(item.get('parameter_code', '') or '-'),
+                str(item.get('parameter_name', '') or '-')[:25],
+                value if value else '-',
+                str(item.get('unit_symbol', '') or '-'),
+                str(item.get('function_name', '') or '-')[:20]
             ])
         
         table = Table(table_data, repeatRows=1)

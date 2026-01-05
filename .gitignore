@@ -213,15 +213,10 @@ docker/postgres/logs/
 *_temp.*
 
 # Project specific outputs that should not be tracked
-outputs/logs/
-# EXCEÇÃO: Manter logs organizacionais importantes (movidos da raiz)
-!outputs/logs/*.log
-outputs/logs_backup_*/
-outputs/norm_csv/
-outputs/norm_excel/
-outputs/csv/
-outputs/atrib_limpos/
-outputs/excel/
+outputs/
+# EXCEÇÃO: Manter apenas arquivos README.md e .gitkeep em outputs/
+!outputs/README.md
+!outputs/.gitkeep
 
 # Outputs temporários de teste (gerados pelos scripts)
 outputs/etap_exports/study_test_study_*.csv
@@ -261,6 +256,34 @@ frontend/protecai-frontend/src/components/SimpleUpload.tsx
 # Docker infrastructure (development only)
 docker/
 
+# ================================
+# PDFs GERADOS (RELATÓRIOS)
+# Data: 05/01/2026
+# ================================
+
+# PDFs de relatórios gerados automaticamente
+*_test.pdf
+*_v2.pdf
+by_bay*.pdf
+coordination*.pdf
+executive*.pdf
+maintenance*.pdf
+protection*.pdf
+setpoints*.pdf
+
+# ================================
+# ARQUIVOS DE SESSÃO E LOGS TEMPORÁRIOS
+# Data: 05/01/2026
+# ================================
+
+# Arquivos de sessão desastrosa/temporários
+SESSAO_DESASTROSA_*.md
+SESSAO_EMERGENCIAL_*.md
+
+# Scripts SQL de correção temporários
+fix_*.sql
+scripts/fix_*.sql
+
 # Documentation drafts and revisions
 outputs/doc/MODELAGEM_DADOS_REVISADA.txt
 outputs/doc/MODELAGEM_DADOS.docx
@@ -275,7 +298,7 @@ docs/
 !docs/status/
 
 # ================================
-# NOVOS PATTERNS - ORGANIZAÇÃO 27/OUT/2025  
+# NOVOS PATTERNS - ORGANIZAÇÃO 27/OUT/2025
 # ================================
 
 # Arquivos temporários de snapshot e auditoria (raiz do projeto)
@@ -295,7 +318,7 @@ temp/real_64_endpoints_test_*.json
 # !temp/AUDITORIA_ENDPOINTS_FANTASMA.md
 
 # ================================
-# ARQUIVOS DE CONTROLE E MONITORAMENTO  
+# ARQUIVOS DE CONTROLE E MONITORAMENTO
 # ================================
 # Arquivos .md de controle do desenvolvimento (apenas temporários)
 CORRECAO_ENDPOINTS_*.md

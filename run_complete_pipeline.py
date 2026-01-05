@@ -79,34 +79,56 @@ def executar_etapa_2_normalizacao():
         return False
 
 def executar_etapa_3_importacao():
-    """Etapa 3: Importar para PostgreSQL"""
+    """Etapa 3: Importar para PostgreSQL (2 passos: equipamentos + settings)"""
     logger.info("\n" + "="*80)
     logger.info("💾 ETAPA 3: IMPORTAÇÃO PARA POSTGRESQL")
     logger.info("="*80)
     
-    # Usar o novo importador correto
-    script_path = project_root / "import_normalized_to_db.py"
+    # PASSO 3A: Criar equipamentos (fabricantes, modelos, relay_equipment)
+    logger.info("\n📦 3A. Criando estrutura de equipamentos...")
+    script_equipment = project_root / "scripts" / "universal_robust_relay_processor.py"
     
-    if not script_path.exists():
-        logger.warning(f"⚠️  Script de importação não encontrado: {script_path}")
-        logger.info("   Pulando importação para PostgreSQL")
+    if script_equipment.exists():
+        try:
+            result = subprocess.run(
+                [sys.executable, str(script_equipment)],
+                cwd=project_root,
+                capture_output=True,
+                text=True
+            )
+            
+            if result.returncode == 0:
+                logger.info("✅ Equipamentos criados")
+            else:
+                logger.error(f"❌ Erro criando equipamentos: {result.stderr}")
+                return False
+        except Exception as e:
+            logger.error(f"❌ Exceção: {e}")
+            return False
+    
+    # PASSO 3B: Importar settings dos equipamentos
+    logger.info("\n📊 3B. Importando settings dos equipamentos...")
+    script_settings = project_root / "scripts" / "import_all_relay_params_universal.py"
+    
+    if not script_settings.exists():
+        logger.warning(f"⚠️  Script de settings não encontrado: {script_settings}")
         return True
     
     try:
         result = subprocess.run(
-            [sys.executable, str(script_path)],
+            [sys.executable, str(script_settings)],
             cwd=project_root,
             capture_output=True,
             text=True
         )
         
         if result.returncode == 0:
-            logger.info("✅ Importação concluída")
+            logger.info("✅ Settings importados")
             if result.stdout:
                 print(result.stdout)
             return True
         else:
-            logger.error(f"❌ Erro na importação: {result.stderr}")
+            logger.error(f"❌ Erro importando settings: {result.stderr}")
             if result.stderr:
                 print(result.stderr)
             return False

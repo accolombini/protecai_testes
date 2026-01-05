@@ -1,4 +1,0 @@
-2025-10-22 12:48:00,509 - ERROR - Erro ao conectar com PostgreSQL: connection to server at "localhost" (127.0.0.1), port 5432 failed: FATAL:  password authentication failed for user "postgres"
-
-2025-10-22 12:48:00,509 - ERROR - Falha na conexão com o banco
-2025-10-22 12:48:00,509 - INFO - Conexão com PostgreSQL fechada

@@ -857,7 +857,7 @@ class UniversalRobustRelayProcessor:
                     """, (
                         info['substation_code'],
                         f"Subestação {info['substation_code']}",
-                        info.get('location', 'Brasil')
+                        info.get('voltage_level', '138kV')  # voltage correto
                     ))
                     substation_id = cur.fetchone()[0]
                     logger.info(f"   🏢 Subestação: {info['substation_code']} (ID: {substation_id})")
@@ -867,12 +867,11 @@ class UniversalRobustRelayProcessor:
             if info['bay_code'] and substation_id:
                 with self.conn.cursor() as cur:
                     cur.execute("""
-                        SELECT protec_ai.get_or_create_bay(%s, %s, %s, %s)
+                        SELECT protec_ai.get_or_create_bay(%s, %s, %s)
                     """, (
                         info['bay_code'],
-                        info['voltage_level'],
                         substation_id,
-                        f"Bay {info['bay_code']}"
+                        info['voltage_level']  # p_bay_code, p_substation_id, p_voltage
                     ))
                     bay_id = cur.fetchone()[0]
                     logger.info(f"   🔌 Bay: {info['bay_code']} (ID: {bay_id})")
@@ -898,8 +897,69 @@ class UniversalRobustRelayProcessor:
                 equipment_id = cur.fetchone()[0]
                 self.equipment_created += 1
                 logger.info(f"✅ Equipamento criado: {equipment_tag} | Fabricante: {manufacturer_code} | Modelo: {model}")
+            
+            # 📊 IMPORTAR PARÂMETROS DO CSV PARA relay_settings
+            import pandas as pd
+            
+            try:
+                df = pd.read_csv(csv_path)
+                logger.info(f"   📄 CSV lido: {len(df)} linhas")
                 
-                return True
+                # DEBUG: Mostrar primeiros valores
+                if len(df) > 0:
+                    first_row = df.iloc[0]
+                    logger.info(f"   🔍 DEBUG primeira linha - Code: '{first_row.get('Code')}' | Value: '{first_row.get('Value')}' | Tipos: {type(first_row.get('Code'))} / {type(first_row.get('Value'))}")
+                
+                # Verificar se tem as colunas necessárias
+                if 'Code' not in df.columns or 'Value' not in df.columns:
+                    logger.warning(f"⚠️  CSV sem colunas Code/Value: {csv_path.name}")
+                    return True
+                
+                settings_imported = 0
+                settings_skipped = 0
+                
+                for _, row in df.iterrows():
+                    # Pegar valores como string diretamente
+                    parameter_code = str(row['Code']).strip()
+                    parameter_value = str(row['Value']).strip()
+                    parameter_name = str(row['Description']).strip()
+                    
+                    # DEBUG: Log primeira linha que for pular
+                    if settings_skipped == 0 and (not parameter_code or not parameter_value or parameter_value == 'nan'):
+                        logger.info(f"   🔍 DEBUG skip - Code: '{parameter_code}' (empty={not parameter_code}) | Value: '{parameter_value}' (empty={not parameter_value}, isnan={parameter_value == 'nan'})")
+                    
+                    # Pular apenas se realmente vazios (não verificar NaN pois já são strings)
+                    if not parameter_code or not parameter_value or parameter_value == 'nan':
+                        settings_skipped += 1
+                        continue
+                    
+                    try:
+                        with self.conn.cursor() as cur_insert:
+                            cur_insert.execute("""
+                                INSERT INTO protec_ai.relay_settings 
+                                (equipment_id, parameter_code, parameter_name, set_value, set_value_text)
+                                VALUES (%s, %s, %s, %s, %s)
+                            """, (
+                                equipment_id,
+                                parameter_code,
+                                parameter_name,
+                                parameter_value,
+                                parameter_value
+                            ))
+                            settings_imported += 1
+                    except Exception as e:
+                        # Log primeiro erro para diagnóstico
+                        if settings_skipped == 0:
+                            logger.warning(f"   ⚠️ ERRO SQL: {e} | Code: '{parameter_code}' | Value: '{parameter_value}'")
+                        settings_skipped += 1
+                
+                self.conn.commit()
+                logger.info(f"   📊 Settings importados: {settings_imported} | Ignorados: {settings_skipped}")
+                
+            except Exception as e:
+                logger.error(f"❌ Erro ao importar settings de {csv_path.name}: {e}")
+            
+            return True
                 
         except Exception as e:
             logger.error(f"❌ Erro processando {csv_path.name}: {e}")

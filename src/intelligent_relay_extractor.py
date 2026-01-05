@@ -156,7 +156,8 @@ class IntelligentRelayExtractor:
                         'modele': 'SEPAM_MODELE',      # Modelo do SEPAM
                         'mes': 'SEPAM_MES',            # Tipo de medição
                         'gamme': 'SEPAM_GAMME',        # Gama/família
-                        'typemat': 'SEPAM_TYPEMAT'     # Tipo de material
+                        'typemat': 'SEPAM_TYPEMAT',    # Tipo de material
+                        'tension_primaire_nominale': 'SEPAM_VOLTAGE_CLASS'  # Classe de tensão primária
                     }
                     
                     if param_name.lower() in metadata_map:

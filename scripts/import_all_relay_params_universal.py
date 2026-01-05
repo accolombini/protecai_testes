@@ -361,27 +361,60 @@ def processar_csv_para_settings(
                 parameter_name = info_glossario['name'] if info_glossario else description
                 unit = info_glossario['unit'] if info_glossario else ''
                 
-                # Inserir em relay_settings (usando schema correto)
+                # CORREÇÃO CRÍTICA: Detectar se valor é numérico ou texto
+                set_value_numeric = None
+                set_value_text = None
+                extracted_unit = None
+                
+                if value and str(value).strip():
+                    value_str = str(value).strip()
+                    
+                    # ⚠️ PROTEÇÃO: Máscaras binárias (>10 dígitos de 0/1) ficam em set_value_text
+                    import re
+                    if re.match(r'^[01]+$', value_str) and len(value_str) > 10:
+                        # Máscara binária de 32 bits - preservar como texto
+                        set_value_text = value_str
+                        extracted_unit = unit
+                    else:
+                        # Regex para extrair número + unidade (ex: "200", "4160V", "60Hz", "5.5A")
+                        match = re.match(r'^([+-]?\d+\.?\d*)\s*([A-Za-z%°]+)?$', value_str)
+                        
+                        if match:
+                            # Valor numérico encontrado
+                            set_value_numeric = float(match.group(1))
+                            extracted_unit = match.group(2) if match.group(2) else unit
+                        else:
+                            # Valor não-numérico (booleano, texto, etc.)
+                            set_value_text = value_str
+                            extracted_unit = unit
+                else:
+                    # Valor vazio
+                    set_value_text = value
+                    extracted_unit = unit
+                
+                # Inserir em relay_settings com campos corretos
                 try:
                     cursor.execute("""
                         INSERT INTO protec_ai.relay_settings (
                             equipment_id,
                             parameter_code,
                             parameter_name,
+                            set_value,
                             set_value_text,
                             unit_of_measure,
                             is_enabled,
                             created_at,
                             updated_at
                         ) VALUES (
-                            %s, %s, %s, %s, %s, %s, NOW(), NOW()
+                            %s, %s, %s, %s, %s, %s, %s, NOW(), NOW()
                         );
                     """, (
                         equipment_id,
                         code,
                         parameter_name,
-                        value,  # Usar set_value_text para todos os valores
-                        unit if unit else None,
+                        set_value_numeric,  # Valor numérico OU NULL
+                        set_value_text,     # Valor texto OU NULL
+                        extracted_unit if extracted_unit else None,
                         True  # Por padrão habilitado
                     ))
                     inseridos += 1

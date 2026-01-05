@@ -776,10 +776,6 @@ async def export_setpoints_report(
             LEFT JOIN protec_ai.units u ON rs.unit_id = u.id
             LEFT JOIN protec_ai.protection_functions pf ON rs.function_id = pf.id
             WHERE rs.is_active = true
-            AND (
-                rs.category IN ('PROTECTION', 'MEASUREMENT', 'CONTROL')
-                OR rs.parameter_name ~* '(pickup|delay|curve|setpoint|limit)'
-            )
             ORDER BY re.equipment_tag, rs.parameter_code
         """)
         
@@ -896,7 +892,17 @@ async def export_by_bay_report(
         
         query = text(f"""
             SELECT 
-                re.substation_name,
+                -- Extrair subestação do equipment_tag se substation_name vazio
+                COALESCE(
+                    NULLIF(re.substation_name, ''),
+                    CASE 
+                        WHEN re.equipment_tag ~ '^P\\d{{3}}_\\d{{3}}' THEN 
+                            SUBSTRING(re.equipment_tag FROM '_(\\d{{3}})-')
+                        WHEN re.equipment_tag ~ '^\\d{{2}}-' THEN 
+                            SUBSTRING(re.equipment_tag FROM '^(\\d{{2}})')
+                        ELSE 'N/A'
+                    END
+                ) as substation_name,
                 re.barra_nome,
                 re.voltage_level,
                 re.equipment_tag,
@@ -916,7 +922,7 @@ async def export_by_bay_report(
             GROUP BY re.id, re.substation_name, re.barra_nome, re.voltage_level, 
                      re.equipment_tag, f.nome_completo, rm.model_name, 
                      re.serial_number, re.status
-            ORDER BY re.substation_name, re.barra_nome, re.equipment_tag
+            ORDER BY substation_name, re.barra_nome, re.equipment_tag
         """)
         
         result = db.execute(query, params)
@@ -977,7 +983,9 @@ async def export_maintenance_report(
             LEFT JOIN protec_ai.relay_models rm ON re.relay_model_id = rm.id
             LEFT JOIN protec_ai.fabricantes f ON rm.manufacturer_id = f.id
             LEFT JOIN protec_ai.relay_settings rs ON rs.equipment_id = re.id
-            GROUP BY re.id, f.nome_completo, rm.model_name
+            GROUP BY re.id, re.equipment_tag, f.nome_completo, rm.model_name, 
+                     re.serial_number, re.barra_nome, re.status, 
+                     re.created_at, re.source_file
             ORDER BY re.created_at DESC, re.equipment_tag
         """)
         

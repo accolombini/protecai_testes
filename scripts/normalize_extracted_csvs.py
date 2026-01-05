@@ -206,10 +206,14 @@ class CSVNormalizer:
             logger.error(f"❌ Diretório não encontrado: {csv_dir}")
             return
         
-        csv_files = sorted(csv_dir.glob("*.csv"))
+        # IMPORTANTE: Normalizar APENAS arquivos _params.csv (não _active_setup.csv)
+        # _active_setup.csv são arquivos auxiliares com parâmetros ativos (feature útil)
+        # mas não devem ser normalizados nem importados para o banco
+        csv_files = sorted(csv_dir.glob("*_params.csv"))
         total_files = len(csv_files)
         
-        logger.info(f"📁 Encontrados {total_files} arquivos CSV")
+        logger.info(f"📁 Encontrados {total_files} arquivos _params.csv para normalizar")
+        logger.info(f"   (Ignorando arquivos _active_setup.csv - são auxiliares)")
         
         for idx, csv_file in enumerate(csv_files, 1):
             logger.info(f"\n[{idx}/{total_files}] Processando {csv_file.name}")

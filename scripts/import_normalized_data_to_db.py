@@ -583,7 +583,7 @@ class NormalizedDataImporter:
             return False
         
         # Listar arquivos CSV
-        csv_files = sorted(NORMALIZED_CSV_DIR.glob("*_normalized.csv"))
+        csv_files = sorted(NORMALIZED_CSV_DIR.glob("*.csv"))
         logger.info(f"\n📁 {len(csv_files)} arquivos CSV encontrados em {NORMALIZED_CSV_DIR}")
         
         if not csv_files:
