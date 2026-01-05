@@ -292,10 +292,22 @@ outputs/doc/MODELAGEM_DADOS.docx
 Direcionadores_PROTECAI.docx
 UTILITARIOS_PROTECAI.docx
 
-# SQL documentation files (keep only final versions)
-docs/
-# EXCEÇÃO: Manter docs de status organizacionais
+# ================================
+# ESTRUTURA ORGANIZADA DE DOCUMENTAÇÃO
+# Data: 05/01/2026
+# ================================
+
+# Permitir estrutura organizada de docs/
+!docs/
+!docs/sessions/
+!docs/roadmaps/
+!docs/sql/
+!docs/archives/
 !docs/status/
+
+# Ignorar apenas arquivos temporários em docs/
+docs/*.tmp
+docs/*_temp.*
 
 # ================================
 # NOVOS PATTERNS - ORGANIZAÇÃO 27/OUT/2025
